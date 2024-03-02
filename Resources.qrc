@@ -1,0 +1,42 @@
+<RCC>
+    <qresource prefix="/Data">
+        <file>Data/Menu/Battle.png</file>
+        <file>Data/Menu/Company.png</file>
+        <file>Data/Menu/Credits.png</file>
+        <file>Data/Menu/MainMenuTower.png</file>
+        <file>Data/Menu/MenuBoard.png</file>
+        <file>Data/Menu/Quit.png</file>
+        <file>Data/Cursor/Cursor.png</file>
+        <file>Data/Menu/Settings.png</file>
+        <file>Data/Locations/Borderlands/Location.xml</file>
+        <file>Data/Enemies/Ghost/Enemy.xml</file>
+        <file>Data/Menu/BattleBoard.png</file>
+        <file>Data/Menu/MenuProcessor.xml</file>
+        <file>Data/Menu/Back.png</file>
+        <file>Data/Locations/Borderlands/Borderlands.png</file>
+        <file>Data/Locations/Hell/Hell.png</file>
+        <file>Data/Locations/Hell/Location.xml</file>
+        <file>Data/Locations/Heaven/Heaven.png</file>
+        <file>Data/Menu/DefaultMapPreview.png</file>
+        <file>Data/Menu/Load.png</file>
+        <file>Data/Locations/Test/Test.png</file>
+        <file>Data/Locations/Test/Location.xml</file>
+        <file>Data/Game/InterfaceDesk.png</file>
+        <file>Data/Game/MinimapDesk.png</file>
+        <file>Data/Game/Show.png</file>
+        <file>Data/Game/Pause.png</file>
+        <file>Data/Game/Hide.png</file>
+        <file>Data/Game/ArrowLeft.png</file>
+        <file>Data/Game/ArrowRight.png</file>
+        <file>Data/Towers/Tower_000/Tower.png</file>
+        <file>Data/Towers/Tower_000/Tower.xml</file>
+        <file>Data/Towers/Tower_001/Fireball.png</file>
+        <file>Data/Towers/Tower_001/Tower.png</file>
+        <file>Data/Towers/Tower_000/TowerAllowBuilding.png</file>
+        <file>Data/Towers/Tower_000/TowerProhibitBuilding.png</file>
+        <file>Data/Towers/Tower_001/TowerAllowBuilding.png</file>
+        <file>Data/Towers/Tower_001/TowerProhibitBuilding.png</file>
+        <file>Data/Enemies/Ghost/Ghost.png</file>
+        <file>Data/Towers/Tower_000/Bullet.png</file>
+    </qresource>
+</RCC>

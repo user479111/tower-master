@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<params name="location">
+
+    <section name="main-info">
+        <attstr name="name" val="The borderlands"/>
+        <attnum name="width" val="2000"/>
+        <attnum name="height" val="1000"/>
+        <attstr name="image" val="Borderlands.png"/>
+
+        <!-- time-for-preparation in seconds -->
+        <attnum name="time-for-preparation" val="5"/>
+        <attnum name="enemy-damage-goal" val="5"/>
+    </section>
+
+    <section name="enemy-routes">
+        <section name="route" id="1">
+            <attpos x="950" y="-50"/>
+            <attpos x="950" y="450"/>
+            <attpos x="550" y="500"/>
+            <attpos x="50" y="1050"/>
+        </section>
+        <section name="route" id="2">
+            <attpos x="1050" y="-50"/>
+            <attpos x="1050" y="450"/>
+            <attpos x="1450" y="500"/>
+            <attpos x="1950" y="1050"/>
+        </section>
+    </section>
+
+    <section name="possible-build-positions">
+        <section name="polygon" id="1">
+            <attpos x="600" y="1000"/>
+            <attpos x="600" y="525"/>
+            <attpos x="1400" y="525"/>
+            <attpos x="1400" y="1000"/>
+            <attpos x="1250" y="1000"/>
+            <attpos x="1250" y="700"/>
+            <attpos x="750" y="700"/>
+            <attpos x="750" y="1000"/>
+        </section>
+        <section name="polygon" id="2">
+            <attpos x="100" y="100"/>
+            <attpos x="900" y="0"/>
+            <attpos x="900" y="350"/>
+            <attpos x="0" y="950"/>
+        </section>
+        <section name="polygon" id="3">
+            <attpos x="1900" y="100"/>
+            <attpos x="1100" y="0"/>
+            <attpos x="1100" y="350"/>
+            <attpos x="2000" y="950"/>
+        </section>
+    </section>
+
+    <section name="vawes">
+        <section name="vawe" id="1">
+            <attenemy type="ghost" route="1"/>
+            <attenemy type="ghost" route="2"/>
+            <attenemy type="ghost" route="1"/>
+            <attenemy type="ghost" route="2"/>
+            <attenemy type="ghost" route="1"/>
+            <attenemy type="ghost" route="2"/>
+        </section>
+        <section name="vawe" id="2">
+            <attenemy type="ghost" route="2"/>
+            <attenemy type="ghost" route="1"/>
+            <attenemy type="ghost" route="2"/>
+            <attenemy type="ghost" route="1"/>
+            <attenemy type="ghost" route="2"/>
+            <attenemy type="ghost" route="1"/>
+        </section>
+    </section>
+</params>
