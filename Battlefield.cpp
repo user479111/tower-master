@@ -119,7 +119,7 @@ bool Battlefield::eventFilter(QObject *obj, QEvent *event) {
             }
 
             // Scale all the enemies on the battlefield
-            for (auto enemyItem : location->getWaves().at(currentWaveIndex)->getGroupOfEnemies())
+            for (auto enemyItem : getGroupOfEnemies())
             {
                 enemyItem->setScale(scaleFactor);
             }
@@ -190,6 +190,11 @@ void Battlefield::addTower(QSharedPointer<Tower> newTower)
     scene->addItem(newTower.get());
 }
 
+const QList<Enemy*> &Battlefield::getGroupOfEnemies() const
+{
+    return location->getWaves().at(currentWaveIndex)->getGroupOfEnemies();
+}
+
 void Battlefield::processCursorMove()
 {
     if(!cursor->getBuildMode()) {
@@ -244,6 +249,9 @@ void Battlefield::startWaveMove()
 
     // Setup enemies for the wave
     location->getWaves().at(currentWaveIndex)->runEnemies(location);
+
+    // Emit signal to connect enemies with minimap
+    emit enemiesHaveBeenRun();
 
     // after the last enemy was killed
     // or reached the end of the route

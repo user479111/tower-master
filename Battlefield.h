@@ -10,6 +10,7 @@
 #include "Location.h"
 #include "Cursor.h"
 #include "Tower.h"
+#include "Enemy.h"
 
 #define MAX_SCALE 2
 
@@ -28,8 +29,11 @@ public:
 
     void addTower(QSharedPointer<Tower> newTower);
 
+    const QList<Enemy*> &getGroupOfEnemies() const;
+
 signals:
     void battlefieldScaled();
+    void enemiesHaveBeenRun();
 
 private slots:
     void processCursorMove();

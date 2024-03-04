@@ -57,7 +57,7 @@ void Wave::runEnemy()
         return;
     }
 
-    scene->addItem(groupOfEnemies.at(currentEnemyId).get());
+    scene->addItem(groupOfEnemies.at(currentEnemyId));
     groupOfEnemies.at(currentEnemyId)->run();
 
     currentEnemyId++;
@@ -114,10 +114,10 @@ void Wave::setupEnemiesFromXml(QString fileName,
             int route = xmlReader.attributes().value("route").toInt();
 
             // Create an enemy
-            QSharedPointer<Enemy> newEnemy(new Enemy(id, type, location->getEnemyRoutes().at(route)));
+            auto newEnemy = new Enemy(id, type, location->getEnemyRoutes().at(route));
             groupOfEnemies.append(newEnemy);
             // Be redy to handle enemy out of battle
-            QObject::connect(newEnemy.get(), &Enemy::outOfBattle, this, &Wave::processEnemyOut);
+            QObject::connect(newEnemy, &Enemy::outOfBattle, this, &Wave::processEnemyOut);
 
             xmlReader.skipCurrentElement();
         }
@@ -130,15 +130,22 @@ void Wave::setupEnemiesFromXml(QString fileName,
     file.close();
 }
 
-void Wave::processEnemyOut(int id)
+void Wave::processEnemyOut(Enemy * enemy)
 {
-    qDebug() << "Wave::processEnemyOut: " << id;
-    if (groupOfEnemies.at(id).get()) {
-        scene->removeItem(groupOfEnemies.at(id).get());
+    int enemyIndex = groupOfEnemies.indexOf(enemy);
+    qDebug() << "Wave::processEnemyOut: " << enemyIndex;
+    if (groupOfEnemies.at(enemyIndex)) {
+        scene->removeItem(groupOfEnemies.at(enemyIndex));
     }
 
     // Check if there any enemy is still running on the battlefield
     if (++enemiesOutOfBattleNum == groupOfEnemies.size()) {
+
+        // clean enemies memory
+        for (auto enemyItem : groupOfEnemies) {
+            delete enemyItem;
+        }
+
         groupOfEnemies.clear(); // clean enemies list;
         emit enemiesEnded();
         return;
@@ -149,7 +156,7 @@ void Wave::processEnemyOut(int id)
 
 }
 
-const QList<QSharedPointer<Enemy> > &Wave::getGroupOfEnemies() const
+const QList<Enemy*> &Wave::getGroupOfEnemies() const
 {
     return groupOfEnemies;
 }

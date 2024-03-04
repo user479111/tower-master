@@ -101,6 +101,7 @@ GameInterface::GameInterface(QSharedPointer<QGraphicsScene> scene,
 
     connect(buildTowerItem.get(), &MenuItem::clicked, this, &GameInterface::processBuildTowerClick);
 
+    // Setup ScrollForward button
     scrollForward->setTitle("scroll-forward");
     scrollForward->setPixmap(QString(":/Data/Data/Game/ArrowLeft.png"));
     scrollForward->setPos(QPointF(
@@ -112,6 +113,7 @@ GameInterface::GameInterface(QSharedPointer<QGraphicsScene> scene,
 
     connect(scrollForward.get(), &MenuItem::clicked, this, &GameInterface::processScrollForward);
 
+    // setup ScrollBackward button
     scrollBackward->setTitle("scroll-backward");
     scrollBackward->setPixmap(QString(":/Data/Data/Game/ArrowRight.png"));
     scrollBackward->setPos(QPointF(
@@ -122,6 +124,8 @@ GameInterface::GameInterface(QSharedPointer<QGraphicsScene> scene,
     scene->addItem(scrollBackward.get());
 
     connect(scrollBackward.get(), &MenuItem::clicked, this, &GameInterface::processScrollBackward);
+
+    connect(battlefield.get(), &Battlefield::enemiesHaveBeenRun, this, &GameInterface::connectMinimapWithEnemies);
 }
 
 GameInterface::~GameInterface()
@@ -160,26 +164,14 @@ void GameInterface::processScroll()
     minimapBoard->setY(scene->sceneRect().bottom() - minimapBoard->boundingRect().height() +
                        hide * (playerBoard->boundingRect().height() / 2));
 
-    int minimapDx = minimap->x();
-    int minimapDy = minimap->y();
-
-    minimap->setX(minimapBoard->x() +
-                    (minimapBoard->boundingRect().width() - minimap->boundingRect().width() * minimap->scale()) / 2);
-    minimap->setY(minimapBoard->y() +
-                    (minimapBoard->boundingRect().height() - minimap->boundingRect().height() * minimap->scale()) / 2);
-
-    minimapDx -= minimap->x();
-    minimapDy -= minimap->y();
+    minimap->setPos(QPointF(
+                       minimapBoard->x() + (minimapBoard->boundingRect().width() -
+                                            minimap->boundingRect().width() * minimap->scale()) / 2,
+                       minimapBoard->y() + (minimapBoard->boundingRect().height() -
+                                            minimap->boundingRect().height() * minimap->scale()) / 2));
 
     auto scenePosOnMap = battlefield->getLocation()->mapFromScene(scene->sceneRect().topLeft());
-
-    shownArea->setPos(minimap->x() + scenePosOnMap.x() * 0.1,
-                      minimap->y() + scenePosOnMap.y() * 0.1);
-
-    for (auto towerItem: towers) {
-        towerItem->setX(towerItem->pos().x() + minimapDx);
-        towerItem->setY(towerItem->pos().y() + minimapDy);
-    }
+    shownArea->setPos(minimap->pos() + scenePosOnMap * 0.1);
 
     playerBoard->setX(scene->sceneRect().left());
     playerBoard->setY(scene->sceneRect().bottom() - playerBoard->boundingRect().height() +
@@ -234,11 +226,10 @@ void GameInterface::processBattlefieldScale()
     // Update corresponding minimap parameters
     minimap->setMapScale(battlefield->getLocation()->scale());
 
-    auto scenePosOnMap = battlefield->getLocation()->mapFromScene(scene->sceneRect().topLeft());
 
     // Redraw shownArea on minimap
-    shownArea->setPos(minimap->x() + scenePosOnMap.x() * 0.1 /* move scale to xml */,
-                      minimap->y() + scenePosOnMap.y() * 0.1 /* move scale to xml */);
+    auto scenePosOnMap = battlefield->getLocation()->mapFromScene(scene->sceneRect().topLeft());
+    shownArea->setPos(minimap->pos() + scenePosOnMap * 0.1 /* move scale to xml */);
     shownArea->setScale(
                 (minimap->boundingRect().width() * 0.1 /* move scale to xml */ * scene->sceneRect().width() /
                  (battlefield->getLocation()->boundingRect().width() * battlefield->getLocation()->scale())) /
@@ -295,18 +286,12 @@ void GameInterface::processBuildingTower()
                                           battlefield->getLocation()));
 
     battlefield->addTower(tower);
-
-    QSharedPointer<QGraphicsRectItem>
-            towerRect(new QGraphicsRectItem(QRectF(
-                                                   minimap->x() + tower->pos().x() * 0.1,
-                                                   minimap->y() + tower->pos().y() * 0.1,
-                                                   0.1 /* TODO */ * tower->boundingRect().width(),
-                                                   0.1 /* TODO */ * tower->boundingRect().height())));
-
-    towerRect->setBrush(QBrush(QColor(0, 255, 0)));
-    towerRect->setZValue(1);
-    scene->addItem(towerRect.get());
-    towers.append(towerRect);
+    minimap->addTower(tower.get());
 
     disconnect(cursor.get(), &Cursor::mousePressed, this, &GameInterface::processBuildingTower);
+}
+
+void GameInterface::connectMinimapWithEnemies()
+{
+    minimap->connectWithEenemies(battlefield->getGroupOfEnemies());
 }

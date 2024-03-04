@@ -32,12 +32,11 @@ public:
     int getId() const;
     void setId(int newId);
 
-
-    const QList<QSharedPointer<Enemy> > &getGroupOfEnemies() const;
+    const QList<Enemy*> &getGroupOfEnemies() const;
 
 private slots:
     void runEnemy();
-    void processEnemyOut(int id);
+    void processEnemyOut(Enemy * enemy);
 
 signals:
     void enemiesEnded();
@@ -47,7 +46,7 @@ private:
     int interval;   // Intercal between this and next wave in seconds
     float dencity;  // Dencity of the wawe [0.1 .. 1]
 
-    QList<QSharedPointer<Enemy>> groupOfEnemies;
+    QList<Enemy*> groupOfEnemies;
     int currentEnemyId; // Id of the enemy that is processed
     int enemiesOutOfBattleNum; // Number of enemies that are already out of battle
 

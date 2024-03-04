@@ -44,7 +44,8 @@ private slots:
     void moveForward();
 
 signals:
-    void outOfBattle(int id);
+    void outOfBattle(Enemy * enemy);
+    void moved(Enemy * enemy);
 
 private:
     int id;

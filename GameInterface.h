@@ -35,6 +35,7 @@ private slots:
     void processScrollForward();
     void processScrollBackward();
     void processBuildingTower();
+    void connectMinimapWithEnemies();
 
 signals:
     void mainMenuSignal();
@@ -47,8 +48,6 @@ private:
     QSharedPointer<QGraphicsPixmapItem> minimapBoard;
     QSharedPointer<Minimap> minimap;
     QSharedPointer<QGraphicsRectItem> shownArea;
-    QList<QSharedPointer<QGraphicsRectItem>> towers;
-    QList<QSharedPointer<QGraphicsRectItem>> enemies;
 
     // TODO: realize as PlayerMenu class
     QSharedPointer<QGraphicsPixmapItem> playerBoard;

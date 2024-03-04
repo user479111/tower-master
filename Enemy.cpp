@@ -28,6 +28,7 @@ Enemy::Enemy(int id,
 
 Enemy::~Enemy()
 {
+    qDebug() << "Enemy::~Enemy";
 }
 
 void Enemy::loadXmlParameters(QString inFileName)
@@ -111,6 +112,8 @@ void Enemy::moveForward()
 
     setPos(pos().x() + stepSize * cos(qDegreesToRadians(-1 * line.angle())),
            pos().y() + stepSize * sin(qDegreesToRadians(-1 * line.angle())));
+
+    emit moved(this);
 }
 
 int Enemy::getSpeed() const
@@ -146,7 +149,7 @@ void Enemy::prepareForRemoval()
     timerMove.stop();
     disconnect(&timerMove, SIGNAL(timeout()), this, SLOT(moveForward()));
 
-    emit outOfBattle(id);
+    emit outOfBattle(this);
 }
 
 int Enemy::getId() const
