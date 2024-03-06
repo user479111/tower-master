@@ -8,7 +8,7 @@
 
 Enemy::Enemy(int id,
              const QString &type,
-             const QSharedPointer<QGraphicsPathItem> route) :
+             const QGraphicsPathItem * route) :
     id(id),
     type(type),
     route(route),
@@ -93,7 +93,7 @@ void Enemy::setRotation(qreal angle)
 
 void Enemy::moveForward()
 {
-    // if close to dest rotate to next dest
+    // If close to dest rotate to next dest
     QLineF line(mapToScene(boundingRect().center()),
                 route->path().elementAt(currentDestinationIndex) * route->scale());
     if (line.length() < stepSize) {
@@ -111,6 +111,8 @@ void Enemy::moveForward()
 
     setPos(pos().x() + stepSize * cos(qDegreesToRadians(-1 * line.angle())),
            pos().y() + stepSize * sin(qDegreesToRadians(-1 * line.angle())));
+
+    emit moved(this);
 }
 
 int Enemy::getSpeed() const
@@ -146,7 +148,8 @@ void Enemy::prepareForRemoval()
     timerMove.stop();
     disconnect(&timerMove, SIGNAL(timeout()), this, SLOT(moveForward()));
 
-    emit outOfBattle(id);
+    emit outOfBattleForMinimap(this); // Allow removal of the enemy from the Minimap
+    emit outOfBattleForWave(this);    // Before it will be completely removed in the Wave
 }
 
 int Enemy::getId() const

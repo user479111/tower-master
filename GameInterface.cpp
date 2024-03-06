@@ -4,11 +4,11 @@
 #include <QDir>
 #include <QDebug>
 
-GameInterface::GameInterface(QSharedPointer<QGraphicsScene> scene,
-                             QSharedPointer<Cursor> cursor,
-                             QSharedPointer<Battlefield> battlefield,
-                             QSharedPointer<QObject> parent) :
-    QObject(parent.get()),
+GameInterface::GameInterface(QGraphicsScene * scene,
+                             Cursor * cursor,
+                             Battlefield * battlefield,
+                             QObject * parent) :
+    QObject(parent),
     scene(scene),
     cursor(cursor),
     battlefield(battlefield),
@@ -20,50 +20,49 @@ GameInterface::GameInterface(QSharedPointer<QGraphicsScene> scene,
     scrollBackward(new MenuItem()),
     hide(false)
 {
-    qDebug() << "GameInterface::GameInterface";
     cursor->setScrollAreaRect(battlefield->getLocation()->mapRectToScene(battlefield->getLocation()->boundingRect()));
 
-    connect(cursor.get(), &Cursor::areaScrolled, this, &GameInterface::processScroll);
+    connect(cursor, &Cursor::areaScrolled, this, &GameInterface::processScroll);
 
     // show minimap board
-    minimapBoard = QSharedPointer<QGraphicsPixmapItem>(new QGraphicsPixmapItem(QPixmap(":/Data/Data/Game/MinimapDesk.png"))); // all the paths should be written somewhere
+    minimapBoard = new QGraphicsPixmapItem(QPixmap(":/Data/Data/Game/MinimapDesk.png")); // all the paths should be written somewhere
     minimapBoard->setX(scene->sceneRect().right() - minimapBoard->boundingRect().width());
     minimapBoard->setY(scene->sceneRect().bottom() - minimapBoard->boundingRect().height());
     minimapBoard->setZValue(1);
-    scene->addItem(minimapBoard.get());
+    scene->addItem(minimapBoard);
 
     // show minimap
-    minimap = QSharedPointer<Minimap>(new Minimap(scene, QPixmap(battlefield->getLocation()->getLocationImagePath())));
+    minimap = new Minimap(QPixmap(battlefield->getLocation()->getLocationImagePath()));
     minimap->setScale(0.1); // TODO: xml
     minimap->setX(minimapBoard->x() +
                     (minimapBoard->boundingRect().width() - minimap->boundingRect().width() * minimap->scale()) / 2);
     minimap->setY(minimapBoard->y() +
                     (minimapBoard->boundingRect().height() - minimap->boundingRect().height() * minimap->scale()) / 2);
     minimap->setZValue(1);
-    scene->addItem(minimap.get());
+    scene->addItem(minimap);
 
     // process press on minimap
-    connect(minimap.get(), &Minimap::mousePressed, this, &GameInterface::processPressEvent);
+    connect(minimap, &Minimap::mousePressed, this, &GameInterface::processPressEvent);
 
     // draw shown area on minimap
-    shownArea = QSharedPointer<QGraphicsRectItem>(new QGraphicsRectItem(0, 0, scene->sceneRect().width() * 0.1,
-                                            scene->sceneRect().height() * 0.1));
+    shownArea = new QGraphicsRectItem(0, 0, scene->sceneRect().width() * 0.1,
+                                            scene->sceneRect().height() * 0.1);
     shownArea->setPos(minimap->x() + scene->sceneRect().x()* 0.1,
                       minimap->y() + scene->sceneRect().y()* 0.1);
     shownArea->setZValue(1);
     shownArea->setBrush(Qt::transparent); // Set the fill color
     shownArea->setPen(QPen(Qt::red));
-    scene->addItem(shownArea.get());
+    scene->addItem(shownArea);
 
     // process map scale
-    connect(battlefield.get(), &Battlefield::battlefieldScaled, this, &GameInterface::processBattlefieldScale);
+    connect(battlefield, &Battlefield::battlefieldScaled, this, &GameInterface::processBattlefieldScale);
 
     // show player board
-    playerBoard = QSharedPointer<QGraphicsPixmapItem>(new QGraphicsPixmapItem(QPixmap(":/Data/Data/Game/MinimapDesk.png"))); // all the paths should be written somewhere
+    playerBoard = new QGraphicsPixmapItem(QPixmap(":/Data/Data/Game/MinimapDesk.png")); // all the paths should be written somewhere
     playerBoard->setX(scene->sceneRect().left());
     playerBoard->setY(scene->sceneRect().bottom() - playerBoard->boundingRect().height());
     playerBoard->setZValue(1);
-    scene->addItem(playerBoard.get());
+    scene->addItem(playerBoard);
 
     // setup pause menu button
     pauseMenu->setTitle("pause");
@@ -72,9 +71,9 @@ GameInterface::GameInterface(QSharedPointer<QGraphicsScene> scene,
         playerBoard->x() + (playerBoard->boundingRect().width() - pauseMenu->boundingRect().width() * 2) / 3,
         playerBoard->y() + pauseMenu->boundingRect().height() * 0.5));
     pauseMenu->setZValue(1);
-    scene->addItem(pauseMenu.get());
+    scene->addItem(pauseMenu);
 
-    connect(pauseMenu.get(), &MenuItem::clicked, this, &GameInterface::processPauseClick);
+    connect(pauseMenu, &MenuItem::clicked, this, &GameInterface::processPauseClick);
 
     // setup hide menu button
     hidePanels->setTitle("hide");
@@ -84,9 +83,9 @@ GameInterface::GameInterface(QSharedPointer<QGraphicsScene> scene,
                            (playerBoard->boundingRect().width() - hidePanels->boundingRect().width() * 2) / 3,
         playerBoard->y() + hidePanels->boundingRect().height() / 2));
     hidePanels->setZValue(1);
-    scene->addItem(hidePanels.get());
+    scene->addItem(hidePanels);
 
-    connect(hidePanels.get(), &MenuItem::clicked, this, &GameInterface::processHideClick);
+    connect(hidePanels, &MenuItem::clicked, this, &GameInterface::processHideClick);
 
     // setup build tower icon
     towersTypes = QDir(":/Data/Data/Towers/").entryList(QDir::Dirs | QDir::NoDotAndDotDot);
@@ -97,10 +96,11 @@ GameInterface::GameInterface(QSharedPointer<QGraphicsScene> scene,
         playerBoard->y() + playerBoard->boundingRect().height() / 2 - buildTowerItem->boundingRect().height() / 2));
     buildTowerItem->setZValue(1);
     buildTowerItem->setStaticSize(true);
-    scene->addItem(buildTowerItem.get());
+    scene->addItem(buildTowerItem);
 
-    connect(buildTowerItem.get(), &MenuItem::clicked, this, &GameInterface::processBuildTowerClick);
+    connect(buildTowerItem, &MenuItem::clicked, this, &GameInterface::processBuildTowerClick);
 
+    // Setup ScrollForward button
     scrollForward->setTitle("scroll-forward");
     scrollForward->setPixmap(QString(":/Data/Data/Game/ArrowLeft.png"));
     scrollForward->setPos(QPointF(
@@ -108,10 +108,11 @@ GameInterface::GameInterface(QSharedPointer<QGraphicsScene> scene,
         playerBoard->y() + playerBoard->boundingRect().height() / 2 - scrollForward->boundingRect().height() / 2));
     scrollForward->setZValue(1);
     scrollForward->setStaticSize(true);
-    scene->addItem(scrollForward.get());
+    scene->addItem(scrollForward);
 
-    connect(scrollForward.get(), &MenuItem::clicked, this, &GameInterface::processScrollForward);
+    connect(scrollForward, &MenuItem::clicked, this, &GameInterface::processScrollForward);
 
+    // setup ScrollBackward button
     scrollBackward->setTitle("scroll-backward");
     scrollBackward->setPixmap(QString(":/Data/Data/Game/ArrowRight.png"));
     scrollBackward->setPos(QPointF(
@@ -119,31 +120,32 @@ GameInterface::GameInterface(QSharedPointer<QGraphicsScene> scene,
         playerBoard->y() + playerBoard->boundingRect().height() / 2 - scrollBackward->boundingRect().height() / 2));
     scrollBackward->setStaticSize(true);
     scrollBackward->setZValue(1);
-    scene->addItem(scrollBackward.get());
+    scene->addItem(scrollBackward);
 
-    connect(scrollBackward.get(), &MenuItem::clicked, this, &GameInterface::processScrollBackward);
+    connect(scrollBackward, &MenuItem::clicked, this, &GameInterface::processScrollBackward);
+
+    connect(battlefield, &Battlefield::enemiesHaveBeenRun, this, &GameInterface::connectMinimapWithEnemies);
 }
 
 GameInterface::~GameInterface()
 {
-    qDebug() << "GameInterface::~GameInterface";
-    scene->removeItem(minimapBoard.get());
+    delete minimapBoard;
 
-    scene->removeItem(minimap.get());
+    delete minimap;
 
-    scene->removeItem(shownArea.get());
+    delete shownArea;
 
-    scene->removeItem(playerBoard.get());
+    delete playerBoard;
 
-    scene->removeItem(pauseMenu.get());
+    delete pauseMenu;
 
-    scene->removeItem(hidePanels.get());
+    delete hidePanels;
 
-    scene->removeItem(buildTowerItem.get());
+    delete buildTowerItem;
 
-    scene->removeItem(scrollForward.get());
+    delete scrollForward;
 
-    scene->removeItem(scrollBackward.get());
+    delete scrollBackward;
 
     auto sceneRect = scene->sceneRect();
     sceneRect.translate(-scene->sceneRect().left(), -scene->sceneRect().top());
@@ -160,26 +162,14 @@ void GameInterface::processScroll()
     minimapBoard->setY(scene->sceneRect().bottom() - minimapBoard->boundingRect().height() +
                        hide * (playerBoard->boundingRect().height() / 2));
 
-    int minimapDx = minimap->x();
-    int minimapDy = minimap->y();
-
-    minimap->setX(minimapBoard->x() +
-                    (minimapBoard->boundingRect().width() - minimap->boundingRect().width() * minimap->scale()) / 2);
-    minimap->setY(minimapBoard->y() +
-                    (minimapBoard->boundingRect().height() - minimap->boundingRect().height() * minimap->scale()) / 2);
-
-    minimapDx -= minimap->x();
-    minimapDy -= minimap->y();
+    minimap->setPos(QPointF(
+                       minimapBoard->x() + (minimapBoard->boundingRect().width() -
+                                            minimap->boundingRect().width() * minimap->scale()) / 2,
+                       minimapBoard->y() + (minimapBoard->boundingRect().height() -
+                                            minimap->boundingRect().height() * minimap->scale()) / 2));
 
     auto scenePosOnMap = battlefield->getLocation()->mapFromScene(scene->sceneRect().topLeft());
-
-    shownArea->setPos(minimap->x() + scenePosOnMap.x() * 0.1,
-                      minimap->y() + scenePosOnMap.y() * 0.1);
-
-    for (auto towerItem: towers) {
-        towerItem->setX(towerItem->pos().x() + minimapDx);
-        towerItem->setY(towerItem->pos().y() + minimapDy);
-    }
+    shownArea->setPos(minimap->pos() + scenePosOnMap * 0.1);
 
     playerBoard->setX(scene->sceneRect().left());
     playerBoard->setY(scene->sceneRect().bottom() - playerBoard->boundingRect().height() +
@@ -234,11 +224,10 @@ void GameInterface::processBattlefieldScale()
     // Update corresponding minimap parameters
     minimap->setMapScale(battlefield->getLocation()->scale());
 
-    auto scenePosOnMap = battlefield->getLocation()->mapFromScene(scene->sceneRect().topLeft());
 
     // Redraw shownArea on minimap
-    shownArea->setPos(minimap->x() + scenePosOnMap.x() * 0.1 /* move scale to xml */,
-                      minimap->y() + scenePosOnMap.y() * 0.1 /* move scale to xml */);
+    auto scenePosOnMap = battlefield->getLocation()->mapFromScene(scene->sceneRect().topLeft());
+    shownArea->setPos(minimap->pos() + scenePosOnMap * 0.1 /* move scale to xml */);
     shownArea->setScale(
                 (minimap->boundingRect().width() * 0.1 /* move scale to xml */ * scene->sceneRect().width() /
                  (battlefield->getLocation()->boundingRect().width() * battlefield->getLocation()->scale())) /
@@ -265,7 +254,7 @@ void GameInterface::processBuildTowerClick()
 {
     cursor->setBuildMode(true, towersTypes[currentTowerItem], battlefield->getLocation()->scale());
 
-    connect(cursor.get(), &Cursor::mousePressed, this, &GameInterface::processBuildingTower);
+    connect(cursor, &Cursor::mousePressed, this, &GameInterface::processBuildingTower);
 }
 
 void GameInterface::processScrollForward()
@@ -290,23 +279,15 @@ void GameInterface::processBuildingTower()
 
     cursor->setBuildMode(false);
 
-    QSharedPointer<Tower> tower(new Tower(towersTypes[currentTowerItem],
-                                          cursor->pos(),
-                                          battlefield->getLocation()));
+    Tower * tower = new Tower(towersTypes[currentTowerItem], cursor->pos(), battlefield->getLocation());
 
     battlefield->addTower(tower);
+    minimap->addTower(tower);
 
-    QSharedPointer<QGraphicsRectItem>
-            towerRect(new QGraphicsRectItem(QRectF(
-                                                   minimap->x() + tower->pos().x() * 0.1,
-                                                   minimap->y() + tower->pos().y() * 0.1,
-                                                   0.1 /* TODO */ * tower->boundingRect().width(),
-                                                   0.1 /* TODO */ * tower->boundingRect().height())));
+    disconnect(cursor, &Cursor::mousePressed, this, &GameInterface::processBuildingTower);
+}
 
-    towerRect->setBrush(QBrush(QColor(0, 255, 0)));
-    towerRect->setZValue(1);
-    scene->addItem(towerRect.get());
-    towers.append(towerRect);
-
-    disconnect(cursor.get(), &Cursor::mousePressed, this, &GameInterface::processBuildingTower);
+void GameInterface::connectMinimapWithEnemies()
+{
+    minimap->connectWithEenemies(battlefield->getGroupOfEnemies());
 }

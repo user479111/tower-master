@@ -3,7 +3,6 @@
 
 #include <QGraphicsPixmapItem>
 #include <QGraphicsPathItem>
-#include <QSharedPointer>
 #include <QObject>
 #include <QPointF>
 #include <QString>
@@ -18,7 +17,7 @@ class Enemy : public QObject, public QGraphicsPixmapItem
 public:
     Enemy(int id,
           const QString &type,
-          const QSharedPointer<QGraphicsPathItem> route);
+          const QGraphicsPathItem * route);
     ~Enemy();
 
     const QString &getType() const;
@@ -44,14 +43,16 @@ private slots:
     void moveForward();
 
 signals:
-    void outOfBattle(int id);
+    void outOfBattleForMinimap(Enemy * enemy);
+    void outOfBattleForWave(Enemy * enemy);
+    void moved(Enemy * enemy);
 
 private:
     int id;
     QString type;
-    QSharedPointer<QGraphicsPathItem> route;
-    int speed;  // pixels per second
-    int stepSize;   // step size per timer interval
+    const QGraphicsPathItem * route;
+    int speed;    // Pixels per second
+    int stepSize; // Step size per timer interval
     int currentDestinationIndex;
     float angle;
 

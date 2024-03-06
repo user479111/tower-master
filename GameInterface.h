@@ -19,10 +19,10 @@ class GameInterface : public QObject
 {
     Q_OBJECT
 public:
-    explicit GameInterface(QSharedPointer<QGraphicsScene> scene,
-                           QSharedPointer<Cursor> cursor,
-                           QSharedPointer<Battlefield> battlefield,
-                           QSharedPointer<QObject> parent = nullptr);
+    explicit GameInterface(QGraphicsScene * scene,
+                           Cursor * cursor,
+                           Battlefield * battlefield,
+                           QObject * parent = nullptr);
     ~GameInterface();
 
 private slots:
@@ -35,30 +35,29 @@ private slots:
     void processScrollForward();
     void processScrollBackward();
     void processBuildingTower();
+    void connectMinimapWithEnemies();
 
 signals:
     void mainMenuSignal();
 
 private:
-    QSharedPointer<QGraphicsScene> scene;
-    QSharedPointer<Cursor> cursor;
-    QSharedPointer<Battlefield> battlefield;
+    QGraphicsScene * scene;
+    Cursor * cursor;
+    Battlefield * battlefield;
 
-    QSharedPointer<QGraphicsPixmapItem> minimapBoard;
-    QSharedPointer<Minimap> minimap;
-    QSharedPointer<QGraphicsRectItem> shownArea;
-    QList<QSharedPointer<QGraphicsRectItem>> towers;
-    QList<QSharedPointer<QGraphicsRectItem>> enemies;
+    QGraphicsPixmapItem * minimapBoard;
+    Minimap * minimap;
+    QGraphicsRectItem * shownArea;
 
     // TODO: realize as PlayerMenu class
-    QSharedPointer<QGraphicsPixmapItem> playerBoard;
-    QSharedPointer<MenuItem> pauseMenu;
-    QSharedPointer<MenuItem> hidePanels;
-    QSharedPointer<MenuItem> buildTowerItem;
+    QGraphicsPixmapItem * playerBoard;
+    MenuItem * pauseMenu;
+    MenuItem * hidePanels;
+    MenuItem * buildTowerItem;
     int currentTowerItem;
     QStringList towersTypes;
-    QSharedPointer<MenuItem> scrollForward;
-    QSharedPointer<MenuItem> scrollBackward;
+    MenuItem * scrollForward;
+    MenuItem * scrollBackward;
 
     //PauseMenu * pauseMenu;
     //QGraphicsPixmapItem * pauseMenuBoard; <- inside PauseMenu

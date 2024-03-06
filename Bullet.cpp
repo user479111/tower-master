@@ -24,7 +24,6 @@ Bullet::Bullet(Bullet &bulletPatern) :
 
 Bullet::~Bullet()
 {
-    qDebug() << "Bullet::~Bullet";
 }
 
 void Bullet::move()
@@ -52,26 +51,26 @@ void Bullet::move()
         }
     }
 
-    // mark the bullet if it crossed the scene bounds
+    // Mark the bullet if it crossed the scene bounds
     outOfBattle = location->boundingRect().left() > pos().x() ||
             location->boundingRect().right() * location->scale() < pos().x() ||
             location->boundingRect().top() > pos().y() ||
             location->boundingRect().bottom() * location->scale() < pos().y();
 }
 
-QSharedPointer<Location> Bullet::getLocation() const
+const Location *Bullet::getLocation() const
 {
     return location;
 }
 
-void Bullet::setLocation(QSharedPointer<Location> newLocation)
+void Bullet::setLocation(const Location *newLocation)
 {
     location = newLocation;
 }
 
 void Bullet::shot()
 {
-    // connect timer to move()
+    // Connect timer to move()
     connect(&moveTimer, SIGNAL(timeout()), this, SLOT(move()));
     moveTimer.start(ENEMY_TIMER_INTERVAL);
 }

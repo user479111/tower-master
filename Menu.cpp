@@ -11,6 +11,12 @@ Menu::Menu() :
 
 Menu::~Menu()
 {
+    delete board;
+
+    for (auto item : listOfItems) {
+        delete item;
+    }
+    listOfItems.clear();
 }
 
 const QString &Menu::getBackgroundImage() const
@@ -35,17 +41,17 @@ void Menu::setBoardImage(const QString &newBoardImage)
     board->setPixmap(":/Data/Data/Menu/" + boardImage);
 }
 
-void Menu::addNewItem(QSharedPointer<MenuItem> newItem)
+void Menu::addNewItem(MenuItem * newItem)
 {
     listOfItems.append(newItem);
 }
 
-QSharedPointer<QGraphicsPixmapItem> Menu::getBoard() const
+QGraphicsPixmapItem* Menu::getBoard() const
 {
     return board;
 }
 
-const QList<QSharedPointer<MenuItem>> &Menu::getListOfItems() const
+const QList<MenuItem*> &Menu::getListOfItems() const
 {
     return listOfItems;
 }

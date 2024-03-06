@@ -4,7 +4,6 @@
 #include <QList>
 #include <QPointF>
 #include <QGraphicsItem>
-#include <QSharedPointer>
 
 #include "MenuItem.h"
 
@@ -14,8 +13,8 @@ public:
     Menu();
     ~Menu();
 
-    virtual void show(QSharedPointer<QGraphicsScene> scene) = 0;
-    virtual void hide(QSharedPointer<QGraphicsScene> scene) = 0;
+    virtual void show(QGraphicsScene * scene) = 0;
+    virtual void hide(QGraphicsScene * scene) = 0;
 
     const QString transition();
 
@@ -25,16 +24,16 @@ public:
     const QString &getBoardImage() const;
     void setBoardImage(const QString &newBoardImage);
 
-    void addNewItem(QSharedPointer<MenuItem> newItem);
+    void addNewItem(MenuItem * newItem);
 
-    QSharedPointer<QGraphicsPixmapItem> getBoard() const;
+    QGraphicsPixmapItem * getBoard() const;
 
-    const QList<QSharedPointer<MenuItem>> &getListOfItems() const;
+    const QList<MenuItem*> &getListOfItems() const;
 
 private:
-    QList<QSharedPointer<MenuItem>> listOfItems;
+    QList<MenuItem*> listOfItems;
     QString backgroundImage;
-    QSharedPointer<QGraphicsPixmapItem> board;
+    QGraphicsPixmapItem * board;
     QString boardImage;
 };
 

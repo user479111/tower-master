@@ -4,7 +4,7 @@
 #include <QTextStream>
 #include <QDebug>
 
-MenuProcessor::MenuProcessor(QSharedPointer<QGraphicsScene> scene) :
+MenuProcessor::MenuProcessor(QGraphicsScene * scene) :
     scene(scene),
     baseMenu(new BaseMenu()),
     battleMenu(new BattleMenu()),
@@ -25,6 +25,8 @@ MenuProcessor::MenuProcessor(QSharedPointer<QGraphicsScene> scene) :
 
 MenuProcessor::~MenuProcessor()
 {
+    delete baseMenu;
+    delete battleMenu;
 }
 
 void MenuProcessor::loadXmlParameters(QString inFileName)
@@ -42,7 +44,7 @@ void MenuProcessor::loadXmlParameters(QString inFileName)
     auto root = MenuProcessorXml.documentElement();
     auto node = root.firstChild().toElement();
 
-    QSharedPointer<Menu> processedMenu;
+    Menu * processedMenu;
 
     while(!node.isNull())
     {
@@ -85,7 +87,7 @@ void MenuProcessor::loadXmlParameters(QString inFileName)
                         continue;
                     }
 
-                    QSharedPointer<MenuItem> newItem = QSharedPointer<MenuItem>(new MenuItem());
+                    MenuItem * newItem = new MenuItem();
 
                     newItem->setTitle(menuItemName);
 
@@ -99,8 +101,6 @@ void MenuProcessor::loadXmlParameters(QString inFileName)
 
                             // Set item's source image
                             if (QString(currentElement.attribute("name")).contains("image")) {
-                                qDebug() << "image: " << QString(currentElement.attributes().namedItem("val").nodeValue());
-
                                 newItem->setPixmap(":/Data/Data/Menu/" + QString(currentElement.attributes().namedItem("val").nodeValue()));
                             }
 
@@ -125,7 +125,7 @@ void MenuProcessor::loadXmlParameters(QString inFileName)
                     }
 
 
-                    connect(newItem.get(), &MenuItem::clicked, this, &MenuProcessor::processItemClick);
+                    connect(newItem, &MenuItem::clicked, this, &MenuProcessor::processItemClick);
 
                     processedMenu->addNewItem(newItem);
                 }
@@ -318,7 +318,7 @@ void MenuProcessor::processItemClick()
 
     currentMenu->hide(scene);
 
-    if (dynamic_cast<BaseMenu*>(currentMenu.get())) {
+    if (dynamic_cast<BaseMenu*>(currentMenu)) {
 
         if (currentMenu->transition() == "company") {
             // Process CompanyMenu class.
@@ -337,7 +337,7 @@ void MenuProcessor::processItemClick()
             qDebug() << "Incorrect transition: " << currentMenu->transition();
         }
 
-    } else if (dynamic_cast<BattleMenu*>(currentMenu.get())) {
+    } else if (dynamic_cast<BattleMenu*>(currentMenu)) {
 
         if (currentMenu->transition() == "back") {
             currentMenu = baseMenu;

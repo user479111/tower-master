@@ -2,7 +2,6 @@
 #define TOWER_H
 
 #include <QGraphicsPixmapItem>
-#include <QSharedPointer>
 #include <QObject>
 #include <QPointF>
 #include <QString>
@@ -20,12 +19,12 @@ class Tower : public QObject, public QGraphicsPixmapItem
 public:
     Tower(const QString &type,
           const QPointF &center,
-          const QSharedPointer<Location> location);
+          const Location * location);
     ~Tower();
 
     const QString &getType() const;
 
-    const QList<QSharedPointer<Bullet> > &getBullets() const;
+    const QList<Bullet*> &getBullets() const;
 
     void setAttackSpeed(float newAttackSpeed);
 
@@ -38,14 +37,14 @@ public slots:
     void clearBullets();
 
 private:
-    QSharedPointer<Location> location;
-    QSharedPointer<QGraphicsPolygonItem> attackArea;
+    const Location * location;
+    QGraphicsPolygonItem * attackArea;
     QPointF attackDestination;
 
     QString type;
 
     Bullet bulletPatern;
-    QList<QSharedPointer<Bullet>> bullets;
+    QList<Bullet*> bullets;
 
     float attackSpeed;
 };

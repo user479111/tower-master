@@ -5,7 +5,6 @@
 #include <QGraphicsPolygonItem>
 #include <QGraphicsPathItem>
 #include <QGraphicsScene>
-#include <QSharedPointer>
 #include <QPolygon>
 #include <QList>
 #include <QPen>
@@ -17,8 +16,7 @@ class Wave;
 class Location : public QGraphicsPixmapItem
 {
 public:
-    Location(QString name,
-             QSharedPointer<QGraphicsScene> scene);
+    Location(QGraphicsScene * scene, QString name);
     ~Location();
 
     int getWidth() const;
@@ -27,13 +25,13 @@ public:
 
     const QString &getLocationImagePath() const;
 
-    const QList<QSharedPointer<QGraphicsPolygonItem> > &getBuildAreas() const;
+    const QList<QGraphicsPolygonItem*> &getBuildAreas() const;
 
-    const QList<QSharedPointer<QGraphicsPathItem> > &getEnemyRoutes() const;
+    const QList<QGraphicsPathItem*> &getEnemyRoutes() const;
 
     short getTimeForPreparation() const;
 
-    const QList<QSharedPointer<Wave>> &getWaves() const;
+    const QList<Wave*> &getWaves() const;
 
     const QString &getName() const;
 
@@ -41,6 +39,8 @@ private:
     void loadXmlParameters(QString inFileName);
 
 private:
+    QGraphicsScene * scene;
+
     QString name;
     QString locationImage;
     QString locationImagePath;
@@ -48,11 +48,9 @@ private:
     int height;
     int timeForPreparation;
 
-    QList<QSharedPointer<QGraphicsPolygonItem>> buildAreas;
-    QList<QSharedPointer<QGraphicsPathItem>> enemyRoutes;
-    QList<QSharedPointer<Wave>> waves;
-
-    QSharedPointer<QGraphicsScene> scene;
+    QList<QGraphicsPolygonItem*> buildAreas;
+    QList<QGraphicsPathItem*> enemyRoutes;
+    QList<Wave*> waves;
 };
 
 #endif // LOCATION_H

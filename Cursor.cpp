@@ -2,7 +2,7 @@
 
 #include <QDebug>
 
-Cursor::Cursor(QSharedPointer<QGraphicsScene> scene,
+Cursor::Cursor(QGraphicsScene * scene,
                const QRectF &inScrollAreaRect) :
     scene(scene),
     scrollAreaRect(inScrollAreaRect),

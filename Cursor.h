@@ -14,7 +14,7 @@ class Cursor : public QObject, public QGraphicsPixmapItem
 {
     Q_OBJECT
 public:
-    Cursor(QSharedPointer<QGraphicsScene> scene, const QRectF &inScrollAreaRect);
+    Cursor(QGraphicsScene * scene, const QRectF &inScrollAreaRect);
 
     void mousePressEvent(QGraphicsSceneMouseEvent * event);
 
@@ -41,7 +41,7 @@ signals:
     void cursorMoved();
 
 private:
-    QSharedPointer<QGraphicsScene> scene;
+    QGraphicsScene * scene;
 
     QTimer scrollTimer;
 

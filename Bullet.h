@@ -2,7 +2,6 @@
 #define BULLET_H
 
 #include <QGraphicsPixmapItem>
-#include <QSharedPointer>
 #include <QObject>
 #include <QTimer>
 
@@ -28,11 +27,10 @@ public:
     int getSpeed() const;
     void setSpeed(int newSpeed);
 
-    void setLocation(QSharedPointer<Location> newLocation);
-
     void shot();
 
-    QSharedPointer<Location> getLocation() const;
+    const Location *getLocation() const;
+    void setLocation(const Location *newLocation);
 
 public slots:
     void move();
@@ -41,7 +39,7 @@ signals:
     void targetReached();
 
 private:
-    QSharedPointer<Location> location;
+    const Location * location;
     QTimer moveTimer;
 
     int damage;

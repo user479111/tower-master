@@ -10,8 +10,8 @@ LocationItem::LocationItem(QString dyrectoryName,
                            int width,
                            int fontSize,
                            QPointF pos,
-                           QSharedPointer<QGraphicsItem> parent) :
-    QGraphicsTextItem(parent.get())
+                           QGraphicsItem * parent) :
+    QGraphicsTextItem(parent)
 {
     directoryName = dyrectoryName;
     setPos(pos);
@@ -19,14 +19,18 @@ LocationItem::LocationItem(QString dyrectoryName,
     setDefaultTextColor(Qt::black);
     setFont(QFont("Helvetica [Cronyx]", fontSize, QFont::Bold));
 
-    backgroundRect = QSharedPointer<QGraphicsRectItem>
-            (new QGraphicsRectItem(x(), y() + HIGHLIGHT_OFFSET, width, fontSize + HIGHLIGHT_OFFSET));
+    backgroundRect = new QGraphicsRectItem(x(), y() + HIGHLIGHT_OFFSET, width, fontSize + HIGHLIGHT_OFFSET);
     backgroundRect->setBrush(Qt::transparent); // Set the fill color
     backgroundRect->setPen(QPen(Qt::transparent));
 
     loadXmlParameters(":/Data/Data/Locations/" + directoryName + "/Location.xml");
 
     setPlainText(directoryName);
+}
+
+LocationItem::~LocationItem()
+{
+    delete backgroundRect;
 }
 
 void LocationItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
@@ -62,12 +66,12 @@ void LocationItem::setChosen(bool newChosen)
     chosen = newChosen;
 }
 
-QSharedPointer<QGraphicsRectItem> LocationItem::getBackgroundRect() const
+QGraphicsRectItem* LocationItem::getBackgroundRect() const
 {
     return backgroundRect;
 }
 
-void LocationItem::setBackgroundRect(QSharedPointer<QGraphicsRectItem> newBackgroundRect)
+void LocationItem::setBackgroundRect(QGraphicsRectItem * newBackgroundRect)
 {
     backgroundRect = newBackgroundRect;
 }

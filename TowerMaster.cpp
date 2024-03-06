@@ -12,22 +12,32 @@ TowerMaster::TowerMaster() :
 
     scene->setSceneRect(0, 0, 800, 600);
 
-    setScene(scene.get());
+    setScene(scene);
     setFixedSize(800, 600); // TODO: Add settings. Size should be read from settings file
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     // set cursor
     setMouseTracking(true);
-    cursor = QSharedPointer<Cursor>(new Cursor(scene, scene->sceneRect()));
+    cursor = new Cursor(scene, scene->sceneRect());
 
-    menuProcessor = QSharedPointer<MenuProcessor>(new MenuProcessor(scene));
+    menuProcessor = new MenuProcessor(scene);
 
-    connect(menuProcessor.get(), &MenuProcessor::keyChoiseMade, this, &TowerMaster::handleMenuProcessor);
+    connect(menuProcessor, &MenuProcessor::keyChoiseMade, this, &TowerMaster::handleMenuProcessor);
 }
 
 TowerMaster::~TowerMaster()
 {
+    delete scene;
+    delete cursor;
+
+    if (menuProcessor) {
+        delete menuProcessor;
+    }
+
+    if (gameProcessor) {
+        delete gameProcessor;
+    }
 }
 
 void TowerMaster::mouseMoveEvent(QMouseEvent *event)
@@ -38,12 +48,16 @@ void TowerMaster::mouseMoveEvent(QMouseEvent *event)
 void TowerMaster::handleGameProcessor()
 {
     qDebug() << "TowerMaster::handleGameProcessor";
-    menuProcessor = QSharedPointer<MenuProcessor>(new MenuProcessor(scene));
+    menuProcessor = new MenuProcessor(scene);
 
     qDebug() << "TowerMaster::handleGameProcessor 1";
-    if (gameProcessor) { gameProcessor.reset(); }
+
+    if (gameProcessor) {
+        delete gameProcessor;
+    }
+
     qDebug() << "TowerMaster::handleGameProcessor 2";
-    connect(menuProcessor.get(), &MenuProcessor::keyChoiseMade, this, &TowerMaster::handleMenuProcessor);
+    connect(menuProcessor, &MenuProcessor::keyChoiseMade, this, &TowerMaster::handleMenuProcessor);
     // Back to main menu => => process = Process::Menu && delete gameProcessor;
     // Quit delete gameProcessor; => quit
 }
@@ -57,11 +71,13 @@ void TowerMaster::handleMenuProcessor()
         {
             // StartGame => Read Params => process = Process::Game && delete menuProcessor;
             qDebug() << "TowerMaster::handleMenuProcessor";
-            gameProcessor = QSharedPointer<GameProcessor>(new GameProcessor(scene, menuProcessor->getLocationChoice(), cursor));
+            gameProcessor = new GameProcessor(scene, menuProcessor->getLocationChoice(), cursor);
 
-            if (menuProcessor) { menuProcessor.reset(); }
+            if (menuProcessor) {
+                delete menuProcessor;
+            }
 
-            connect(gameProcessor.get(), &GameProcessor::mainMenuSignal, this, &TowerMaster::handleGameProcessor);
+            connect(gameProcessor, &GameProcessor::mainMenuSignal, this, &TowerMaster::handleGameProcessor);
 
             break;
         }

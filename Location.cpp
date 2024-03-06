@@ -1,16 +1,15 @@
 #include "Location.h"
 #include "Enemy.h"
 
+#include <QGraphicsScene>
 #include <QtXml/QDomDocument>
 #include <QFile>
 #include <QDebug>
 
-Location::Location(QString name,
-                   QSharedPointer<QGraphicsScene> scene) :
-    name(name),
-    scene(scene)
+Location::Location(QGraphicsScene * scene, QString name) :
+    scene(scene),
+    name(name)
 {
-    qDebug() << "Location::Location";
     // read Location.xml file and set Location parameters
     loadXmlParameters(QString(":/Data/Data/Locations/" + name + "/Location.xml"));
 
@@ -21,13 +20,20 @@ Location::Location(QString name,
 
 Location::~Location()
 {
-    qDebug() << "Location::~Location";
-
+    for (auto buildArea : buildAreas) {
+        delete buildArea;
+    }
     buildAreas.clear();
-    enemyRoutes.clear();
-    waves.clear();
 
-    qDebug() << "Location::~Location 1";
+    for (auto enemyRoute : enemyRoutes) {
+        delete enemyRoute;
+    }
+    enemyRoutes.clear();
+
+    for (auto wave : waves) {
+        delete wave;
+    }
+    waves.clear();
 }
 
 void Location::loadXmlParameters(QString inFileName)
@@ -63,7 +69,6 @@ void Location::loadXmlParameters(QString inFileName)
 
                     if (QString(locationAttribute.attribute("name")) == "image") {
                         locationImage = QString(locationAttribute.attribute("val"));
-                        qDebug() << "Location.cpp:" << locationImage;
                     }
 
                 } else if (QString(locationAttribute.tagName()) == "attnum") {
@@ -119,7 +124,7 @@ void Location::loadXmlParameters(QString inFileName)
                     }
                 }
 
-                QSharedPointer<QGraphicsPolygonItem> newBuildArea(new QGraphicsPolygonItem(buildAreaPolygon));
+                QGraphicsPolygonItem * newBuildArea(new QGraphicsPolygonItem(buildAreaPolygon));
 
                 buildAreas.append(newBuildArea);
 
@@ -165,9 +170,9 @@ void Location::loadXmlParameters(QString inFileName)
                 }
 
                 // Create new enemy route of the QGraphicsPathItem type
-                QSharedPointer<QPainterPath> newPath(new QPainterPath);
-                newPath->addPolygon(enemyRoute);
-                QSharedPointer<QGraphicsPathItem> newEnemyRoute(new QGraphicsPathItem(*newPath));
+                QPainterPath newPath;
+                newPath.addPolygon(enemyRoute);
+                QGraphicsPathItem * newEnemyRoute(new QGraphicsPathItem(newPath));
 
                 // Add to the list
                 enemyRoutes.append(newEnemyRoute);
@@ -185,7 +190,7 @@ void Location::loadXmlParameters(QString inFileName)
                     continue;
                 }
 
-                QSharedPointer<Wave> newWave(new Wave(scene));
+                Wave * newWave(new Wave(scene));
 
                 newWave->setId(QString(waveXmlNode.attributes().namedItem("id").nodeValue()).toInt());
 
@@ -221,7 +226,7 @@ const QString &Location::getName() const
     return name;
 }
 
-const QList<QSharedPointer<Wave> > &Location::getWaves() const
+const QList<Wave*> &Location::getWaves() const
 {
     return waves;
 }
@@ -231,12 +236,12 @@ short Location::getTimeForPreparation() const
     return timeForPreparation;
 }
 
-const QList<QSharedPointer<QGraphicsPathItem> > &Location::getEnemyRoutes() const
+const QList<QGraphicsPathItem*> &Location::getEnemyRoutes() const
 {
     return enemyRoutes;
 }
 
-const QList<QSharedPointer<QGraphicsPolygonItem> > &Location::getBuildAreas() const
+const QList<QGraphicsPolygonItem*> &Location::getBuildAreas() const
 {
     return buildAreas;
 }
