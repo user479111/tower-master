@@ -3,7 +3,6 @@
 
 #include <QGraphicsTextItem>
 #include <QGraphicsRectItem>
-#include <QSharedPointer>
 #include <QString>
 #include <QPointF>
 
@@ -17,7 +16,8 @@ public:
                  int width,
                  int fontSize,
                  QPointF pos,
-                 QSharedPointer<QGraphicsItem> parent = 0);
+                 QGraphicsItem * parent = 0);
+    ~LocationItem();
 
     void mousePressEvent(QGraphicsSceneMouseEvent * event);
     void mouseReleaseEvent(QGraphicsSceneMouseEvent * event);
@@ -28,8 +28,8 @@ public:
     bool isChosen() const;
     void setChosen(bool newChosen);
 
-    QSharedPointer<QGraphicsRectItem> getBackgroundRect() const;
-    void setBackgroundRect(QSharedPointer<QGraphicsRectItem> newBackgroundRect);
+    QGraphicsRectItem * getBackgroundRect() const;
+    void setBackgroundRect(QGraphicsRectItem * newBackgroundRect);
 
     const QString &getLocationImage() const;
     void setLocationImage(const QString &newLocationImage);
@@ -47,7 +47,7 @@ signals:
     void clicked();
 
 private:
-    QSharedPointer<QGraphicsRectItem> backgroundRect;
+    QGraphicsRectItem * backgroundRect;
     QString directoryName;
     QString locationFullName;
     QString locationImage;

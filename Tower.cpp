@@ -11,7 +11,7 @@
 
 Tower::Tower(const QString &type,
              const QPointF &center,
-             const QSharedPointer<Location> location) :
+             const Location * location) :
     location(location),
     type(type),
     attackSpeed(MIN_ATTACK_SPEED)
@@ -38,7 +38,7 @@ Tower::Tower(const QString &type,
                                boundingRect().center().y() + AREA_RADIUS * sin(qDegreesToRadians(angle * i))));
     }
 
-    attackArea = QSharedPointer<QGraphicsPolygonItem>(new QGraphicsPolygonItem(polygon, this));
+    attackArea = new QGraphicsPolygonItem(polygon, this);
     attackArea->setPen(QPen(Qt::DotLine));
     attackArea->setPen(QPen(QColor(255, 0, 0)));
 
@@ -54,16 +54,20 @@ Tower::Tower(const QString &type,
 Tower::~Tower()
 {
     qDebug() << "Tower::~Tower";
+    delete attackArea;
+
+    for (auto bullet : bullets) {
+        delete bullet;
+    }
     bullets.clear();
 }
 
 void Tower::fire()
 {
-    QSharedPointer<Bullet> bullet =
-            QSharedPointer<Bullet>(new Bullet(bulletPatern));
+    Bullet * bullet = new Bullet(bulletPatern);
 
     // Display the bullet
-    scene()->addItem(bullet.get());
+    scene()->addItem(bullet);
     bullet->setScale(scale());
     bullet->setPos(mapToScene(boundingRect().center()));
 
@@ -72,7 +76,7 @@ void Tower::fire()
     bullet->setAngle(-1 * attackLine.angle());
 
     // Prepare for the bullet removal on the target reaching event
-    connect(bullet.get(), &Bullet::targetReached, this, &Tower::clearBullets);
+    connect(bullet, &Bullet::targetReached, this, &Tower::clearBullets);
 
     // Start movement
     bullet->shot();
@@ -120,8 +124,9 @@ void Tower::clearBullets()
     if (bullets.size() > 0) {
         for (auto bulletItem : bullets) {
             if (bulletItem->isOutOfBattle()) {
-                scene()->removeItem(bulletItem.get());
+                scene()->removeItem(bulletItem);
                 bullets.removeOne(bulletItem);
+                delete bulletItem;
             }
         }
     }
@@ -139,7 +144,7 @@ void Tower::setAttackSpeed(float newAttackSpeed)
 }
 
 
-const QList<QSharedPointer<Bullet> > &Tower::getBullets() const
+const QList<Bullet*> &Tower::getBullets() const
 {
     return bullets;
 }

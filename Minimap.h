@@ -3,8 +3,6 @@
 
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsPixmapItem>
-#include <QGraphicsScene>
-#include <QSharedPointer>
 #include <QPointF>
 #include <QObject>
 #include <QMap>
@@ -16,9 +14,9 @@ class Minimap : public QObject, public QGraphicsPixmapItem
 {
     Q_OBJECT
 public:
-    Minimap(QSharedPointer<QGraphicsScene> scene,
-            const QPixmap &pixmap,
-            QSharedPointer<QGraphicsPixmapItem> parent = nullptr);
+    Minimap(const QPixmap &pixmap,
+            QGraphicsPixmapItem * parent = nullptr);
+    ~Minimap();
 
     void mousePressEvent(QGraphicsSceneMouseEvent * event);
 
@@ -43,13 +41,12 @@ private slots:
     void enemyRemoved(Enemy * enemy);
 
 private:
-    QSharedPointer<QGraphicsScene> scene;
     QPointF clickPosition;
     QPointF calculatedScenePosition;
     float mapScale;
 
-    QMap<Tower* , QSharedPointer<QGraphicsRectItem>> towers;
-    QMap<Enemy* , QSharedPointer<QGraphicsRectItem>> enemies;
+    QMap<Tower* , QGraphicsRectItem*> towers;
+    QMap<Enemy* , QGraphicsRectItem*> enemies;
 };
 
 #endif // MINIMAP_H

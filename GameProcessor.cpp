@@ -2,26 +2,35 @@
 
 #include <QDebug>
 
-GameProcessor::GameProcessor(QSharedPointer<QGraphicsScene> scene,
+GameProcessor::GameProcessor(QGraphicsScene * scene,
                              QString locationName,
-                             QSharedPointer<Cursor> cursor,
-                             QSharedPointer<QObject> parent)
-    : QObject(parent.get()),
+                             Cursor * cursor,
+                             QObject * parent)
+    : QObject(parent),
       scene(scene),
       cursor(cursor),
-      location(new Location(locationName, static_cast<QSharedPointer<QGraphicsScene>>(scene))),
+      location(new Location(scene, locationName)),
       battlefield(new Battlefield(scene, cursor, location)),
       gameInterface(new GameInterface(scene, cursor, battlefield))
 {
-    qDebug() << "GameProcessor::GameProcessor";
     scene->setBackgroundBrush(QBrush(Qt::black));
 
-    connect(gameInterface.get(), &GameInterface::mainMenuSignal, this, &GameProcessor::processMainMenuClick);
+    connect(gameInterface, &GameInterface::mainMenuSignal, this, &GameProcessor::processMainMenuClick);
 }
 
 GameProcessor::~GameProcessor()
 {
-    qDebug() << "GameProcessor::~GameProcessor";
+    if (location) {
+        delete location;
+    }
+
+    if (battlefield) {
+        delete battlefield;
+    }
+
+    if (gameInterface) {
+        delete gameInterface;
+    }
 }
 
 void GameProcessor::processMainMenuClick()

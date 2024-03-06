@@ -4,7 +4,6 @@
 #include <QGraphicsView>
 #include <QGraphicsScene>
 #include <QGraphicsPixmapItem>
-#include <QSharedPointer>
 #include <QMouseEvent>
 #include <QObject>
 
@@ -26,10 +25,10 @@ private slots:
     void handleGameProcessor();
 
 private:
-    QSharedPointer<QGraphicsScene> scene;
-    QSharedPointer<Cursor> cursor;
-    QSharedPointer<MenuProcessor> menuProcessor;
-    QSharedPointer<GameProcessor> gameProcessor;
+    QGraphicsScene * scene;
+    Cursor * cursor;
+    MenuProcessor * menuProcessor;
+    GameProcessor * gameProcessor;
 };
 
 #endif // TOWERMASTER_H

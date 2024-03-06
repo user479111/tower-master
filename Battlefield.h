@@ -2,7 +2,6 @@
 #define BATTLEFIELD_H
 
 #include <QGraphicsScene>
-#include <QSharedPointer>
 #include <QObject>
 #include <QTimer>
 #include <QList>
@@ -18,18 +17,18 @@ class Battlefield : public QObject
 {
     Q_OBJECT
 public:
-    Battlefield(QSharedPointer<QGraphicsScene> scene,
-                QSharedPointer<Cursor> cursor,
-                QSharedPointer<Location> location);
+    Battlefield(QGraphicsScene * scene,
+                Cursor * cursor,
+                Location * location);
     ~Battlefield();
 
     bool eventFilter(QObject *obj, QEvent *event);
 
-    QSharedPointer<Location> getLocation() const;
-
-    void addTower(QSharedPointer<Tower> newTower);
+    void addTower(Tower * newTower);
 
     const QList<Enemy*> &getGroupOfEnemies() const;
+
+    Location* getLocation() const;
 
 signals:
     void battlefieldScaled();
@@ -41,11 +40,11 @@ private slots:
     void startNextWave();
 
 private:
-    QSharedPointer<QGraphicsScene> scene;
-    QSharedPointer<Cursor> cursor;
-    QSharedPointer<Location> location;
+    QGraphicsScene * scene;
+    Cursor * cursor;
+    Location * location;
 
-    QList<QSharedPointer<Tower>> towers;
+    QList<Tower*> towers;
 
     QTimer timerBetweenWaves;
 

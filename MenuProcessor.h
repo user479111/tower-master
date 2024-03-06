@@ -4,7 +4,6 @@
 #include <QGraphicsScene>
 #include <QMouseEvent>
 #include <QGraphicsPixmapItem>
-#include <QSharedPointer>
 #include <QObject>
 #include <QPointF>
 #include <QList>
@@ -17,7 +16,7 @@ class MenuProcessor : public QObject
 {
     Q_OBJECT
 public:
-    MenuProcessor(QSharedPointer<QGraphicsScene> scene);
+    MenuProcessor(QGraphicsScene * scene);
     ~MenuProcessor();
 
     enum Choice { StayInMenu, StartGame, Quit };
@@ -35,11 +34,11 @@ signals:
     void keyChoiseMade();
 
 private:
-    QSharedPointer<QGraphicsScene> scene;
-    QSharedPointer<Menu> currentMenu;
-    QSharedPointer<BaseMenu> baseMenu;
+    QGraphicsScene * scene;
+    Menu * currentMenu;
+    BaseMenu * baseMenu;
     //CompanyMenu * subMenuCompany;
-    QSharedPointer<BattleMenu> battleMenu;
+    BattleMenu * battleMenu;
     //SettingsMenu * subMenuSettings;
     //CreditsMenu * subMenuCreadits;
     Choice choice;

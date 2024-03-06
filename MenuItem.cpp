@@ -1,7 +1,7 @@
 #include "MenuItem.h"
 #include <QDebug>
-MenuItem::MenuItem(QSharedPointer<QGraphicsItem> parent) :
-    QGraphicsPixmapItem(parent.get()),
+MenuItem::MenuItem(QGraphicsItem * parent) :
+    QGraphicsPixmapItem(parent),
     title(""),
     chosen(false),
     staticSize(false)

@@ -3,14 +3,13 @@
 
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsPixmapItem>
-#include <QSharedPointer>
 #include <QObject>
 
 class MenuItem : public QObject, public QGraphicsPixmapItem
 {
     Q_OBJECT
 public:
-    MenuItem(QSharedPointer<QGraphicsItem> parent = 0);
+    MenuItem(QGraphicsItem * parent = 0);
 
     void mousePressEvent(QGraphicsSceneMouseEvent * event);
     void mouseReleaseEvent(QGraphicsSceneMouseEvent * event);

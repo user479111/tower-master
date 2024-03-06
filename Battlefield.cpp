@@ -6,19 +6,16 @@
 #include <QLabel>
 #include <QDebug>
 
-Battlefield::Battlefield(QSharedPointer<QGraphicsScene> scene,
-                         QSharedPointer<Cursor> cursor,
-                         QSharedPointer<Location> location) :
+Battlefield::Battlefield(QGraphicsScene * scene,
+                         Cursor * cursor,
+                         Location * location) :
     scene(scene),
     cursor(cursor),
     location(location),
     currentWaveIndex(0)
 {
-    qDebug() << "Battlefield::Battlefield";
     // display location
-    scene->addItem(location.get());
-
-    qDebug() << "Battlefield::Battlefield 1";
+    scene->addItem(location);
 
     // Temporarily dysplay polygons
     for (auto polygonItem: location->getBuildAreas()) {
@@ -32,10 +29,8 @@ Battlefield::Battlefield(QSharedPointer<QGraphicsScene> scene,
         QBrush brush(QColor(255, 0, 0, 128));   // Set brush color to red with 50% transparency
         polygonItem->setBrush(brush);           // Apply the brush to the polygon item
 
-        scene->addItem(polygonItem.get());
+        scene->addItem(polygonItem);
     }
-
-    qDebug() << "Battlefield::Battlefield 2";
 
     // Temporarily dysplay enemy routes
     for (auto routeItem: location->getEnemyRoutes()) {
@@ -45,10 +40,8 @@ Battlefield::Battlefield(QSharedPointer<QGraphicsScene> scene,
         pen.setStyle(Qt::DotLine);  // Set pen style to dash line
         routeItem->setPen(pen);     // Apply the pen to the polygon item
 
-        scene->addItem(routeItem.get());
+        scene->addItem(routeItem);
     }
-
-    qDebug() << "Battlefield::Battlefield 3";
 
     scene->installEventFilter(this);
 
@@ -56,7 +49,7 @@ Battlefield::Battlefield(QSharedPointer<QGraphicsScene> scene,
                 scene->sceneRect().height() / location->boundingRect().height() :
                 scene->sceneRect().width() / location->boundingRect().width();
 
-    connect(cursor.get(), &Cursor::cursorMoved, this, &Battlefield::processCursorMove);
+    connect(cursor, &Cursor::cursorMoved, this, &Battlefield::processCursorMove);
 
     // Set the interval to the time for preparation in milliseconds
     timerBetweenWaves.setInterval(location->getTimeForPreparation() * 1000);
@@ -70,7 +63,9 @@ Battlefield::Battlefield(QSharedPointer<QGraphicsScene> scene,
 
 Battlefield::~Battlefield()
 {
-    scene->removeItem(location.get());
+    for (auto tower : towers) {
+        delete tower;
+    }
 }
 
 bool Battlefield::eventFilter(QObject *obj, QEvent *event) {
@@ -105,6 +100,11 @@ bool Battlefield::eventFilter(QObject *obj, QEvent *event) {
 
             // Scale all the built towers
             for (auto towerItem : towers) {
+
+                if (!towerItem) {
+                    continue;
+                }
+
                 towerItem->setScale(location->scale());
 
                 // Place tower on the "scaled" position on the location
@@ -112,6 +112,11 @@ bool Battlefield::eventFilter(QObject *obj, QEvent *event) {
 
                 // Same for each bullet
                 for (auto bulletItem : towerItem->getBullets()) {
+
+                    if (!bulletItem) {
+                        continue;
+                    }
+
                     bulletItem->setScale(location->scale());
                     bulletItem->setPos(bulletItem->pos() * scaleFactor);
                 }
@@ -121,6 +126,10 @@ bool Battlefield::eventFilter(QObject *obj, QEvent *event) {
             // Scale all the enemies on the battlefield
             for (auto enemyItem : getGroupOfEnemies())
             {
+                if (!enemyItem) {
+                    continue;
+                }
+
                 enemyItem->setScale(scaleFactor);
             }
 
@@ -179,15 +188,10 @@ bool Battlefield::eventFilter(QObject *obj, QEvent *event) {
 
 }
 
-QSharedPointer<Location> Battlefield::getLocation() const
-{
-    return location;
-}
-
-void Battlefield::addTower(QSharedPointer<Tower> newTower)
+void Battlefield::addTower(Tower * newTower)
 {
     towers.append(newTower);
-    scene->addItem(newTower.get());
+    scene->addItem(newTower);
 }
 
 const QList<Enemy*> &Battlefield::getGroupOfEnemies() const
@@ -256,7 +260,7 @@ void Battlefield::startWaveMove()
     // after the last enemy was killed
     // or reached the end of the route
     // startNextWave
-    QObject::connect(location->getWaves().at(currentWaveIndex).get(),
+    QObject::connect(location->getWaves().at(currentWaveIndex),
                      &Wave::enemiesEnded,
                      this,
                      &Battlefield::startNextWave);
@@ -287,4 +291,9 @@ void Battlefield::startNextWave()
 
     // Start the timer
     timerBetweenWaves.start();
+}
+
+Location *Battlefield::getLocation() const
+{
+    return location;
 }

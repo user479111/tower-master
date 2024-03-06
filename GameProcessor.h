@@ -3,7 +3,6 @@
 
 #include <QObject>
 #include <QGraphicsScene>
-#include <QSharedPointer>
 #include <QMouseEvent>
 
 #include "Cursor.h"
@@ -15,10 +14,10 @@ class GameProcessor : public QObject
 {
     Q_OBJECT
 public:
-    explicit GameProcessor(QSharedPointer<QGraphicsScene> scene,
+    explicit GameProcessor(QGraphicsScene * scene,
                            QString locationName,
-                           QSharedPointer<Cursor> cursor,
-                           QSharedPointer<QObject> parent = nullptr);
+                           Cursor * cursor,
+                           QObject * parent = nullptr);
 
     ~GameProcessor();
 
@@ -29,13 +28,13 @@ signals:
     void mainMenuSignal();
 
 private:
-    QSharedPointer<QGraphicsScene> scene;
-    QSharedPointer<Cursor> cursor;
+    QGraphicsScene * scene;
+    Cursor * cursor;
 
-    QSharedPointer<Location> location;
-    QSharedPointer<Battlefield> battlefield;
+    Location * location;
+    Battlefield * battlefield;
 
-    QSharedPointer<GameInterface> gameInterface;
+    GameInterface * gameInterface;
 };
 
 #endif // GAMEPROCESSOR_H

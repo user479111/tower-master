@@ -16,6 +16,12 @@ BattleMenu::BattleMenu() :
 
 BattleMenu::~BattleMenu()
 {
+    delete mapPreview;
+    delete locationInfo;
+
+    for (auto locationItem : locations) {
+        delete locationItem;
+    }
 }
 
 void BattleMenu::prepare()
@@ -37,15 +43,15 @@ void BattleMenu::prepare()
         if (fileInfo.exists() && fileInfo.isFile()) {
 
 
-            QSharedPointer<LocationItem> location = QSharedPointer<LocationItem>(new LocationItem(subdir,
+            LocationItem * location = new LocationItem(subdir,
                                                        locationListWidth,
                                                        locationListFontSize,
                                                        QPointF(locationListPos.x(),
                                                                locationListPos.y() +
                                                                 (locationListFontSize + locationListInterval) *
-                                                                    locations.size()))); // Each new item should be lower that previous
+                                                                    locations.size())); // Each new item should be lower that previous
 
-            connect(location.get(), &LocationItem::clicked, this, &BattleMenu::processLocationsClick);
+            connect(location, &LocationItem::clicked, this, &BattleMenu::processLocationsClick);
 
             locations.append(location);
         } else {
@@ -53,44 +59,44 @@ void BattleMenu::prepare()
     }
 }
 
-void BattleMenu::show(QSharedPointer<QGraphicsScene> scene)
+void BattleMenu::show(QGraphicsScene * scene)
 {
     scene->setBackgroundBrush(QBrush(QImage(":/Data/Data/Menu/" + getBackgroundImage())));
-    scene->addItem(getBoard().get());
+    scene->addItem(getBoard());
 
-    scene->addItem(mapPreview.get());
-    scene->addItem(locationInfo.get());
+    scene->addItem(mapPreview);
+    scene->addItem(locationInfo);
 
     // show locations
     foreach (auto item, locations) {
-        scene->addItem(item->getBackgroundRect().get());
-        scene->addItem(item.get());
+        scene->addItem(item->getBackgroundRect());
+        scene->addItem(item);
     }
 
     foreach (auto item, getListOfItems()) {
         item->setChosen(false);
-        scene->addItem(item.get());
+        scene->addItem(item);
     }
 }
 
-void BattleMenu::hide(QSharedPointer<QGraphicsScene> scene)
+void BattleMenu::hide(QGraphicsScene * scene)
 {
-    scene->removeItem(getBoard().get());
+    scene->removeItem(getBoard());
 
-    scene->removeItem(mapPreview.get());
-    scene->removeItem(locationInfo.get());
+    scene->removeItem(mapPreview);
+    scene->removeItem(locationInfo);
 
     // hide locations
     for (auto item : locations) {
-        scene->removeItem(item->getBackgroundRect().get());
-        scene->removeItem(item.get());
+        scene->removeItem(item->getBackgroundRect());
+        scene->removeItem(item);
     }
 
     // hide location info
 
     // hide items
     for (auto item : getListOfItems()) {
-        scene->removeItem(item.get());
+        scene->removeItem(item);
     }
 }
 
@@ -114,7 +120,10 @@ void BattleMenu::processLocationsClick()
 
         locationChoice = item->getDirectoryName();
 
-        mapPreview->setPixmap(QPixmap(":/Data/Data/Locations/" + item->getDirectoryName() + "/" + item->getLocationImage()));
+        mapPreview->setPixmap(QPixmap(":/Data/Data/Locations/" +
+                                      item->getDirectoryName() +
+                                      "/" +
+                                      item->getLocationImage()));
 
         locationInfo->setPlainText("Name: " + item->getLocationFullName() + "\n"
                                    + "Vawes: " + QString::number(item->getWavesNum()));

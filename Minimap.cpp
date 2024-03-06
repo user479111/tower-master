@@ -1,16 +1,26 @@
 #include "Minimap.h"
 
+#include <QGraphicsScene>
 #include <QList>
 #include <QDebug>
 
-Minimap::Minimap(QSharedPointer<QGraphicsScene> scene,
-                 const QPixmap &pixmap,
-                 QSharedPointer<QGraphicsPixmapItem> parent) :
-    QGraphicsPixmapItem(pixmap , parent.get()),
-    scene(scene),
+Minimap::Minimap(const QPixmap &pixmap,
+                 QGraphicsPixmapItem * parent) :
+    QGraphicsPixmapItem(pixmap , parent),
     clickPosition(0, 0),
     mapScale(1)
 {
+}
+
+Minimap::~Minimap()
+{
+    for(auto tower: towers.keys()) {
+        delete towers.value(tower);
+    }
+
+    for(auto enemy: enemies.keys()) {
+        delete enemies.value(enemy);
+    }
 }
 
 void Minimap::mousePressEvent(QGraphicsSceneMouseEvent *event)
@@ -19,20 +29,20 @@ void Minimap::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
     // Calculate the point on the map that represents the click point on the minimap
     // X
-    if (event->pos().x() * mapScale <= scene->sceneRect().width() / 2) {
-        calculatedScenePosition.setX(scene->sceneRect().width() / 2);
+    if (event->pos().x() * mapScale <= scene()->sceneRect().width() / 2) {
+        calculatedScenePosition.setX(scene()->sceneRect().width() / 2);
     }
-    else if (event->pos().x() * mapScale >= boundingRect().width() * mapScale - scene->sceneRect().width() / 2) {
-        calculatedScenePosition.setX(boundingRect().width() * mapScale - scene->sceneRect().width() / 2);
+    else if (event->pos().x() * mapScale >= boundingRect().width() * mapScale - scene()->sceneRect().width() / 2) {
+        calculatedScenePosition.setX(boundingRect().width() * mapScale - scene()->sceneRect().width() / 2);
     } else {
         calculatedScenePosition.setX(event->pos().x() * mapScale);
     }
     // Y
-    if (event->pos().y() * mapScale <= scene->sceneRect().height() / 2) {
-        calculatedScenePosition.setY(scene->sceneRect().height() / 2);
+    if (event->pos().y() * mapScale <= scene()->sceneRect().height() / 2) {
+        calculatedScenePosition.setY(scene()->sceneRect().height() / 2);
     }
-    else if (event->pos().y() * mapScale >= boundingRect().height() * mapScale - scene->sceneRect().height() / 2) {
-        calculatedScenePosition.setY(boundingRect().height() * mapScale - scene->sceneRect().height() / 2);
+    else if (event->pos().y() * mapScale >= boundingRect().height() * mapScale - scene()->sceneRect().height() / 2) {
+        calculatedScenePosition.setY(boundingRect().height() * mapScale - scene()->sceneRect().height() / 2);
     } else {
         calculatedScenePosition.setY(event->pos().y() * mapScale);
     }
@@ -62,18 +72,18 @@ QPointF Minimap::getCalculatedScenePosition() const
 
 void Minimap::addTower(Tower * tower)
 {
-    QSharedPointer<QGraphicsRectItem>
-            towerRect(new QGraphicsRectItem(0,
-                                            0,
-                                            0.1 /* TODO */ * tower->boundingRect().width(),
-                                            0.1 /* TODO */ * tower->boundingRect().height()));
+    QGraphicsRectItem * towerRect =
+            new QGraphicsRectItem(0,
+                                  0,
+                                  0.1 /* TODO */ * tower->boundingRect().width(),
+                                  0.1 /* TODO */ * tower->boundingRect().height());
 
     towerRect->setPos(x() + tower->pos().x() / tower->scale() * 0.1,
                       y() + tower->pos().y() / tower->scale() * 0.1);
     towerRect->setZValue(1);
     towerRect->setBrush(QBrush(Qt::green));
 
-    scene->addItem(towerRect.get());
+    scene()->addItem(towerRect);
 
     towers.insert(tower, towerRect);
 }
@@ -83,11 +93,21 @@ void Minimap::setPos(const QPointF &pos)
     QGraphicsItem::setPos(pos);
 
     for(auto tower: towers.keys()) {
+
+        if (!tower || !towers.value(tower)) {
+            continue;
+        }
+
         towers.value(tower)->setPos(x() + tower->pos().x() / tower->scale() * 0.1,
                                     y() + tower->pos().y() / tower->scale() * 0.1);
     }
 
     for(auto enemy: enemies.keys()) {
+
+        if (!enemy || !enemies.value(enemy)) {
+            continue;
+        }
+
         enemies.value(enemy)->setPos(x() + enemy->pos().x() / enemy->scale() * 0.1,
                                     y() + enemy->pos().y() / enemy->scale() * 0.1);
     }
@@ -96,28 +116,26 @@ void Minimap::setPos(const QPointF &pos)
 void Minimap::connectWithEenemies(const QList<Enemy*> &currentEnemies)
 {
     for (auto enemy : currentEnemies) {
-        QSharedPointer<QGraphicsRectItem>
-                enemyRect(new QGraphicsRectItem(0,
-                                                0,
-                                                0.1 /* TODO */ * enemy->boundingRect().width(),
-                                                0.1 /* TODO */ * enemy->boundingRect().height()));
+        QGraphicsRectItem * enemyRect =
+                new QGraphicsRectItem(0,
+                                      0,
+                                      0.1 /* TODO */ * enemy->boundingRect().width(),
+                                      0.1 /* TODO */ * enemy->boundingRect().height());
 
         enemyRect->setPos(x() + enemy->pos().x() / enemy->scale() * 0.1,
                           y() + enemy->pos().y() / enemy->scale() * 0.1);
         enemyRect->setZValue(1);
-        enemyRect->setBrush(QBrush(Qt::red));
 
-        // Show the enemy position rect only if it's within the map
-        if (mapRectToScene(boundingRect()).contains(enemyRect->pos()) &&
-            mapRectToScene(boundingRect()).contains(enemyRect->pos() +
-                                                    enemyRect->boundingRect().bottomRight())) {
-            scene->addItem(enemyRect.get());
-        }
+        // Make it visible only if it's within the map
+        enemyRect->setPen(QPen(QColor(0, 0, 0, 0)));
+        enemyRect->setBrush(QBrush(QColor(255, 0, 0, 0)));
+
+        scene()->addItem(enemyRect);
 
         enemies.insert(enemy, enemyRect);
 
         connect(enemy, &Enemy::moved, this, &Minimap::enemyRepositioned);
-        connect(enemy, &Enemy::outOfBattle, this, &Minimap::enemyRemoved);
+        connect(enemy, &Enemy::outOfBattleForMinimap, this, &Minimap::enemyRemoved);
     }
 }
 
@@ -130,13 +148,14 @@ void Minimap::enemyRepositioned(Enemy * enemy)
     if (mapRectToScene(boundingRect()).contains(enemies.value(enemy)->pos()) &&
         mapRectToScene(boundingRect()).contains(enemies.value(enemy)->pos() +
                                                 enemies.value(enemy)->boundingRect().bottomRight())) {
-
-        scene->addItem(enemies.value(enemy).get());
-
+        enemies.value(enemy)->setPen(QPen(QColor(0, 0, 0, 255)));
+        enemies.value(enemy)->setBrush(QBrush(QColor(255, 0, 0, 255)));
     } else {
-        foreach (auto sceneItem, scene->items()) {
-            if (sceneItem == enemies.value(enemy).get()) {
-                scene->removeItem(enemies.value(enemy).get());
+        foreach (auto sceneItem, scene()->items()) {
+            if (sceneItem == enemies.value(enemy)) {
+                // Hide enemy
+                enemies.value(enemy)->setPen(QPen(QColor(0, 0, 0, 0)));
+                enemies.value(enemy)->setBrush(QBrush(QColor(255, 0, 0, 0)));
                 break;
             }
         }
@@ -145,5 +164,10 @@ void Minimap::enemyRepositioned(Enemy * enemy)
 
 void Minimap::enemyRemoved(Enemy * enemy)
 {
-    enemies.remove(enemy);
+    // Remove the enemy rect position from the 'enemies' map
+    // and clear memory for it
+    if (enemies.value(enemy)) {
+        delete enemies.value(enemy);
+        enemies.remove(enemy);
+    }
 }

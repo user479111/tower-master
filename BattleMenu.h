@@ -6,7 +6,6 @@
 
 #include <QGraphicsPixmapItem>
 #include <QGraphicsScene>
-#include <QSharedPointer>
 #include <QObject>
 #include <QList>
 
@@ -19,8 +18,8 @@ public:
 
     void prepare();
 
-    void show(QSharedPointer<QGraphicsScene> scene);
-    void hide(QSharedPointer<QGraphicsScene> scene);
+    void show(QGraphicsScene * scene);
+    void hide(QGraphicsScene * scene);
 
     void setLocationListFontSize(int newLocationListFontSize);
 
@@ -46,18 +45,18 @@ public slots:
     void processLocationsClick();
 
 private:
-    QList<QSharedPointer<LocationItem>> locations;
+    QList<LocationItem*> locations;
     QPointF locationListPos;
     int locationListFontSize;
     int locationListInterval;
     int locationListWidth;
 
-    QSharedPointer<QGraphicsPixmapItem> mapPreview;
+    QGraphicsPixmapItem* mapPreview;
     QString mapPreviewImage;
     QPointF mapPreviewPos;
     float mapPreviewScale;
 
-    QSharedPointer<QGraphicsTextItem> locationInfo;
+    QGraphicsTextItem* locationInfo;
     QPointF locationInfoPos;
     float locationInfoFontSize;
 

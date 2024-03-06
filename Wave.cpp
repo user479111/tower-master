@@ -5,7 +5,7 @@
 #include <QFile>
 #include <QDebug>
 
-Wave::Wave(const QSharedPointer<QGraphicsScene> scene):
+Wave::Wave(QGraphicsScene * scene):
     interval(0),
     dencity(1),
     currentEnemyId(0),
@@ -16,6 +16,9 @@ Wave::Wave(const QSharedPointer<QGraphicsScene> scene):
 
 Wave::~Wave()
 {
+    for (auto enemy : groupOfEnemies) {
+        delete enemy;
+    }
 }
 
 int Wave::getInterval() const
@@ -68,7 +71,7 @@ void Wave::runEnemy()
     timerBetweenEnemies.start();
 }
 
-void Wave::runEnemies(const QSharedPointer<Location> location)
+void Wave::runEnemies(const Location * location)
 {
     // Read all info about enemies and fill the list / connect enemyOutOfBattle with local slot
     setupEnemiesFromXml(QString(":/Data/Data/Locations/" + location->getName() + "/Location.xml"), location);
@@ -77,10 +80,8 @@ void Wave::runEnemies(const QSharedPointer<Location> location)
     runEnemy();
 }
 
-void Wave::setupEnemiesFromXml(QString fileName,
-                               const QSharedPointer<Location> location)
+void Wave::setupEnemiesFromXml(QString fileName, const Location * location)
 {
-    qDebug() << "Wave::setupEnemiesFromXml" << id;
     QFile file(fileName);
 
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -114,10 +115,10 @@ void Wave::setupEnemiesFromXml(QString fileName,
             int route = xmlReader.attributes().value("route").toInt();
 
             // Create an enemy
-            auto newEnemy = new Enemy(id, type, location->getEnemyRoutes().at(route));
+            Enemy * newEnemy = new Enemy(id, type, location->getEnemyRoutes().at(route));
             groupOfEnemies.append(newEnemy);
             // Be redy to handle enemy out of battle
-            QObject::connect(newEnemy, &Enemy::outOfBattle, this, &Wave::processEnemyOut);
+            QObject::connect(newEnemy, &Enemy::outOfBattleForWave, this, &Wave::processEnemyOut);
 
             xmlReader.skipCurrentElement();
         }
@@ -133,7 +134,6 @@ void Wave::setupEnemiesFromXml(QString fileName,
 void Wave::processEnemyOut(Enemy * enemy)
 {
     int enemyIndex = groupOfEnemies.indexOf(enemy);
-    qDebug() << "Wave::processEnemyOut: " << enemyIndex;
     if (groupOfEnemies.at(enemyIndex)) {
         scene->removeItem(groupOfEnemies.at(enemyIndex));
     }
@@ -141,12 +141,14 @@ void Wave::processEnemyOut(Enemy * enemy)
     // Check if there any enemy is still running on the battlefield
     if (++enemiesOutOfBattleNum == groupOfEnemies.size()) {
 
-        // clean enemies memory
-        for (auto enemyItem : groupOfEnemies) {
-            delete enemyItem;
+        // Clean memory after enemies
+        for (auto enemy : groupOfEnemies) {
+            delete enemy;
         }
 
-        groupOfEnemies.clear(); // clean enemies list;
+        // clean enemies list;
+        groupOfEnemies.clear();
+
         emit enemiesEnded();
         return;
     }
