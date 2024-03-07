@@ -60,7 +60,7 @@ void Wave::runEnemy()
         return;
     }
 
-    scene->addItem(groupOfEnemies.at(currentEnemyId));
+    groupOfEnemies.at(currentEnemyId)->show(scene);
     groupOfEnemies.at(currentEnemyId)->run();
 
     currentEnemyId++;
@@ -135,7 +135,7 @@ void Wave::processEnemyOut(Enemy * enemy)
 {
     int enemyIndex = groupOfEnemies.indexOf(enemy);
     if (groupOfEnemies.at(enemyIndex)) {
-        scene->removeItem(groupOfEnemies.at(enemyIndex));
+        groupOfEnemies.at(enemyIndex)->hide(scene);
     }
 
     // Check if there any enemy is still running on the battlefield

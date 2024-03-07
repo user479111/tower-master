@@ -117,7 +117,7 @@ bool Battlefield::eventFilter(QObject *obj, QEvent *event) {
                         continue;
                     }
 
-                    bulletItem->setScale(location->scale());
+                    bulletItem->setScale(scaleFactor);
                     bulletItem->setPos(bulletItem->pos() * scaleFactor);
                 }
 

@@ -2,14 +2,14 @@
 <params name="Star">
     <section name="tower">
         <attstr name="type" val="shooting"/>
-        <attnum name="attack-speed" val="1" unit="shot/sec"/>
+        <attnum name="attack-speed" val="2" unit="shot/sec"/>
         <attstr name="skin" val="Tower.png"/>
         <attnum name="width" val="85"/>
         <attnum name="height" val="82"/>
     </section>
     <section name="bullet">
         <attnum name="damage" val="1"/>
-        <attnum name="speed" val="100" unit="pix/sec"/>
+        <attnum name="speed" val="150" unit="pix/sec"/>
         <attstr name="skin" val="Bullet.png"/>
         <attnum name="width" val="10"/>
         <attnum name="height" val="10"/>
