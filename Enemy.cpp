@@ -2,6 +2,7 @@
 
 #include <QtXml/QDomDocument>
 #include <QFile>
+#include <QPen>
 #include <QtMath>
 
 #include <QDebug>
@@ -12,22 +13,36 @@ Enemy::Enemy(int id,
     id(id),
     type(type),
     route(route),
-    speed(1),
+    totalHealth(MIN_ENEMY_HEALTH),
+    currentHealth(MIN_ENEMY_HEALTH),
+    speed(MIN_ENEMY_SPEED),
     stepSize(MIN_ENEMY_SPEED),
-    currentDestinationIndex(1),
-    angle(0)
+    currentDestinationIndex(0),
+    angle(0),
+    totalHealthBar(new QGraphicsLineItem),
+    currentHealthBar(new QGraphicsLineItem)
 {
-    // read Enemy.xml file and set MenuProcessor parameters
+    // Read Enemy.xml file and set the parameters
     loadXmlParameters(QString(":/Data/Data/Enemies/" + QString(type.at(0).toUpper() + type.mid(1)) + "/Enemy.xml"));
 
+    // Scale skin and health bars
     setScale(route->scale());
+    totalHealthBar->setScale(route->scale());
+    currentHealthBar->setScale(route->scale());
 
     // Place the enemy at the beginning of the route
-    setPos((route->path().elementAt(0) - boundingRect().bottomRight() / 2) * route->scale());
+    setPos(QPointF((route->path().elementAt(currentDestinationIndex++) -
+                    boundingRect().bottomRight() / 2) * scale()));
+
+    // Rotate to the next point on the route
+    setRotation(-1 * QLineF(mapToScene(boundingRect().center()),
+                       route->path().elementAt(currentDestinationIndex) * route->scale()).angle());
 }
 
 Enemy::~Enemy()
 {
+    delete totalHealthBar;
+    delete currentHealthBar;
 }
 
 void Enemy::loadXmlParameters(QString inFileName)
@@ -54,15 +69,34 @@ void Enemy::loadXmlParameters(QString inFileName)
                 qDebug() << "Skin:" << QString(":/Data/Data/Enemies/" +
                                                QString(type.at(0).toUpper() + type.mid(1)) + "/") <<
                                                QString(node.attribute("val"));
+
+                // Set pixmap skin
                 setPixmap(QString(":/Data/Data/Enemies/" +
                                   QString(type.at(0).toUpper() + type.mid(1)) + "/") +
                                   QString(node.attribute("val")));
+
+                // Prepare total health bar
+                totalHealthBar->setPen(QPen(Qt::red));
+                totalHealthBar->setLine(pos().x(),
+                                        pos().y(),
+                                        pos().x() + boundingRect().width() * scale(),
+                                        pos().y());
+
+                // Prepare current health bar
+                currentHealthBar->setPen(QPen(Qt::green));
+                currentHealthBar->setLine(pos().x(),
+                                          pos().y(),
+                                          pos().x() + boundingRect().width() * scale(),
+                                          pos().y());
             }
 
         } else if (QString(node.tagName()) == "attnum") {
 
             if (QString(node.attribute("name")) == "health") {
-                qDebug() << QString(node.attribute("val")).toInt();
+
+                setTotalHealth(QString(node.attribute("val")).toInt());
+                setCurrentHealth(getTotalHealth());
+
             } else if (QString(node.attribute("name")) == "speed") {
 
                 setSpeed(QString(node.attribute("val")).toInt());
@@ -85,10 +119,9 @@ void Enemy::setRotation(qreal angle)
     this->angle = angle;
 
     setTransform(QTransform().
-                 translate(pixmap().width()/2 * route->scale(), pixmap().height()/2 * route->scale()).
+                 translate(pixmap().width()/2 * scale(), pixmap().height()/2 * scale()).
                  rotate(angle).
-                 translate(-pixmap().width()/2 * route->scale(), -pixmap().height()/2 * route->scale()));
-
+                 translate(-pixmap().width()/2 * scale(), -pixmap().height()/2 * scale()));
 }
 
 void Enemy::moveForward()
@@ -96,7 +129,7 @@ void Enemy::moveForward()
     // If close to dest rotate to next dest
     QLineF line(mapToScene(boundingRect().center()),
                 route->path().elementAt(currentDestinationIndex) * route->scale());
-    if (line.length() < stepSize) {
+    if (line.length() < stepSize * scale()) {
 
         if (++currentDestinationIndex == route->path().elementCount()) {
             prepareForRemoval();
@@ -109,10 +142,49 @@ void Enemy::moveForward()
         setRotation(-1 * line.angle());
     }
 
-    setPos(pos().x() + stepSize * cos(qDegreesToRadians(-1 * line.angle())),
-           pos().y() + stepSize * sin(qDegreesToRadians(-1 * line.angle())));
+    setPos(QPointF(pos().x() + stepSize * scale() * cos(qDegreesToRadians(-1 * line.angle())),
+           pos().y() + stepSize * scale() * sin(qDegreesToRadians(-1 * line.angle()))));
 
     emit moved(this);
+}
+
+int Enemy::getCurrentHealth() const
+{
+    return currentHealth;
+}
+
+void Enemy::setCurrentHealth(int newCurrentHealth)
+{
+    currentHealth = (newCurrentHealth < MIN_ENEMY_HEALTH) ? MIN_ENEMY_HEALTH : newCurrentHealth;
+
+    if(currentHealth < totalHealth) {
+        // Decrease current health bar (Green line)
+        currentHealthBar->setLine(0, 0, totalHealthBar->line().length() * currentHealth / totalHealth, 0);
+    }
+}
+
+int Enemy::getTotalHealth() const
+{
+    return totalHealth;
+}
+
+void Enemy::setTotalHealth(int newTotalHealth)
+{
+    totalHealth = (newTotalHealth < MIN_ENEMY_HEALTH) ? MIN_ENEMY_HEALTH : newTotalHealth;
+}
+
+void Enemy::show(QGraphicsScene * scene)
+{
+    scene->addItem(this);
+    scene->addItem(totalHealthBar);
+    scene->addItem(currentHealthBar);
+}
+
+void Enemy::hide(QGraphicsScene * scene)
+{
+    scene->removeItem(this);
+    scene->removeItem(totalHealthBar);
+    scene->removeItem(currentHealthBar);
 }
 
 int Enemy::getSpeed() const
@@ -122,13 +194,9 @@ int Enemy::getSpeed() const
 
 void Enemy::setSpeed(int newSpeed)
 {
-    if (newSpeed < MIN_ENEMY_SPEED) {
-        speed = MIN_ENEMY_SPEED;
-    } else {
-        speed = newSpeed;
-    }
+    speed = (newSpeed < MIN_ENEMY_SPEED) ? MIN_ENEMY_SPEED : newSpeed;
 
-    stepSize = speed * ENEMY_TIMER_INTERVAL / 1000;
+    stepSize = speed * ENEMY_TIMER_INTERVAL / 1000 * scale();
 }
 
 void Enemy::setScale(qreal scale)
@@ -136,6 +204,10 @@ void Enemy::setScale(qreal scale)
     setRotation(-angle);
 
     QGraphicsPixmapItem::setScale(this->scale() * scale);
+
+    totalHealthBar->setScale(totalHealthBar->scale() * scale);
+    currentHealthBar->setScale(currentHealthBar->scale() * scale);
+
 
     // Place enemy on the "scaled" position
     setPos(pos() * scale);
@@ -152,6 +224,14 @@ void Enemy::prepareForRemoval()
     emit outOfBattleForWave(this);    // Before it will be completely removed in the Wave
 }
 
+void Enemy::setPos(const QPointF &pos)
+{
+    QGraphicsPixmapItem::setPos(pos);
+
+    totalHealthBar->setPos(pos);
+    currentHealthBar->setPos(pos);
+}
+
 int Enemy::getId() const
 {
     return id;
@@ -160,9 +240,6 @@ int Enemy::getId() const
 void Enemy::run()
 {
     // run the enemy on the route
-    setRotation(-1 * QLineF(mapToScene(boundingRect().center()),
-                       route->path().elementAt(currentDestinationIndex) * route->scale()).angle());
-
     connect(&timerMove, SIGNAL(timeout()), this, SLOT(moveForward()));
     timerMove.start(ENEMY_TIMER_INTERVAL);
 }

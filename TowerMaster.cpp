@@ -28,9 +28,6 @@ TowerMaster::TowerMaster() :
 
 TowerMaster::~TowerMaster()
 {
-    delete scene;
-    delete cursor;
-
     if (menuProcessor) {
         delete menuProcessor;
     }
@@ -38,6 +35,10 @@ TowerMaster::~TowerMaster()
     if (gameProcessor) {
         delete gameProcessor;
     }
+
+    delete cursor;
+
+    delete scene;
 }
 
 void TowerMaster::mouseMoveEvent(QMouseEvent *event)
@@ -47,16 +48,13 @@ void TowerMaster::mouseMoveEvent(QMouseEvent *event)
 
 void TowerMaster::handleGameProcessor()
 {
-    qDebug() << "TowerMaster::handleGameProcessor";
     menuProcessor = new MenuProcessor(scene);
-
-    qDebug() << "TowerMaster::handleGameProcessor 1";
 
     if (gameProcessor) {
         delete gameProcessor;
+        gameProcessor = nullptr;
     }
 
-    qDebug() << "TowerMaster::handleGameProcessor 2";
     connect(menuProcessor, &MenuProcessor::keyChoiseMade, this, &TowerMaster::handleMenuProcessor);
     // Back to main menu => => process = Process::Menu && delete gameProcessor;
     // Quit delete gameProcessor; => quit
@@ -64,17 +62,16 @@ void TowerMaster::handleGameProcessor()
 
 void TowerMaster::handleMenuProcessor()
 {
-    qDebug() << "TowerMaster::handleMenuProcessor 0";
     switch (menuProcessor->getChoice())
     {
         case MenuProcessor::StartGame:
         {
             // StartGame => Read Params => process = Process::Game && delete menuProcessor;
-            qDebug() << "TowerMaster::handleMenuProcessor";
             gameProcessor = new GameProcessor(scene, menuProcessor->getLocationChoice(), cursor);
 
             if (menuProcessor) {
                 delete menuProcessor;
+                menuProcessor = nullptr;
             }
 
             connect(gameProcessor, &GameProcessor::mainMenuSignal, this, &TowerMaster::handleGameProcessor);
@@ -83,6 +80,11 @@ void TowerMaster::handleMenuProcessor()
         }
         case MenuProcessor::Quit:
         {
+            if (menuProcessor) {
+                delete menuProcessor;
+                menuProcessor = nullptr;
+            }
+
             // Post a quit event to the application's event loop
             QCoreApplication::postEvent(QCoreApplication::instance(), new QEvent(QEvent::Quit));
 

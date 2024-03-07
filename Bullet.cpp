@@ -14,6 +14,8 @@ Bullet::Bullet() :
 }
 
 Bullet::Bullet(Bullet &bulletPatern) :
+    QObject(),
+    QGraphicsPixmapItem(),
     outOfBattle(false)
 {
     setPixmap(bulletPatern.pixmap());
@@ -28,24 +30,24 @@ Bullet::~Bullet()
 
 void Bullet::move()
 {
-    setPos(pos().x() + stepSize * cos(qDegreesToRadians(angle)),
-           pos().y() + stepSize * sin(qDegreesToRadians(angle)));
+    setPos(pos().x() + stepSize * scale() * cos(qDegreesToRadians(angle)),
+           pos().y() + stepSize * scale() * sin(qDegreesToRadians(angle)));
 
     // Get a list of items colliding with this item
     QList<QGraphicsItem *> collidingItems = this->collidingItems();
 
-    // Iterate through the list
+    // Iterate through the colliding items list
     for (QGraphicsItem * collidingItem : collidingItems) {
         // Check if the colliding item is the enemy
         auto enemy = dynamic_cast<Enemy *>(collidingItem);
 
         if (enemy) {
+
+            attackTarget(enemy);
+
             // Mark the bullet for removal
             outOfBattle = true;
             emit targetReached();
-
-            // Same for the enemy
-            enemy->prepareForRemoval();
 
             break; // No need to continue checking once intersection is detected
         }
@@ -72,7 +74,16 @@ void Bullet::shot()
 {
     // Connect timer to move()
     connect(&moveTimer, SIGNAL(timeout()), this, SLOT(move()));
-    moveTimer.start(ENEMY_TIMER_INTERVAL);
+    moveTimer.start(BULLET_TIMER_INTERVAL);
+}
+
+void Bullet::attackTarget(Enemy *enemy)
+{
+    if (enemy->getCurrentHealth() - damage > MIN_ENEMY_HEALTH) {
+        enemy->setCurrentHealth(enemy->getCurrentHealth() - damage);
+    } else {
+        enemy->prepareForRemoval();
+    }
 }
 
 int Bullet::getSpeed() const
@@ -82,13 +93,14 @@ int Bullet::getSpeed() const
 
 void Bullet::setSpeed(int newSpeed)
 {
-    if (newSpeed < MIN_BULLET_SPEED) {
-        speed = MIN_BULLET_SPEED;
-    } else {
-        speed = newSpeed;
-    }
+    speed = (newSpeed < MIN_BULLET_SPEED) ? MIN_BULLET_SPEED : newSpeed;
 
     stepSize = speed * BULLET_TIMER_INTERVAL / 1000;
+}
+
+void Bullet::setScale(qreal scale)
+{
+    QGraphicsPixmapItem::setScale(this->scale() * scale);
 }
 
 int Bullet::getDamage() const

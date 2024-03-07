@@ -6,6 +6,7 @@
 #include <QTimer>
 
 #include "Location.h"
+#include "Enemy.h"
 
 #define MIN_BULLET_DAMAGE 1
 #define BULLET_TIMER_INTERVAL 50
@@ -27,7 +28,11 @@ public:
     int getSpeed() const;
     void setSpeed(int newSpeed);
 
+    void setScale(qreal scale);
+
     void shot();
+
+    void attackTarget(Enemy * enemy);
 
     const Location *getLocation() const;
     void setLocation(const Location *newLocation);
