@@ -13,10 +13,10 @@ Enemy::Enemy(int id,
     id(id),
     type(type),
     route(route),
-    totalHealth(MIN_ENEMY_HEALTH),
-    currentHealth(MIN_ENEMY_HEALTH),
-    speed(MIN_ENEMY_SPEED),
-    stepSize(MIN_ENEMY_SPEED),
+    totalHealth(ENEMY_MIN_HEALTH),
+    currentHealth(ENEMY_MIN_HEALTH),
+    speed(ENEMY_MIN_SPEED),
+    stepSize(ENEMY_MIN_SPEED),
     currentDestinationIndex(0),
     angle(0),
     totalHealthBar(new QGraphicsLineItem),
@@ -76,14 +76,14 @@ void Enemy::loadXmlParameters(QString inFileName)
                                   QString(node.attribute("val")));
 
                 // Prepare total health bar
-                totalHealthBar->setPen(QPen(Qt::red));
+                totalHealthBar->setPen(QPen(QBrush(Qt::red), ENEMY_HEALTH_BAR_WIDTH));
                 totalHealthBar->setLine(pos().x(),
                                         pos().y(),
                                         pos().x() + boundingRect().width() * scale(),
                                         pos().y());
 
                 // Prepare current health bar
-                currentHealthBar->setPen(QPen(Qt::green));
+                currentHealthBar->setPen(QPen(QBrush(Qt::green), ENEMY_HEALTH_BAR_WIDTH));
                 currentHealthBar->setLine(pos().x(),
                                           pos().y(),
                                           pos().x() + boundingRect().width() * scale(),
@@ -155,7 +155,7 @@ int Enemy::getCurrentHealth() const
 
 void Enemy::setCurrentHealth(int newCurrentHealth)
 {
-    currentHealth = (newCurrentHealth < MIN_ENEMY_HEALTH) ? MIN_ENEMY_HEALTH : newCurrentHealth;
+    currentHealth = (newCurrentHealth < ENEMY_MIN_HEALTH) ? ENEMY_MIN_HEALTH : newCurrentHealth;
 
     if(currentHealth < totalHealth) {
         // Decrease current health bar (Green line)
@@ -170,7 +170,7 @@ int Enemy::getTotalHealth() const
 
 void Enemy::setTotalHealth(int newTotalHealth)
 {
-    totalHealth = (newTotalHealth < MIN_ENEMY_HEALTH) ? MIN_ENEMY_HEALTH : newTotalHealth;
+    totalHealth = (newTotalHealth < ENEMY_MIN_HEALTH) ? ENEMY_MIN_HEALTH : newTotalHealth;
 }
 
 void Enemy::show(QGraphicsScene * scene)
@@ -194,7 +194,7 @@ int Enemy::getSpeed() const
 
 void Enemy::setSpeed(int newSpeed)
 {
-    speed = (newSpeed < MIN_ENEMY_SPEED) ? MIN_ENEMY_SPEED : newSpeed;
+    speed = (newSpeed < ENEMY_MIN_SPEED) ? ENEMY_MIN_SPEED : newSpeed;
 
     stepSize = speed * ENEMY_TIMER_INTERVAL / 1000 * scale();
 }

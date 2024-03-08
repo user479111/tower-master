@@ -11,8 +11,9 @@
 #include <QRectF>
 
 #define ENEMY_TIMER_INTERVAL 50
-#define MIN_ENEMY_SPEED 20
-#define MIN_ENEMY_HEALTH 1
+#define ENEMY_MIN_SPEED 20
+#define ENEMY_MIN_HEALTH 1
+#define ENEMY_HEALTH_BAR_WIDTH 3
 
 class Enemy : public QObject, public QGraphicsPixmapItem
 {
