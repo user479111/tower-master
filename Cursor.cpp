@@ -89,6 +89,8 @@ bool Cursor::getBuildMode() const
 
 void Cursor::setBuildMode(const bool newBuildMode, const QString &towerType, const qreal scale)
 {
+    buildMode = newBuildMode;
+
     if (newBuildMode) {
 
         if (towerType.isEmpty()) {
@@ -97,7 +99,7 @@ void Cursor::setBuildMode(const bool newBuildMode, const QString &towerType, con
 
         this->towerType = towerType;
 
-        setPixmap(QString(":/Data/Data/Towers/" + towerType + "/Tower.png"));
+        setBuildImage(false);
         QGraphicsPixmapItem::setPos(pos().x() - pixmap().width()/2, pos().y() - pixmap().height()/2);
 
     } else {
@@ -107,8 +109,6 @@ void Cursor::setBuildMode(const bool newBuildMode, const QString &towerType, con
         QGraphicsPixmapItem::setPos(previousPosition);
 
     }
-
-    buildMode = newBuildMode;
 
     setScale(scale);
 }
@@ -164,6 +164,5 @@ void Cursor::setScrollAreaRect(const QRectF &newScrollAreaRect)
 //       procedure won't be called
 void Cursor::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    QGraphicsPixmapItem::mousePressEvent(event);
     emit mousePressed();
 }

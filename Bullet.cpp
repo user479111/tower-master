@@ -79,7 +79,7 @@ void Bullet::shot()
 
 void Bullet::attackTarget(Enemy *enemy)
 {
-    if (enemy->getCurrentHealth() - damage > MIN_ENEMY_HEALTH) {
+    if (enemy->getCurrentHealth() - damage > ENEMY_MIN_HEALTH) {
         enemy->setCurrentHealth(enemy->getCurrentHealth() - damage);
     } else {
         enemy->prepareForRemoval();

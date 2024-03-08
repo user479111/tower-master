@@ -262,6 +262,11 @@ void GameInterface::processScrollForward()
     currentTowerItem = (currentTowerItem + 1) % towersTypes.size(); // increment until towersTypes.size()
 
     buildTowerItem->setPixmap(QString(":/Data/Data/Towers/" + towersTypes[currentTowerItem] + "/Tower.png"));
+
+    // Set the Icon on the updated position
+    buildTowerItem->setPos(QPointF(
+        playerBoard->x() + playerBoard->boundingRect().width() / 2 - buildTowerItem->boundingRect().width() / 2,
+        playerBoard->y() + playerBoard->boundingRect().height() / 2 - buildTowerItem->boundingRect().height() / 2));
 }
 
 void GameInterface::processScrollBackward()
@@ -269,6 +274,11 @@ void GameInterface::processScrollBackward()
     currentTowerItem = (currentTowerItem > 0 ? currentTowerItem : towersTypes.size()) - 1; // decrement until 0
 
     buildTowerItem->setPixmap(QString(":/Data/Data/Towers/" + towersTypes[currentTowerItem] + "/Tower.png"));
+
+    // Set the Icon on the updated position
+    buildTowerItem->setPos(QPointF(
+        playerBoard->x() + playerBoard->boundingRect().width() / 2 - buildTowerItem->boundingRect().width() / 2,
+        playerBoard->y() + playerBoard->boundingRect().height() / 2 - buildTowerItem->boundingRect().height() / 2));
 }
 
 void GameInterface::processBuildingTower()
@@ -281,7 +291,10 @@ void GameInterface::processBuildingTower()
 
     Tower * tower = new Tower(towersTypes[currentTowerItem], cursor->pos(), battlefield->getLocation());
 
+    // Display the tower on the battlefield
     battlefield->addTower(tower);
+
+    // Display the tower position on the minimap
     minimap->addTower(tower);
 
     disconnect(cursor, &Cursor::mousePressed, this, &GameInterface::processBuildingTower);
