@@ -5,7 +5,8 @@
 #include <QDebug>
 
 TowerMaster::TowerMaster() :
-    scene(new QGraphicsScene(this))
+    scene(new QGraphicsScene(this)),
+    preferences(new Preferences)
 {
     setRenderHint(QPainter::Antialiasing); // Set rendering hints for smoother zooming
     //setTransformationAnchor(QGraphicsView::AnchorUnderMouse); // Zoom centered around mouse cursor
@@ -21,7 +22,7 @@ TowerMaster::TowerMaster() :
     setMouseTracking(true);
     cursor = new Cursor(scene, scene->sceneRect());
 
-    menuProcessor = new MenuProcessor(scene);
+    menuProcessor = new MenuProcessor(preferences, scene);
 
     connect(menuProcessor, &MenuProcessor::keyChoiseMade, this, &TowerMaster::handleMenuProcessor);
 }
@@ -48,7 +49,7 @@ void TowerMaster::mouseMoveEvent(QMouseEvent *event)
 
 void TowerMaster::handleGameProcessor()
 {
-    menuProcessor = new MenuProcessor(scene);
+    menuProcessor = new MenuProcessor(preferences, scene);
 
     if (gameProcessor) {
         delete gameProcessor;
@@ -67,7 +68,7 @@ void TowerMaster::handleMenuProcessor()
         case MenuProcessor::StartGame:
         {
             // StartGame => Read Params => process = Process::Game && delete menuProcessor;
-            gameProcessor = new GameProcessor(scene, menuProcessor->getLocationChoice(), cursor);
+            gameProcessor = new GameProcessor(preferences, scene, menuProcessor->getLocationChoice(), cursor);
 
             if (menuProcessor) {
                 delete menuProcessor;

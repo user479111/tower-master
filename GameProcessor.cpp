@@ -2,7 +2,8 @@
 
 #include <QDebug>
 
-GameProcessor::GameProcessor(QGraphicsScene * scene,
+GameProcessor::GameProcessor(Preferences * preferences,
+                             QGraphicsScene * scene,
                              QString locationName,
                              Cursor * cursor,
                              QObject * parent)
@@ -11,7 +12,7 @@ GameProcessor::GameProcessor(QGraphicsScene * scene,
       cursor(cursor),
       location(new Location(scene, locationName)),
       battlefield(new Battlefield(scene, cursor, location)),
-      gameInterface(new GameInterface(scene, cursor, battlefield))
+      gameInterface(new GameInterface(preferences, scene, cursor, battlefield))
 {
     scene->setBackgroundBrush(QBrush(Qt::black));
 

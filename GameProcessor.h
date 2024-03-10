@@ -9,12 +9,14 @@
 #include "Location.h"
 #include "GameInterface.h"
 #include "Battlefield.h"
+#include "Preferences.h"
 
 class GameProcessor : public QObject
 {
     Q_OBJECT
 public:
-    explicit GameProcessor(QGraphicsScene * scene,
+    explicit GameProcessor(Preferences * preferences,
+                           QGraphicsScene * scene,
                            QString locationName,
                            Cursor * cursor,
                            QObject * parent = nullptr);

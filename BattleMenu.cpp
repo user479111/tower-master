@@ -16,12 +16,13 @@ BattleMenu::BattleMenu() :
 
 BattleMenu::~BattleMenu()
 {
-    delete mapPreview;
-    delete locationInfo;
-
     for (auto locationItem : locations) {
         delete locationItem;
     }
+
+    delete locationInfo;
+
+    delete mapPreview;
 }
 
 void BattleMenu::prepare()
@@ -75,7 +76,7 @@ void BattleMenu::show(QGraphicsScene * scene)
 
     foreach (auto item, getListOfItems()) {
         item->setChosen(false);
-        scene->addItem(item);
+        item->show(scene);
     }
 }
 
@@ -96,7 +97,7 @@ void BattleMenu::hide(QGraphicsScene * scene)
 
     // hide items
     for (auto item : getListOfItems()) {
-        scene->removeItem(item);
+        item->hide(scene);
     }
 }
 

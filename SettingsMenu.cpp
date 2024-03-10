@@ -1,20 +1,19 @@
-#include "BaseMenu.h"
+#include "SettingsMenu.h"
 
-#include <QDebug>
-
-BaseMenu::BaseMenu()
+SettingsMenu::SettingsMenu(QObject *parent)
+    : QObject{parent}
 {
+
 }
 
-BaseMenu::~BaseMenu()
+SettingsMenu::~SettingsMenu()
 {
+
 }
 
-void BaseMenu::show(QGraphicsScene * scene)
+void SettingsMenu::show(QGraphicsScene *scene)
 {
-    qDebug() << getBackgroundImage();
     scene->setBackgroundBrush(QBrush(QImage(":/Data/Data/Menu/" + getBackgroundImage())));
-
     scene->addItem(getBoard());
 
     // show items
@@ -24,7 +23,7 @@ void BaseMenu::show(QGraphicsScene * scene)
     }
 }
 
-void BaseMenu::hide(QGraphicsScene * scene)
+void SettingsMenu::hide(QGraphicsScene *scene)
 {
     scene->removeItem(getBoard());
 
@@ -33,4 +32,3 @@ void BaseMenu::hide(QGraphicsScene * scene)
         item->hide(scene);
     }
 }
-

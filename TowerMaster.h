@@ -9,6 +9,7 @@
 
 #include "MenuProcessor.h"
 #include "GameProcessor.h"
+#include "Preferences.h"
 #include "Cursor.h"
 
 class TowerMaster : public QGraphicsView
@@ -29,6 +30,7 @@ private:
     Cursor * cursor;
     MenuProcessor * menuProcessor;
     GameProcessor * gameProcessor;
+    Preferences * preferences;
 };
 
 #endif // TOWERMASTER_H

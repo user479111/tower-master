@@ -4,11 +4,13 @@
 #include <QDir>
 #include <QDebug>
 
-GameInterface::GameInterface(QGraphicsScene * scene,
+GameInterface::GameInterface(Preferences * preferences,
+                             QGraphicsScene * scene,
                              Cursor * cursor,
                              Battlefield * battlefield,
                              QObject * parent) :
     QObject(parent),
+    preferences(preferences),
     scene(scene),
     cursor(cursor),
     battlefield(battlefield),
@@ -65,25 +67,45 @@ GameInterface::GameInterface(QGraphicsScene * scene,
     scene->addItem(playerBoard);
 
     // setup pause menu button
-    pauseMenu->setTitle("pause");
-    pauseMenu->setPixmap(QString(":/Data/Data/Game/Pause.png"));
+    pauseMenu->setPixmap(QString(":/Data/Data/Menu/Scroll.png"));
+
+    // move to XML?
+    if (preferences->getLanguage() == "English") {
+        pauseMenu->setText("Pause");
+    } else if (preferences->getLanguage() == "Ukrainian") {
+        pauseMenu->setText("Пауза");
+    } else if (preferences->getLanguage() == "Russian") {
+        pauseMenu->setText("Пауза");
+    }
+
+    pauseMenu->setScale(0.5 /* xml */);
     pauseMenu->setPos(QPointF(
-        playerBoard->x() + (playerBoard->boundingRect().width() - pauseMenu->boundingRect().width() * 2) / 3,
-        playerBoard->y() + pauseMenu->boundingRect().height() * 0.5));
+        playerBoard->x() + (playerBoard->boundingRect().width() - pauseMenu->boundingRect().width() * 2 * pauseMenu->scale()) / 3,
+        playerBoard->y() + pauseMenu->boundingRect().height() * pauseMenu->scale() / 2));
     pauseMenu->setZValue(1);
-    scene->addItem(pauseMenu);
+    pauseMenu->show(scene);
 
     connect(pauseMenu, &MenuItem::clicked, this, &GameInterface::processPauseClick);
 
     // setup hide menu button
-    hidePanels->setTitle("hide");
-    hidePanels->setPixmap(QString(":/Data/Data/Game/Hide.png"));
+    hidePanels->setPixmap(QString(":/Data/Data/Menu/Scroll.png"));
+
+    // move to XML?
+    if (preferences->getLanguage() == "English") {
+        hidePanels->setText("Hide");
+    } else if (preferences->getLanguage() == "Ukrainian") {
+        hidePanels->setText("Сховати");
+    } else if (preferences->getLanguage() == "Russian") {
+        hidePanels->setText("Спрятать");
+    }
+
+    hidePanels->setScale(0.5 /* xml */ );
     hidePanels->setPos(QPointF(
-        playerBoard->x() + playerBoard->boundingRect().width() - hidePanels->boundingRect().width() -
-                           (playerBoard->boundingRect().width() - hidePanels->boundingRect().width() * 2) / 3,
-        playerBoard->y() + hidePanels->boundingRect().height() / 2));
+        playerBoard->x() + playerBoard->boundingRect().width() - hidePanels->boundingRect().width() * hidePanels->scale() -
+                           (playerBoard->boundingRect().width() - hidePanels->boundingRect().width() * hidePanels->scale() * 2) / 3,
+        playerBoard->y() + hidePanels->boundingRect().height() * hidePanels->scale() / 2));
     hidePanels->setZValue(1);
-    scene->addItem(hidePanels);
+    hidePanels->show(scene);
 
     connect(hidePanels, &MenuItem::clicked, this, &GameInterface::processHideClick);
 
@@ -176,13 +198,13 @@ void GameInterface::processScroll()
                       hide * (playerBoard->boundingRect().height() / 2));
 
     pauseMenu->setPos(QPointF(
-        playerBoard->x() + (playerBoard->boundingRect().width() - pauseMenu->boundingRect().width() * 2) / 3,
-        playerBoard->y() + pauseMenu->boundingRect().height() * 0.5));
+        playerBoard->x() + (playerBoard->boundingRect().width() - pauseMenu->boundingRect().width() * pauseMenu->scale() * 2) / 3,
+        playerBoard->y() + pauseMenu->boundingRect().height() * pauseMenu->scale() / 2));
 
     hidePanels->setPos(QPointF(
-        playerBoard->x() + playerBoard->boundingRect().width() - hidePanels->boundingRect().width() -
-                           (playerBoard->boundingRect().width() - hidePanels->boundingRect().width() * 2) / 3,
-        playerBoard->y() + hidePanels->boundingRect().height() * 0.5));
+        playerBoard->x() + playerBoard->boundingRect().width() - hidePanels->boundingRect().width() * hidePanels->scale() -
+                           (playerBoard->boundingRect().width() - hidePanels->boundingRect().width() * hidePanels->scale() * 2) / 3,
+        playerBoard->y() + hidePanels->boundingRect().height() * hidePanels->scale() / 2));
 
     buildTowerItem->setPos(QPointF(
         playerBoard->x() + playerBoard->boundingRect().width() / 2 - buildTowerItem->boundingRect().width() / 2,
@@ -245,7 +267,13 @@ void GameInterface::processHideClick()
 {
     hide = !hide;
 
-    hidePanels->setPixmap(hide ? QString(":/Data/Data/Game/Show.png") : QString(":/Data/Data/Game/Hide.png"));
+    if (preferences->getLanguage() == "English") {
+        hidePanels->setText(hide ? "Show" : "Hide");
+    } else if (preferences->getLanguage() == "Ukrainian") {
+        hidePanels->setText(hide ? "Показати" : "Сховати");
+    } else if (preferences->getLanguage() == "Russian") {
+        hidePanels->setText(hide ? "Показать" : "Спрятать");
+    }
 
     processScroll();
 }

@@ -13,24 +13,39 @@
         </section>
 
         <section name="menu-content">
-            <section name="company">
-                <attstr name="company-image" val="Company.png"/>
+            <section name="company" type="menu-item">
+                <attstr name="image" val="Scroll.png"/>
+                <attstr name="text" language="English" val="Company"/>
+                <attstr name="text" language="Ukrainian" val="Компанія"/>
+                <attstr name="text" language="Russian" val="Компания"/>
                 <attpos x="80" y="80"/>
             </section>
-            <section name="battle">
-                <attstr name="battle-image" val="Battle.png"/>
+            <section name="battle" type="menu-item">
+                <attstr name="image" val="Scroll.png"/>
+                <attstr name="text" language="English" val="Battle"/>
+                <attstr name="text" language="Ukrainian" val="Битва"/>
+                <attstr name="text" language="Russian" val="Бой"/>
                 <attpos x="80" y="160"/>
             </section>
-            <section name="settings">
-                <attstr name="settings-image" val="Settings.png"/>
+            <section name="settings" type="menu-item">
+                <attstr name="image" val="Scroll.png"/>
+                <attstr name="text" language="English" val="Settings"/>
+                <attstr name="text" language="Ukrainian" val="Налаштування"/>
+                <attstr name="text" language="Russian" val="Настройки"/>
                 <attpos x="80" y="240"/>
             </section>
-            <section name="credits">
-                <attstr name="creadits-image" val="Credits.png"/>
+            <section name="credits" type="menu-item">
+                <attstr name="image" val="Scroll.png"/>
+                <attstr name="text" language="English" val="Credits"/>
+                <attstr name="text" language="Ukrainian" val="Автори"/>
+                <attstr name="text" language="Russian" val="Авторы"/>
                 <attpos x="80" y="320"/>
             </section>
-            <section name="quit">
-                <attstr name="quit-image" val="Quit.png"/>
+            <section name="quit" type="menu-item">
+                <attstr name="image" val="Scroll.png"/>
+                <attstr name="text" language="English" val="Quit"/>
+                <attstr name="text" language="Ukrainian" val="Вихід"/>
+                <attstr name="text" language="Russian" val="Выход"/>
                 <attpos x="80" y="400"/>
             </section>
         </section>
@@ -49,12 +64,18 @@
         </section>
 
         <section name="menu-content">
-            <section name="back">
-                <attstr name="back-image" val="Back.png"/>
+            <section name="back" type="menu-item">
+            <attstr name="image" val="Scroll.png"/>
+            <attstr name="text" language="English" val="Back"/>
+            <attstr name="text" language="Ukrainian" val="Назад"/>
+            <attstr name="text" language="Russian" val="Назад"/>
                 <attpos x="70" y="390"/>
             </section>
-            <section name="load">
-                <attstr name="load-image" val="Load.png"/>
+            <section name="load" type="menu-item">
+                <attstr name="image" val="Scroll.png"/>
+                <attstr name="text" language="English" val="Load"/>
+                <attstr name="text" language="Ukrainian" val="Завантажити"/>
+                <attstr name="text" language="Russian" val="Загрузить"/>
                 <attpos x="560" y="390"/>
             </section>
         </section>
@@ -76,6 +97,35 @@
         <section name="location-info">
             <attpos x="545" y="200"/>
             <attnum name="font-size" val="10"/>
+        </section>
+    </section>
+
+    <section name="settings-menu">
+
+        <section name="background">
+            <attstr name="background-image" val="MainMenuTower.png"/>
+        </section>
+
+        <section name="menu">
+            <attstr name="menu-image" val="SettingsBoard.png"/>
+            <attpos x="50" y="0"/>
+        </section>
+
+        <section name="menu-content">
+            <section name="back" type="menu-item">
+                <attstr name="image" val="Scroll.png"/>
+                <attstr name="text" language="English" val="Back"/>
+                <attstr name="text" language="Ukrainian" val="Назад"/>
+                <attstr name="text" language="Russian" val="Назад"/>
+                <attpos x="70" y="395"/>
+            </section>
+            <section name="apply" type="menu-item">
+                <attstr name="image" val="Scroll.png"/>
+                <attstr name="text" language="English" val="Apply"/>
+                <attstr name="text" language="Ukrainian" val="Застосувати"/>
+                <attstr name="text" language="Russian" val="Применить"/>
+                <attpos x="575" y="395"/>
+            </section>
         </section>
     </section>
 

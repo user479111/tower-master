@@ -24,6 +24,8 @@ SOURCES += \
     MenuItem.cpp \
     MenuProcessor.cpp \
     Minimap.cpp \
+    Preferences.cpp \
+    SettingsMenu.cpp \
     Tower.cpp \
     TowerMaster.cpp \
     Wave.cpp \
@@ -44,6 +46,8 @@ HEADERS += \
     MenuItem.h \
     MenuProcessor.h \
     Minimap.h \
+    Preferences.h \
+    SettingsMenu.h \
     Tower.h \
     TowerMaster.h \
     Wave.h

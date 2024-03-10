@@ -11,12 +11,15 @@
 #include "Menu.h"
 #include "BaseMenu.h"
 #include "BattleMenu.h"
+#include "Preferences.h"
+#include "SettingsMenu.h"
 
 class MenuProcessor : public QObject
 {
     Q_OBJECT
 public:
-    MenuProcessor(QGraphicsScene * scene);
+    MenuProcessor(Preferences * preferences,
+                  QGraphicsScene * scene);
     ~MenuProcessor();
 
     enum Choice { StayInMenu, StartGame, Quit };
@@ -34,16 +37,18 @@ signals:
     void keyChoiseMade();
 
 private:
+    Preferences * preferences;
     QGraphicsScene * scene;
+
     Menu * currentMenu;
     BaseMenu * baseMenu;
     //CompanyMenu * subMenuCompany;
     BattleMenu * battleMenu;
-    //SettingsMenu * subMenuSettings;
+    SettingsMenu * settingsMenu;
     //CreditsMenu * subMenuCreadits;
+
     Choice choice;
     QString locationChoice;
-
 };
 
 #endif // MENUPROCESSOR_H

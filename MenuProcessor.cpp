@@ -4,11 +4,15 @@
 #include <QTextStream>
 #include <QDebug>
 
-MenuProcessor::MenuProcessor(QGraphicsScene * scene) :
+MenuProcessor::MenuProcessor(Preferences * preferences,
+                             QGraphicsScene * scene) :
+    preferences(preferences),
     scene(scene),
     baseMenu(new BaseMenu()),
     battleMenu(new BattleMenu()),
-    choice(StayInMenu)
+    settingsMenu(new SettingsMenu()),
+    choice(StayInMenu),
+    locationChoice("")
 {
     // read MenuProcessorXML file and set MenuProcessor parameters
     loadXmlParameters(QString(":/Data/Data/Menu/MenuProcessor.xml"));
@@ -27,6 +31,7 @@ MenuProcessor::~MenuProcessor()
 {
     delete baseMenu;
     delete battleMenu;
+    delete settingsMenu;
 }
 
 void MenuProcessor::loadXmlParameters(QString inFileName)
@@ -57,6 +62,8 @@ void MenuProcessor::loadXmlParameters(QString inFileName)
             processedMenu = baseMenu;
         } else if (QString(node.attribute("name")) == "battle-menu") {
             processedMenu = battleMenu;
+        } else if (QString(node.attribute("name")) == "settings-menu") {
+            processedMenu = settingsMenu;
         } else {
             processedMenu = baseMenu;
         }
@@ -99,9 +106,16 @@ void MenuProcessor::loadXmlParameters(QString inFileName)
 
                         if(currentElement.tagName() == "attstr") {
 
-                            // Set item's source image
                             if (QString(currentElement.attribute("name")).contains("image")) {
+
+                                // Set item's background source image
                                 newItem->setPixmap(":/Data/Data/Menu/" + QString(currentElement.attributes().namedItem("val").nodeValue()));
+
+                            } else if (QString(currentElement.attribute("name")).contains("text") &&
+                                       QString(currentElement.attribute("language")).contains(preferences->getLanguage())) {
+
+                                // Set text for the item
+                                newItem->setText(QString(currentElement.attributes().namedItem("val").nodeValue()));
                             }
 
                         } else if (currentElement.tagName() == "attpos") {
@@ -325,7 +339,7 @@ void MenuProcessor::processItemClick()
         } else if (currentMenu->transition() == "battle") {
             currentMenu = battleMenu;
         } else if (currentMenu->transition() == "settings") {
-            // Process SettingsMenu class.
+            currentMenu = settingsMenu;
         } else if (currentMenu->transition() == "credits") {
             // Process CreditsMenu class.
         } else if (currentMenu->transition() == "quit") {
@@ -347,6 +361,16 @@ void MenuProcessor::processItemClick()
                 choice = StartGame;
                 emit  keyChoiseMade();
             }
+        }
+
+    } else if (dynamic_cast<SettingsMenu*>(currentMenu)) {
+
+        if (currentMenu->transition() == "back") {
+            currentMenu = baseMenu;
+        } else if (currentMenu->transition() == "apply") {
+
+            // Apply changes on scene or inside the TowerMaster class
+            emit  keyChoiseMade();
         }
 
     } else {
