@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<params name="base-menu">
+
+    <section name="background">
+        <attstr name="background-image" val="MainMenuTower.png"/>
+    </section>
+
+    <section name="menu">
+        <attstr name="menu-image" val="MenuBoard.png"/>
+        <attpos x="10" y="0"/>
+    </section>
+
+    <section name="menu-content">
+        <section name="company" type="menu-item">
+            <attpos x="80" y="80"/>
+            <attnum name="fixed-size" val="false"/>
+            <attstr name="image" val="Scroll.png"/>
+            <attstr name="text" language="English" val="Company"/>
+            <attstr name="text" language="Українська" val="Компанія"/>
+            <attstr name="text" language="Русский" val="Компания"/>
+            <attstr name="title" val="company"/>
+        </section>
+        <section name="battle" type="menu-item">
+            <attpos x="80" y="160"/>
+            <attnum name="fixed-size" val="false"/>
+            <attstr name="image" val="Scroll.png"/>
+            <attstr name="text" language="English" val="Battle"/>
+            <attstr name="text" language="Українська" val="Битва"/>
+            <attstr name="text" language="Русский" val="Бой"/>
+            <attstr name="title" val="battle"/>
+        </section>
+        <section name="settings" type="menu-item">
+            <attpos x="80" y="240"/>
+            <attnum name="fixed-size" val="false"/>
+            <attstr name="image" val="Scroll.png"/>
+            <attstr name="text" language="English" val="Settings"/>
+            <attstr name="text" language="Українська" val="Налаштування"/>
+            <attstr name="text" language="Русский" val="Настройки"/>
+            <attstr name="title" val="settings"/>
+        </section>
+        <section name="credits" type="menu-item">
+            <attpos x="80" y="320"/>
+            <attnum name="fixed-size" val="false"/>
+            <attstr name="image" val="Scroll.png"/>
+            <attstr name="text" language="English" val="Credits"/>
+            <attstr name="text" language="Українська" val="Автори"/>
+            <attstr name="text" language="Русский" val="Авторы"/>
+            <attstr name="title" val="credits"/>
+        </section>
+        <section name="quit" type="menu-item">
+            <attpos x="80" y="400"/>
+            <attnum name="fixed-size" val="false"/>
+            <attstr name="image" val="Scroll.png"/>
+            <attstr name="text" language="English" val="Quit"/>
+            <attstr name="text" language="Українська" val="Вихід"/>
+            <attstr name="text" language="Русский" val="Выход"/>
+            <attstr name="title" val="quit"/>
+        </section>
+    </section>
+
+</params>

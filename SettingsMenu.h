@@ -2,22 +2,26 @@
 #define SETTINGSMENU_H
 
 #include <QGraphicsScene>
-#include <QObject>
 
 #include "Menu.h"
+#include "Preferences.h"
 
-class SettingsMenu : public QObject, public Menu
+
+class SettingsMenu : public Menu
 {
-    Q_OBJECT
 public:
-    explicit SettingsMenu(QObject *parent = nullptr);
+    SettingsMenu(Preferences * preferences);
     virtual ~SettingsMenu();
 
     void show(QGraphicsScene * scene);
     void hide(QGraphicsScene * scene);
 
-signals:
+    void matchSettings();
+    void applySettings();
 
+private:
+    static const QString XML_FILE_NAME;
+    Preferences * preferences;
 };
 
 #endif // SETTINGSMENU_H

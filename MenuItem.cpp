@@ -105,8 +105,11 @@ void MenuItem::setZValue(qreal z)
 void MenuItem::setText(const QString &text)
 {
     this->text->setDefaultTextColor(Qt::black);
-    this->text->setFont(QFont("Helvetica [Cronyx]", 14, QFont::Bold));
+    this->text->setFont(QFont("Helvetica [Cronyx]", 14 /* TODO: Take from Preferences */ , QFont::Bold));
     this->text->setPlainText(text);
+
+    this->text->setPos(pos().x() + pixmap().width() * scale() / 2 - this->text->boundingRect().width() * scale() / 2,
+                      pos().y() + pixmap().height() * scale() / 2 - this->text->boundingRect().height() * scale() / 2);
 }
 
 void MenuItem::show(QGraphicsScene *scene)

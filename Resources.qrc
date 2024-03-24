@@ -6,7 +6,6 @@
         <file>Data/Locations/Borderlands/Location.xml</file>
         <file>Data/Enemies/Ghost/Enemy.xml</file>
         <file>Data/Menu/BattleBoard.png</file>
-        <file>Data/Menu/MenuProcessor.xml</file>
         <file>Data/Locations/Borderlands/Borderlands.png</file>
         <file>Data/Locations/Hell/Hell.png</file>
         <file>Data/Locations/Hell/Location.xml</file>
@@ -33,5 +32,11 @@
         <file>Data/Towers/Tower_000/Bullet.png</file>
         <file>Data/Menu/SettingsBoard.png</file>
         <file>Data/Menu/Scroll.png</file>
+        <file>Data/Menu/ArrowLeft.png</file>
+        <file>Data/Menu/ArrowRight.png</file>
+        <file>Data/Menu/BaseMenu.xml</file>
+        <file>Data/Menu/BattleMenu.xml</file>
+        <file>Data/Menu/SettingsMenu.xml</file>
+        <file>Data/Preferences/Preferences.xml</file>
     </qresource>
 </RCC>

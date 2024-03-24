@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<params name="preferences">
+ <attstr name="language" val="1"/>
+ <attstr name="fullscreen-mode" val="1"/>
+ <attstr name="resolution" val="1"/>
+</params>

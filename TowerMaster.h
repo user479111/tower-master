@@ -21,6 +21,9 @@ public:
 
     void mouseMoveEvent(QMouseEvent * event);
 
+private:
+    void applyScreenPreferences();
+
 private slots:
     void handleMenuProcessor();
     void handleGameProcessor();

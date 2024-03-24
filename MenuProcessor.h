@@ -1,9 +1,9 @@
 #ifndef MENUPROCESSOR_H
 #define MENUPROCESSOR_H
 
+#include <QGraphicsPixmapItem>
 #include <QGraphicsScene>
 #include <QMouseEvent>
-#include <QGraphicsPixmapItem>
 #include <QObject>
 #include <QPointF>
 #include <QList>
@@ -22,13 +22,10 @@ public:
                   QGraphicsScene * scene);
     ~MenuProcessor();
 
-    enum Choice { StayInMenu, StartGame, Quit };
+    enum Choice { StayInMenu, StartGame, ApplySettings, Quit };
     Choice getChoice() const;
 
     const QString &getLocationChoice() const;
-
-private:
-    void loadXmlParameters(QString inFileName);
 
 private slots:
     void processItemClick();

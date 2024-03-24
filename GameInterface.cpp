@@ -72,9 +72,9 @@ GameInterface::GameInterface(Preferences * preferences,
     // move to XML?
     if (preferences->getLanguage() == "English") {
         pauseMenu->setText("Pause");
-    } else if (preferences->getLanguage() == "Ukrainian") {
+    } else if (preferences->getLanguage() == "Українська") {
         pauseMenu->setText("Пауза");
-    } else if (preferences->getLanguage() == "Russian") {
+    } else if (preferences->getLanguage() == "Русский") {
         pauseMenu->setText("Пауза");
     }
 
@@ -90,12 +90,12 @@ GameInterface::GameInterface(Preferences * preferences,
     // setup hide menu button
     hidePanels->setPixmap(QString(":/Data/Data/Menu/Scroll.png"));
 
-    // move to XML?
+    // TODO: move to XML?
     if (preferences->getLanguage() == "English") {
         hidePanels->setText("Hide");
-    } else if (preferences->getLanguage() == "Ukrainian") {
+    } else if (preferences->getLanguage() == "Українська") {
         hidePanels->setText("Сховати");
-    } else if (preferences->getLanguage() == "Russian") {
+    } else if (preferences->getLanguage() == "Русский") {
         hidePanels->setText("Спрятать");
     }
 
@@ -269,9 +269,9 @@ void GameInterface::processHideClick()
 
     if (preferences->getLanguage() == "English") {
         hidePanels->setText(hide ? "Show" : "Hide");
-    } else if (preferences->getLanguage() == "Ukrainian") {
+    } else if (preferences->getLanguage() == "Українська") {
         hidePanels->setText(hide ? "Показати" : "Сховати");
-    } else if (preferences->getLanguage() == "Russian") {
+    } else if (preferences->getLanguage() == "Русский") {
         hidePanels->setText(hide ? "Показать" : "Спрятать");
     }
 
