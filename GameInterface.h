@@ -12,14 +12,16 @@
 #include "Cursor.h"
 #include "Minimap.h"
 #include "Location.h"
-#include "Battlefield.h"
 #include "MenuItem.h"
+#include "Battlefield.h"
+#include "Preferences.h"
 
 class GameInterface : public QObject
 {
     Q_OBJECT
 public:
-    explicit GameInterface(QGraphicsScene * scene,
+    explicit GameInterface(Preferences * preferences,
+                           QGraphicsScene * scene,
                            Cursor * cursor,
                            Battlefield * battlefield,
                            QObject * parent = nullptr);
@@ -41,6 +43,7 @@ signals:
     void mainMenuSignal();
 
 private:
+    Preferences * preferences;
     QGraphicsScene * scene;
     Cursor * cursor;
     Battlefield * battlefield;

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<params name="battle-menu">
+
+    <section name="background">
+        <attstr name="background-image" val="MainMenuTower.png"/>
+    </section>
+
+    <section name="menu">
+        <attstr name="menu-image" val="BattleBoard.png"/>
+        <attpos x="50" y="0"/>
+    </section>
+
+    <section name="menu-content">
+        <section name="back" type="menu-item">
+            <attpos x="70" y="390"/>
+            <attnum name="fixed-size" val="false"/>
+            <attstr name="image" val="Scroll.png"/>
+            <attstr name="text" language="English" val="Back"/>
+            <attstr name="text" language="Українська" val="Назад"/>
+            <attstr name="text" language="Русский" val="Назад"/>
+            <attstr name="title" val="back"/>
+        </section>
+        <section name="load" type="menu-item">
+            <attpos x="560" y="390"/>
+            <attnum name="fixed-size" val="false"/>
+            <attstr name="image" val="Scroll.png"/>
+            <attstr name="text" language="English" val="Load"/>
+            <attstr name="text" language="Українська" val="Завантажити"/>
+            <attstr name="text" language="Русский" val="Загрузить"/>
+            <attstr name="title" val="load"/>
+        </section>
+    </section>
+
+    <section name="locations-list">
+        <attpos x="120" y="120"/>
+        <attnum name="font-size" val="16"/>
+        <attnum name="interval" val="2"/>
+        <attnum name="width" val="300"/>
+        <attnum name="height" val="200"/>
+    </section>
+
+    <section name="map-preview">
+        <attstr name="default-map" val="DefaultMapPreview.png"/>
+        <attpos x="545" y="100"/>
+        <attnum name="scale" val="0.08"/>
+    </section>
+
+    <section name="location-info">
+        <attpos x="545" y="200"/>
+        <attnum name="font-size" val="10"/>
+    </section>
+
+</params>

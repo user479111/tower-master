@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<params name="settings-menu">
+
+    <section name="background">
+        <attstr name="background-image" val="MainMenuTower.png"/>
+    </section>
+
+    <section name="menu">
+        <attstr name="menu-image" val="SettingsBoard.png"/>
+        <attpos x="50" y="0"/>
+    </section>
+
+    <section name="menu-content">
+        <section name="fullscreen-mode" type="scroll-option">
+            <attpos x="180" y="150"/>
+
+            <section type="description">
+                <attstr name="text" language="English" val="Fullscreen mode:"/>
+                <attstr name="text" language="Українська" val="Повноекранний режим:"/>
+                <attstr name="text" language="Русский" val="Полноэкранный режим:"/>
+            </section>
+
+            <section name="left" type="menu-item">
+                <attstr name="image" val="ArrowLeft.png"/>
+                <attnum name="fixed-size" val="true"/>
+            </section>
+
+            <section type="options">
+                <section type="option">
+                    <attstr name="text" language="English" val="On"/>
+                    <attstr name="text" language="Українська" val="Вімк."/>
+                    <attstr name="text" language="Русский" val="Вкл."/>
+                </section>
+                <section type="option">
+                    <attstr name="text" language="English" val="Off"/>
+                    <attstr name="text" language="Українська" val="Вимк."/>
+                    <attstr name="text" language="Русский" val="Выкл."/>
+                </section>
+            </section>
+
+            <section name="right" type="menu-item">
+               <attstr name="image" val="ArrowRight.png"/>
+               <attnum name="fixed-size" val="true"/>
+            </section>
+        </section>
+
+        <section name="resolution" type="scroll-option">
+            <attpos x="180" y="200"/>
+
+            <section type="description">
+                <attstr name="text" language="English" val="Resolution:"/>
+                <attstr name="text" language="Українська" val="Дозвіл:"/>
+                <attstr name="text" language="Русский" val="Разрешение:"/>
+            </section>
+
+            <section name="left" type="menu-item">
+                <attstr name="image" val="ArrowLeft.png"/>
+                <attnum name="fixed-size" val="true"/>
+            </section>
+
+            <section type="options">
+                <section type="option">
+                    <attstr name="text" language="Any" val="800x600"/>
+                </section>
+                <section type="option">
+                    <attstr name="text" language="Any" val="1024x768"/>
+                </section>
+            </section>
+
+            <section name="right" type="menu-item">
+               <attstr name="image" val="ArrowRight.png"/>
+                <attnum name="fixed-size" val="true"/>
+            </section>
+        </section>
+
+        <section name="language" type="scroll-option">
+            <attpos x="180" y="250"/>
+
+            <section type="description">
+                <attstr name="text" language="English" val="Interface language:"/>
+                <attstr name="text" language="Українська" val="Мова інтерфейсу:"/>
+                <attstr name="text" language="Русский" val="Язык интерфейса:"/>
+            </section>
+
+            <section name="left" type="menu-item">
+                <attstr name="image" val="ArrowLeft.png"/>
+                <attnum name="fixed-size" val="true"/>
+            </section>
+
+            <section type="options">
+                <section type="option">
+                    <attstr name="text" language="Any" val="English"/>
+                </section>
+                <section type="option">
+                    <attstr name="text" language="Any" val="Українська"/>
+                </section>
+                <section type="option">
+                    <attstr name="text" language="Any" val="Русский"/>
+                </section>
+            </section>
+
+            <section name="right" type="menu-item">
+               <attstr name="image" val="ArrowRight.png"/>
+               <attnum name="fixed-size" val="true"/>
+            </section>
+        </section>
+
+        <section name="back" type="menu-item">
+            <attstr name="image" val="Scroll.png"/>
+            <attstr name="text" language="English" val="Back"/>
+            <attstr name="text" language="Українська" val="Назад"/>
+            <attstr name="text" language="Русский" val="Назад"/>
+            <attstr name="title" val="back"/>
+            <attpos x="70" y="395"/>
+        </section>
+        <section name="apply" type="menu-item">
+            <attstr name="image" val="Scroll.png"/>
+            <attstr name="text" language="English" val="Apply"/>
+            <attstr name="text" language="Українська" val="Застосувати"/>
+            <attstr name="text" language="Русский" val="Применить"/>
+            <attstr name="title" val="apply"/>
+            <attpos x="575" y="395"/>
+        </section>
+    </section>
+
+</params>

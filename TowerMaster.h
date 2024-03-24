@@ -9,6 +9,7 @@
 
 #include "MenuProcessor.h"
 #include "GameProcessor.h"
+#include "Preferences.h"
 #include "Cursor.h"
 
 class TowerMaster : public QGraphicsView
@@ -20,6 +21,9 @@ public:
 
     void mouseMoveEvent(QMouseEvent * event);
 
+private:
+    void applyScreenPreferences();
+
 private slots:
     void handleMenuProcessor();
     void handleGameProcessor();
@@ -29,6 +33,7 @@ private:
     Cursor * cursor;
     MenuProcessor * menuProcessor;
     GameProcessor * gameProcessor;
+    Preferences * preferences;
 };
 
 #endif // TOWERMASTER_H

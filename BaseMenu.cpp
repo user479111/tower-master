@@ -2,7 +2,11 @@
 
 #include <QDebug>
 
-BaseMenu::BaseMenu()
+
+const QString BaseMenu::XML_FILE_NAME = "BaseMenu.xml";
+
+BaseMenu::BaseMenu(const Preferences * preferences)
+    : Menu(preferences, XML_FILE_NAME)
 {
 }
 
@@ -12,15 +16,23 @@ BaseMenu::~BaseMenu()
 
 void BaseMenu::show(QGraphicsScene * scene)
 {
-    qDebug() << getBackgroundImage();
-    scene->setBackgroundBrush(QBrush(QImage(":/Data/Data/Menu/" + getBackgroundImage())));
+    // Load image
+    QPixmap backgroundImage(MENU_DIRECTORY + getBackgroundImage());
+     // Scale it to the screen size
+    backgroundImage = backgroundImage.scaled(scene->width(),
+                                             scene->height(),
+                                             Qt::IgnoreAspectRatio,
+                                             Qt::SmoothTransformation);
+    // Set it as a background brush
+    scene->setBackgroundBrush(backgroundImage);
 
+    // Display board with menu items
     scene->addItem(getBoard());
 
-    // show items
+    // Show items
     for (auto item : getListOfItems()) {
         item->setChosen(false);
-        scene->addItem(item);
+        item->show(scene);
     }
 }
 
@@ -30,7 +42,7 @@ void BaseMenu::hide(QGraphicsScene * scene)
 
     // remove items
     for (auto item : getListOfItems()) {
-        scene->removeItem(item);
+        item->hide(scene);
     }
 }
 

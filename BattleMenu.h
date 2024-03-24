@@ -2,6 +2,7 @@
 #define BATTLEMENU_H
 
 #include "Menu.h"
+#include "Preferences.h"
 #include "LocationItem.h"
 
 #include <QGraphicsPixmapItem>
@@ -9,11 +10,11 @@
 #include <QObject>
 #include <QList>
 
-class BattleMenu : public QObject, public Menu
+class BattleMenu : public Menu
 {
     Q_OBJECT
 public:
-    BattleMenu();
+    BattleMenu(const Preferences * preferences);
     virtual ~BattleMenu();
 
     void prepare();
@@ -41,10 +42,17 @@ public:
 
     const QString &getLocationChoice() const;
 
+protected:
+    void loadXmlParameters();
+
 public slots:
     void processLocationsClick();
 
 private:
+    static const QString XML_FILE_NAME;
+    static const QString LOCATIONS_DIRECTORY;
+    const Preferences * preferences;
+
     QList<LocationItem*> locations;
     QPointF locationListPos;
     int locationListFontSize;

@@ -24,6 +24,9 @@ SOURCES += \
     MenuItem.cpp \
     MenuProcessor.cpp \
     Minimap.cpp \
+    Preferences.cpp \
+    ScrollOption.cpp \
+    SettingsMenu.cpp \
     Tower.cpp \
     TowerMaster.cpp \
     Wave.cpp \
@@ -44,6 +47,9 @@ HEADERS += \
     MenuItem.h \
     MenuProcessor.h \
     Minimap.h \
+    Preferences.h \
+    ScrollOption.h \
+    SettingsMenu.h \
     Tower.h \
     TowerMaster.h \
     Wave.h
@@ -62,6 +68,7 @@ DISTFILES += \
     Data/Enemies/Ghost/Enemy.xml \
     Data/Locations/Borderlands/Location.xml \
     Data/Locations/Hell/Location.xml \
+    Data/Menu/BaseMenu.xml \
     Data/Menu/MenuProcessor.xml \
     Data/Towers/Shooting/Tower.xml \
     README.md
