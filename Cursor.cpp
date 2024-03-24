@@ -82,6 +82,14 @@ bool Cursor::getBuildIsPossible() const
     return buildIsPossible;
 }
 
+void Cursor::checkEscape(QKeyEvent *event)
+{
+    if (buildMode && event->key() == Qt::Key_Escape) {
+        // Escape from build mode
+        setBuildMode(false);
+    }
+}
+
 bool Cursor::getBuildMode() const
 {
     return buildMode;

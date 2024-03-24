@@ -5,6 +5,7 @@
 #include <QGraphicsScene>
 #include <QGraphicsPixmapItem>
 #include <QMouseEvent>
+#include <QKeyEvent>
 #include <QObject>
 
 #include "MenuProcessor.h"
@@ -20,6 +21,8 @@ public:
     ~TowerMaster();
 
     void mouseMoveEvent(QMouseEvent * event);
+
+    void keyPressEvent(QKeyEvent *event);
 
 private:
     void applyScreenPreferences();

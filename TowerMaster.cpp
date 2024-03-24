@@ -47,6 +47,11 @@ void TowerMaster::mouseMoveEvent(QMouseEvent *event)
     cursor->setPos(mapToScene(event->pos()));
 }
 
+void TowerMaster::keyPressEvent(QKeyEvent *event)
+{
+    cursor->checkEscape(event);
+}
+
 void TowerMaster::applyScreenPreferences()
 {
     setWindowState(preferences->getFullscreen() ? Qt::WindowFullScreen : Qt::WindowNoState);
