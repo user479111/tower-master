@@ -5,6 +5,7 @@
 #include <QGraphicsPixmapItem>
 #include <QGraphicsScene>
 #include <QGraphicsView>
+#include <QKeyEvent>
 #include <QPointF>
 #include <QObject>
 #include <QRectF>
@@ -31,6 +32,8 @@ public:
     void setBuildImage(bool buildIsPossible);
 
     bool getBuildIsPossible() const;
+
+    void checkEscape(QKeyEvent *event);
 
 private slots:
     void checkScrollArea();
