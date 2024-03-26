@@ -8,7 +8,13 @@
 
 Location::Location(QGraphicsScene * scene, QString name) :
     scene(scene),
-    name(name)
+    name(name),
+    locationImage(""),
+    locationImagePath(""),
+    width(0),
+    height(0),
+    timeForPreparation(0),
+    enemyDamageGoal(0)
 {
     // read Location.xml file and set Location parameters
     loadXmlParameters(QString(":/Data/Data/Locations/" + name + "/Location.xml"));
@@ -79,6 +85,8 @@ void Location::loadXmlParameters(QString inFileName)
                         height = QString(locationAttribute.attribute("val")).toInt();
                     } else if (QString(locationAttribute.attribute("name")) == "time-for-preparation") {
                         timeForPreparation = QString(locationAttribute.attribute("val")).toInt();
+                    } else if (QString(locationAttribute.attribute("name")) == "enemy-damage-goal") {
+                        enemyDamageGoal = QString(locationAttribute.attribute("val")).toInt();
                     }
 
                 }
@@ -219,6 +227,11 @@ void Location::loadXmlParameters(QString inFileName)
 
         node = node.nextSibling().toElement();
     }
+}
+
+int Location::getEnemyDamageGoal() const
+{
+    return enemyDamageGoal;
 }
 
 const QString &Location::getName() const

@@ -46,6 +46,13 @@ signals:
     void mainMenuSignal();
 
 private:
+    static const float BUILD_ITEM_SCALE;
+    static const float BOARD_ITEM_SCALE;
+    static const float MINIMAP_SCALE;
+
+    static const QString FONT_STYLE;
+    static const int FONT_SIZE;
+
     Preferences * preferences;
     QGraphicsScene * scene;
     Cursor * cursor;
@@ -61,9 +68,13 @@ private:
     MenuItem * hidePanels;
     MenuItem * buildTowerItem;
     int currentTowerItem;
+    int largestTowerWidth;
     QStringList towersTypes;
     MenuItem * scrollForward;
     MenuItem * scrollBackward;
+    QGraphicsRectItem * totalBaseHealthBar;
+    QGraphicsRectItem * currentBaseHealthBar;
+    QGraphicsTextItem * healthInfo;
 
     PauseMenu * pauseMenu;
     //QGraphicsPixmapItem * pauseMenuBoard; <- inside PauseMenu

@@ -35,6 +35,10 @@ public:
 
     const QString &getName() const;
 
+    int getEnemyDamageGoal() const;
+
+    int getEnemyReachedNumber() const;
+
 private:
     void loadXmlParameters(QString inFileName);
 
@@ -47,6 +51,8 @@ private:
     int width;
     int height;
     int timeForPreparation;
+
+    int enemyDamageGoal; // Nomber of enemies that need to reach the end of the route to destroy the base
 
     QList<QGraphicsPolygonItem*> buildAreas;
     QList<QGraphicsPathItem*> enemyRoutes;

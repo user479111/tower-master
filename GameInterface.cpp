@@ -4,6 +4,13 @@
 #include <QDir>
 #include <QDebug>
 
+const float GameInterface::BUILD_ITEM_SCALE = 0.8;
+const float GameInterface::BOARD_ITEM_SCALE = 0.5;
+const float GameInterface::MINIMAP_SCALE = 0.1;
+
+const QString GameInterface::FONT_STYLE = "Helvetica [Cronyx]";
+const int GameInterface::FONT_SIZE = 9;
+
 GameInterface::GameInterface(Preferences * preferences,
                              QGraphicsScene * scene,
                              Cursor * cursor,
@@ -18,8 +25,12 @@ GameInterface::GameInterface(Preferences * preferences,
     hidePanels(new MenuItem()),
     buildTowerItem(new MenuItem()),
     currentTowerItem(0),
+    largestTowerWidth(0),
     scrollForward(new MenuItem()),
     scrollBackward(new MenuItem()),
+    totalBaseHealthBar(new QGraphicsRectItem(0, 0, 0, 0)),
+    currentBaseHealthBar(new QGraphicsRectItem(0, 0, 0, 0)),
+    healthInfo(new QGraphicsTextItem),
     pauseMenu(new PauseMenu(preferences)),
     hide(false)
 {
@@ -36,7 +47,7 @@ GameInterface::GameInterface(Preferences * preferences,
 
     // show minimap
     minimap = new Minimap(QPixmap(battlefield->getLocation()->getLocationImagePath()));
-    minimap->setScale(0.1); // TODO: xml
+    minimap->setScale(MINIMAP_SCALE);
     minimap->setX(minimapBoard->x() +
                     (minimapBoard->boundingRect().width() - minimap->boundingRect().width() * minimap->scale()) / 2);
     minimap->setY(minimapBoard->y() +
@@ -48,10 +59,10 @@ GameInterface::GameInterface(Preferences * preferences,
     connect(minimap, &Minimap::mousePressed, this, &GameInterface::processPressEvent);
 
     // draw shown area on minimap
-    shownArea = new QGraphicsRectItem(0, 0, scene->sceneRect().width() * 0.1,
-                                            scene->sceneRect().height() * 0.1);
-    shownArea->setPos(minimap->x() + scene->sceneRect().x()* 0.1,
-                      minimap->y() + scene->sceneRect().y()* 0.1);
+    shownArea = new QGraphicsRectItem(0, 0, scene->sceneRect().width() * MINIMAP_SCALE,
+                                            scene->sceneRect().height() * MINIMAP_SCALE);
+    shownArea->setPos(minimap->x() + scene->sceneRect().x()* MINIMAP_SCALE,
+                      minimap->y() + scene->sceneRect().y()* MINIMAP_SCALE);
     shownArea->setZValue(1);
     shownArea->setBrush(Qt::transparent); // Set the fill color
     shownArea->setPen(QPen(Qt::red));
@@ -79,13 +90,12 @@ GameInterface::GameInterface(Preferences * preferences,
         pauseMenuItem->setText("Пауза");
     }
 
-    pauseMenuItem->setScale(0.5 /* xml */);
+    pauseMenuItem->setScale(BOARD_ITEM_SCALE);
     pauseMenuItem->setPos(QPointF(
         playerBoard->x() + (playerBoard->boundingRect().width() -
                                pauseMenuItem->boundingRect().width() * 2 *
                                pauseMenuItem->scale()) / 3,
-        playerBoard->y() + pauseMenuItem->boundingRect().height() *
-                              pauseMenuItem->scale() / 2));
+        playerBoard->y() + pauseMenuItem->boundingRect().height() * pauseMenuItem->scale() * 1.5));
     pauseMenuItem->setZValue(1);
     pauseMenuItem->show(scene);
 
@@ -103,52 +113,124 @@ GameInterface::GameInterface(Preferences * preferences,
         hidePanels->setText("Спрятать");
     }
 
-    hidePanels->setScale(0.5 /* xml */ );
+    hidePanels->setScale(BOARD_ITEM_SCALE);
     hidePanels->setPos(QPointF(
         playerBoard->x() + playerBoard->boundingRect().width() - hidePanels->boundingRect().width() * hidePanels->scale() -
                            (playerBoard->boundingRect().width() - hidePanels->boundingRect().width() * hidePanels->scale() * 2) / 3,
-        playerBoard->y() + hidePanels->boundingRect().height() * hidePanels->scale() / 2));
+        playerBoard->y() + hidePanels->boundingRect().height() * hidePanels->scale() * 1.5));
     hidePanels->setZValue(1);
     hidePanels->show(scene);
 
     connect(hidePanels, &MenuItem::clicked, this, &GameInterface::processHideClick);
 
+    // Setup total health bar for base
+    totalBaseHealthBar->setRect(QRectF(0, 0,
+                                       hidePanels->pos().x() + hidePanels->boundingRect().width() * hidePanels->scale() - pauseMenuItem->pos().x(),
+                                       pauseMenuItem->boundingRect().height() * pauseMenuItem->scale() / 2));
+    totalBaseHealthBar->setPos(pauseMenuItem->pos().x(),
+                               playerBoard->y() +
+                               pauseMenuItem->boundingRect().height() * pauseMenuItem->scale() / 2);
+    totalBaseHealthBar->setZValue(1);
+    totalBaseHealthBar->setBrush(QBrush(Qt::red));
+
+    // Setup current health bar for base
+    currentBaseHealthBar->setRect(QRectF(0, 0,
+                                       hidePanels->pos().x() + hidePanels->boundingRect().width() * hidePanels->scale() - pauseMenuItem->pos().x(),
+                                       pauseMenuItem->boundingRect().height() * pauseMenuItem->scale() / 2));
+    currentBaseHealthBar->setPos(pauseMenuItem->pos().x(),
+                                 playerBoard->y() +
+                                 pauseMenuItem->boundingRect().height() * pauseMenuItem->scale() / 2);
+    currentBaseHealthBar->setZValue(1);
+    currentBaseHealthBar->setBrush(QBrush(Qt::green));
+
+    scene->addItem(currentBaseHealthBar);
+
+    // Setup health info
+    healthInfo->setPlainText(QString::number(battlefield->getEnemyDamageGoal() - battlefield->getEnemyReachedNumber())
+                             + '/' + QString::number(battlefield->getEnemyDamageGoal()));
+    healthInfo->setDefaultTextColor(Qt::black);
+    healthInfo->setFont(QFont(FONT_STYLE, FONT_SIZE, QFont::Bold));
+    healthInfo->setX(currentBaseHealthBar->x() +
+                     currentBaseHealthBar->boundingRect().width() / 2 -
+                     healthInfo->boundingRect().width() / 2);
+    healthInfo->setY(currentBaseHealthBar->y() +
+                     currentBaseHealthBar->boundingRect().height() / 2 -
+                     healthInfo->boundingRect().height() / 2);
+    healthInfo->setZValue(1);
+
+    scene->addItem(healthInfo);
+
     // setup build tower icon
     towersTypes = QDir(":/Data/Data/Towers/").entryList(QDir::Dirs | QDir::NoDotAndDotDot);
     buildTowerItem->setTitle("build-tower");
     buildTowerItem->setPixmap(QString(":/Data/Data/Towers/" + towersTypes[currentTowerItem] + "/Tower.png"));
-    buildTowerItem->setPos(QPointF(
-        playerBoard->x() + playerBoard->boundingRect().width() / 2 - buildTowerItem->boundingRect().width() / 2,
-        playerBoard->y() + playerBoard->boundingRect().height() / 2 - buildTowerItem->boundingRect().height() / 2));
+    buildTowerItem->setScale(BUILD_ITEM_SCALE);
+
+    // Place it in the middle of the 'playerBoard' on horizontal line
+    buildTowerItem->setX(playerBoard->x() +
+                         playerBoard->boundingRect().width() / 2 -
+                         buildTowerItem->boundingRect().width() * buildTowerItem->scale() / 2);
+
+    // Place it in the middle between 'pauseMenuItem' and the bottom of 'playerBoard'
+    buildTowerItem->setY(pauseMenuItem->pos().y() +
+                         (playerBoard->y() + playerBoard->boundingRect().height() -
+                         pauseMenuItem->pos().y() +
+                         pauseMenuItem->boundingRect().height() * pauseMenuItem->scale()) / 2 -
+                         buildTowerItem->boundingRect().height() * buildTowerItem->scale() / 2);
     buildTowerItem->setZValue(1);
     buildTowerItem->setStaticSize(true);
     scene->addItem(buildTowerItem);
 
     connect(buildTowerItem, &MenuItem::clicked, this, &GameInterface::processBuildTowerClick);
 
-    // Setup ScrollForward button
-    scrollForward->setTitle("scroll-forward");
-    scrollForward->setPixmap(QString(":/Data/Data/Game/ArrowLeft.png"));
-    scrollForward->setPos(QPointF(
-        buildTowerItem->x() - scrollForward->boundingRect().width() * 1.1,
-        playerBoard->y() + playerBoard->boundingRect().height() / 2 - scrollForward->boundingRect().height() / 2));
-    scrollForward->setZValue(1);
-    scrollForward->setStaticSize(true);
-    scene->addItem(scrollForward);
+    // Prepare 'largestTowerWidth'
+    for (size_t i = 0, towerTypesNum = towersTypes.size(); i != towerTypesNum; i++) {
 
-    connect(scrollForward, &MenuItem::clicked, this, &GameInterface::processScrollForward);
+        QPixmap tmpTowerBuildItem(QString(":/Data/Data/Towers/" + towersTypes[currentTowerItem] + "/Tower.png"));
+        if (largestTowerWidth < tmpTowerBuildItem.width() * BUILD_ITEM_SCALE) {
+            largestTowerWidth = tmpTowerBuildItem.width() * BUILD_ITEM_SCALE;
+        }
 
-    // setup ScrollBackward button
+    }
+
+    // Setup 'scrollBackward' button
     scrollBackward->setTitle("scroll-backward");
-    scrollBackward->setPixmap(QString(":/Data/Data/Game/ArrowRight.png"));
-    scrollBackward->setPos(QPointF(
-        buildTowerItem->x() + buildTowerItem->boundingRect().width() + scrollBackward->boundingRect().width() * 0.1,
-        playerBoard->y() + playerBoard->boundingRect().height() / 2 - scrollBackward->boundingRect().height() / 2));
-    scrollBackward->setStaticSize(true);
+    scrollBackward->setPixmap(QString(":/Data/Data/Game/ArrowLeft.png"));
+
+    // Place it between the 'buildTowerItem' and the left border of the board
+    scrollBackward->setX(playerBoard->x() +
+                         (playerBoard->boundingRect().width() / 2 - largestTowerWidth / 2) / 2 -
+                         scrollBackward->boundingRect().width() / 2);
+
+    scrollBackward->setY(pauseMenuItem->pos().y() +
+                        (playerBoard->y() + playerBoard->boundingRect().height() -
+                        pauseMenuItem->pos().y() +
+                        pauseMenuItem->boundingRect().height() * pauseMenuItem->scale()) / 2 -
+                        scrollBackward->boundingRect().height() * scrollBackward->scale() / 2);
     scrollBackward->setZValue(1);
+    scrollBackward->setStaticSize(true);
     scene->addItem(scrollBackward);
 
     connect(scrollBackward, &MenuItem::clicked, this, &GameInterface::processScrollBackward);
+
+    // setup 'scrollForward' button
+    scrollForward->setTitle("scroll-forward");
+    scrollForward->setPixmap(QString(":/Data/Data/Game/ArrowRight.png"));
+
+    // Place it between the 'buildTowerItem' and the right border of the board
+    scrollForward->setX(playerBoard->x() + playerBoard->boundingRect().width() * 3 / 4 +
+                        largestTowerWidth / 4 - scrollForward->boundingRect().width() / 2);
+
+    scrollForward->setY(pauseMenuItem->pos().y() +
+                        (playerBoard->y() + playerBoard->boundingRect().height() -
+                        pauseMenuItem->pos().y() +
+                        pauseMenuItem->boundingRect().height() * pauseMenuItem->scale()) / 2 -
+                        scrollForward->boundingRect().height() * scrollForward->scale() / 2);
+    scrollForward->setStaticSize(true);
+    scrollForward->setZValue(1);
+    scene->addItem(scrollForward);
+
+    connect(scrollForward, &MenuItem::clicked, this, &GameInterface::processScrollForward);
 
     connect(battlefield, &Battlefield::enemiesHaveBeenRun, this, &GameInterface::connectMinimapWithEnemies);
 
@@ -178,6 +260,10 @@ GameInterface::~GameInterface()
 
     delete pauseMenu;
 
+    delete totalBaseHealthBar;
+
+    delete currentBaseHealthBar;
+
     auto sceneRect = scene->sceneRect();
     sceneRect.translate(-scene->sceneRect().left(), -scene->sceneRect().top());
     scene->setSceneRect(sceneRect);
@@ -200,7 +286,7 @@ void GameInterface::processScroll()
                                             minimap->boundingRect().height() * minimap->scale()) / 2));
 
     auto scenePosOnMap = battlefield->getLocation()->mapFromScene(scene->sceneRect().topLeft());
-    shownArea->setPos(minimap->pos() + scenePosOnMap * 0.1);
+    shownArea->setPos(minimap->pos() + scenePosOnMap * MINIMAP_SCALE);
 
     playerBoard->setX(scene->sceneRect().left());
     playerBoard->setY(scene->sceneRect().bottom() - playerBoard->boundingRect().height() +
@@ -211,7 +297,7 @@ void GameInterface::processScroll()
                             pauseMenuItem->boundingRect().width() *
                             pauseMenuItem->scale() * 2) / 3,
         playerBoard->y() + pauseMenuItem->boundingRect().height() *
-                          pauseMenuItem->scale() / 2));
+                          pauseMenuItem->scale() * 1.5));
 
     hidePanels->setPos(QPointF(
         playerBoard->x() + playerBoard->boundingRect().width() -
@@ -221,19 +307,55 @@ void GameInterface::processScroll()
                             hidePanels->boundingRect().width() *
                             hidePanels->scale() * 2) / 3,
         playerBoard->y() + hidePanels->boundingRect().height() *
-                           hidePanels->scale() / 2));
+                           hidePanels->scale() * 1.5));
 
-    buildTowerItem->setPos(QPointF(
-        playerBoard->x() + playerBoard->boundingRect().width() / 2 - buildTowerItem->boundingRect().width() / 2,
-        playerBoard->y() + playerBoard->boundingRect().height() / 2 - buildTowerItem->boundingRect().height() / 2));
+    totalBaseHealthBar->setPos(QPointF(pauseMenuItem->pos().x(),
+                                         playerBoard->y() +
+                                         pauseMenuItem->boundingRect().height() * pauseMenuItem->scale() / 2));
 
-    scrollForward->setPos(QPointF(
-        buildTowerItem->x() - scrollForward->boundingRect().width() * 1.1,
-        playerBoard->y() + playerBoard->boundingRect().height() / 2 - scrollForward->boundingRect().height() / 2));
+    currentBaseHealthBar->setPos(QPointF(pauseMenuItem->pos().x(),
+                                         playerBoard->y() +
+                                         pauseMenuItem->boundingRect().height() * pauseMenuItem->scale() / 2));
 
-    scrollBackward->setPos(QPointF(
-        buildTowerItem->x() + buildTowerItem->boundingRect().width() + scrollBackward->boundingRect().width() * 0.1,
-        playerBoard->y() + playerBoard->boundingRect().height() / 2 - scrollBackward->boundingRect().height() / 2));
+    healthInfo->setX(currentBaseHealthBar->x() +
+                     currentBaseHealthBar->boundingRect().width() / 2 -
+                     healthInfo->boundingRect().width() / 2);
+    healthInfo->setY(currentBaseHealthBar->y() +
+                     currentBaseHealthBar->boundingRect().height() / 2 -
+                     healthInfo->boundingRect().height() / 2);
+
+    // Place it in the middle of the 'playerBoard' on horizontal line
+    buildTowerItem->setX(playerBoard->x() +
+                         playerBoard->boundingRect().width() / 2 -
+                         buildTowerItem->boundingRect().width() * buildTowerItem->scale() / 2);
+
+    // Place it in the middle between 'pauseMenuItem' and the bottom of 'playerBoard'
+    buildTowerItem->setY(pauseMenuItem->pos().y() +
+                         (playerBoard->y() + playerBoard->boundingRect().height() -
+                         pauseMenuItem->pos().y() +
+                         pauseMenuItem->boundingRect().height() * pauseMenuItem->scale()) / 2 -
+                         buildTowerItem->boundingRect().height() * buildTowerItem->scale() / 2);
+
+    // Place it between the 'buildTowerItem' and the left border of the board
+    scrollBackward->setX(playerBoard->x() +
+                         (playerBoard->boundingRect().width() / 2 - largestTowerWidth / 2) / 2 -
+                         scrollBackward->boundingRect().width() / 2);
+
+    scrollBackward->setY(pauseMenuItem->pos().y() +
+                        (playerBoard->y() + playerBoard->boundingRect().height() -
+                        pauseMenuItem->pos().y() +
+                        pauseMenuItem->boundingRect().height() * pauseMenuItem->scale()) / 2 -
+                        scrollBackward->boundingRect().height() * scrollBackward->scale() / 2);
+
+    // Place it between the 'buildTowerItem' and the right border of the board
+    scrollForward->setX(playerBoard->x() + playerBoard->boundingRect().width() * 3 / 4 +
+                        largestTowerWidth / 4 - scrollForward->boundingRect().width() / 2);
+
+    scrollForward->setY(pauseMenuItem->pos().y() +
+                        (playerBoard->y() + playerBoard->boundingRect().height() -
+                        pauseMenuItem->pos().y() +
+                        pauseMenuItem->boundingRect().height() * pauseMenuItem->scale()) / 2 -
+                        scrollForward->boundingRect().height() * scrollForward->scale() / 2);
 }
 
 void GameInterface::processPressEvent()
@@ -266,9 +388,9 @@ void GameInterface::processBattlefieldScale()
 
     // Redraw shownArea on minimap
     auto scenePosOnMap = battlefield->getLocation()->mapFromScene(scene->sceneRect().topLeft());
-    shownArea->setPos(minimap->pos() + scenePosOnMap * 0.1 /* move scale to xml */);
+    shownArea->setPos(minimap->pos() + scenePosOnMap * MINIMAP_SCALE);
     shownArea->setScale(
-                (minimap->boundingRect().width() * 0.1 /* move scale to xml */ * scene->sceneRect().width() /
+                (minimap->boundingRect().width() * MINIMAP_SCALE * scene->sceneRect().width() /
                  (battlefield->getLocation()->boundingRect().width() * battlefield->getLocation()->scale())) /
                 shownArea->boundingRect().width());
 
@@ -314,11 +436,20 @@ void GameInterface::processScrollForward()
     currentTowerItem = (currentTowerItem + 1) % towersTypes.size(); // increment until towersTypes.size()
 
     buildTowerItem->setPixmap(QString(":/Data/Data/Towers/" + towersTypes[currentTowerItem] + "/Tower.png"));
+    buildTowerItem->setScale(BUILD_ITEM_SCALE);
 
     // Set the Icon on the updated position
-    buildTowerItem->setPos(QPointF(
-        playerBoard->x() + playerBoard->boundingRect().width() / 2 - buildTowerItem->boundingRect().width() / 2,
-        playerBoard->y() + playerBoard->boundingRect().height() / 2 - buildTowerItem->boundingRect().height() / 2));
+    // Place it in the middle of the 'playerBoard' on horizontal line
+    buildTowerItem->setX(playerBoard->x() +
+                         playerBoard->boundingRect().width() / 2 -
+                         buildTowerItem->boundingRect().width() * buildTowerItem->scale() / 2);
+
+    // Place it in the middle between 'pauseMenuItem' and the bottom of 'playerBoard'
+    buildTowerItem->setY(pauseMenuItem->pos().y() +
+                         (playerBoard->y() + playerBoard->boundingRect().height() -
+                         pauseMenuItem->pos().y() +
+                         pauseMenuItem->boundingRect().height() * pauseMenuItem->scale()) / 2 -
+                         buildTowerItem->boundingRect().height() * buildTowerItem->scale() / 2);
 }
 
 void GameInterface::processScrollBackward()
@@ -326,11 +457,20 @@ void GameInterface::processScrollBackward()
     currentTowerItem = (currentTowerItem > 0 ? currentTowerItem : towersTypes.size()) - 1; // decrement until 0
 
     buildTowerItem->setPixmap(QString(":/Data/Data/Towers/" + towersTypes[currentTowerItem] + "/Tower.png"));
+    buildTowerItem->setScale(BUILD_ITEM_SCALE);
 
     // Set the Icon on the updated position
-    buildTowerItem->setPos(QPointF(
-        playerBoard->x() + playerBoard->boundingRect().width() / 2 - buildTowerItem->boundingRect().width() / 2,
-        playerBoard->y() + playerBoard->boundingRect().height() / 2 - buildTowerItem->boundingRect().height() / 2));
+    // Place it in the middle of the 'playerBoard' on horizontal line
+    buildTowerItem->setX(playerBoard->x() +
+                         playerBoard->boundingRect().width() / 2 -
+                         buildTowerItem->boundingRect().width() * buildTowerItem->scale() / 2);
+
+    // Place it in the middle between 'pauseMenuItem' and the bottom of 'playerBoard'
+    buildTowerItem->setY(pauseMenuItem->pos().y() +
+                         (playerBoard->y() + playerBoard->boundingRect().height() -
+                         pauseMenuItem->pos().y() +
+                         pauseMenuItem->boundingRect().height() * pauseMenuItem->scale()) / 2 -
+                         buildTowerItem->boundingRect().height() * buildTowerItem->scale() / 2);
 }
 
 void GameInterface::processBuildingTower()
