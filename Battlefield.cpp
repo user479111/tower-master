@@ -12,7 +12,11 @@ Battlefield::Battlefield(QGraphicsScene * scene,
     scene(scene),
     cursor(cursor),
     location(location),
-    currentWaveIndex(0)
+    timerBetweenWaves(this),
+    timerRemainingTimeOnPause(0),
+    currentWaveIndex(0),
+    minScale(0.0),
+    scalingAllowed(true)
 {
     // display location
     scene->addItem(location);
@@ -70,7 +74,7 @@ Battlefield::~Battlefield()
 
 bool Battlefield::eventFilter(QObject *obj, QEvent *event) {
 
-    if (obj == scene && event->type() == QEvent::GraphicsSceneWheel) {
+    if (obj == scene && event->type() == QEvent::GraphicsSceneWheel && scalingAllowed) {
 
         QGraphicsSceneWheelEvent *wheelEvent = static_cast<QGraphicsSceneWheelEvent*>(event);
 
@@ -266,7 +270,7 @@ void Battlefield::startWaveMove()
                      &Battlefield::startNextWave);
 
     // Start the timer
-    timerBetweenWaves.start();
+    timerBetweenWaves.start(location->getTimeForPreparation() * 1000);
 }
 
 void Battlefield::startNextWave()
@@ -290,7 +294,43 @@ void Battlefield::startNextWave()
     QObject::connect(&timerBetweenWaves, &QTimer::timeout, this, &Battlefield::startWaveMove);
 
     // Start the timer
-    timerBetweenWaves.start();
+    timerBetweenWaves.start(location->getTimeForPreparation() * 1000);
+}
+
+void Battlefield::pause()
+{
+    scalingAllowed = false;
+
+    // Stop towers' timers
+    for (auto tower : towers) {
+        tower->pause();
+    }
+
+    // Stop wave
+    location->getWaves().at(currentWaveIndex)->pause();
+
+    if (timerBetweenWaves.isActive()) {
+        timerRemainingTimeOnPause = timerBetweenWaves.remainingTime();
+        timerBetweenWaves.stop();
+    }
+}
+
+void Battlefield::resume()
+{
+    scalingAllowed = true;
+
+    // Stop towers' timers
+    for (auto tower : towers) {
+        tower->resume();
+    }
+
+    // Stop wave
+    location->getWaves().at(currentWaveIndex)->resume();
+
+    if (timerRemainingTimeOnPause) {
+        timerRemainingTimeOnPause = 0;
+        timerBetweenWaves.start(timerRemainingTimeOnPause);
+    }
 }
 
 Location *Battlefield::getLocation() const

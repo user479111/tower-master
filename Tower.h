@@ -28,6 +28,9 @@ public:
 
     void setAttackSpeed(float newAttackSpeed);
 
+    void pause();
+    void resume();
+
 private:
     void loadXmlParameters(QString inFileName);
 
@@ -38,8 +41,12 @@ public slots:
 
 private:
     const Location * location;
-    QGraphicsPolygonItem * attackArea;
+
+    QTimer attackTimer;
+    unsigned int timerRemainingTimeOnPause;
+
     QPointF attackDestination;
+    QGraphicsPolygonItem * attackArea;
 
     QString type;
 

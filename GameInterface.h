@@ -13,6 +13,7 @@
 #include "Minimap.h"
 #include "Location.h"
 #include "MenuItem.h"
+#include "PauseMenu.h"
 #include "Battlefield.h"
 #include "Preferences.h"
 
@@ -38,6 +39,8 @@ private slots:
     void processScrollBackward();
     void processBuildingTower();
     void connectMinimapWithEnemies();
+    void processResumeClick();
+    void processMainMenuClick();
 
 signals:
     void mainMenuSignal();
@@ -54,7 +57,7 @@ private:
 
     // TODO: realize as PlayerMenu class
     QGraphicsPixmapItem * playerBoard;
-    MenuItem * pauseMenu;
+    MenuItem * pauseMenuItem;
     MenuItem * hidePanels;
     MenuItem * buildTowerItem;
     int currentTowerItem;
@@ -62,7 +65,7 @@ private:
     MenuItem * scrollForward;
     MenuItem * scrollBackward;
 
-    //PauseMenu * pauseMenu;
+    PauseMenu * pauseMenu;
     //QGraphicsPixmapItem * pauseMenuBoard; <- inside PauseMenu
     //QList<MenuItem *> listOfItems; <- inside PauseMenu
     bool hide;

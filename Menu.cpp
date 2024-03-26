@@ -111,16 +111,30 @@ void Menu::loadXmlParameters()
                 } else if (currentElement.tagName() == "attpos") {
 
                     // Set menu board coordinates
-                    getBoard()->setPos(QPointF(QString(currentElement.
-                                                       attributes().
-                                                       namedItem("x").
-                                                       nodeValue()).
-                                               toFloat(),
-                                               QString(currentElement.
-                                                       attributes().
-                                                       namedItem("y").
-                                                       nodeValue()).
-                                               toFloat()));
+                    if (QString(currentElement.attributes().namedItem("val").nodeValue()) == "center") {
+                        setBoardPos(preferences->getResolution().width / 2 - board->boundingRect().width() / 2,
+                                    preferences->getResolution().height / 2 - board->boundingRect().height() / 2);
+                    } else {
+                        getBoard()->setPos(QPointF(QString(currentElement.
+                                                           attributes().
+                                                           namedItem("x").
+                                                           nodeValue()).
+                                                   toFloat(),
+                                                   QString(currentElement.
+                                                           attributes().
+                                                           namedItem("y").
+                                                           nodeValue()).
+                                                   toFloat()));
+                    }
+
+                    if (!QString(currentElement.attributes().namedItem("z").nodeValue()).isEmpty())
+                    {
+                        getBoard()->setZValue(QString(currentElement.
+                                                      attributes().
+                                                      namedItem("z").
+                                                      nodeValue()).
+                                              toFloat());
+                    }
 
                 }
             }
@@ -157,19 +171,27 @@ void Menu::readMenuItemXml(MenuItem * newItem, const QDomNodeList &menuItemAttri
         } else if (currentElement.tagName() == "attpos") {
 
             // Set item's coordinates
-            newItem->setPos(QPointF(
-                                QString(
-                                    currentElement.
-                                    attributes().
-                                    namedItem("x").
-                                    nodeValue()).
-                                    toFloat(),
-                                QString(
-                                    currentElement.
-                                    attributes().
-                                    namedItem("y").
-                                    nodeValue()).
-                                            toFloat()));
+            if (QString(currentElement.attributes().namedItem("val").nodeValue()) == "center") {
+                newItem->setCentered(true);
+            } else {
+                newItem->setPos(QPointF(
+                                    QString(
+                                        currentElement.
+                                        attributes().
+                                        namedItem("x").
+                                        nodeValue()).
+                                        toFloat(),
+                                    QString(
+                                        currentElement.
+                                        attributes().
+                                        namedItem("y").
+                                        nodeValue()).
+                                                toFloat()));
+            }
+
+            if (!QString(currentElement.attributes().namedItem("z").nodeValue()).isEmpty()) {
+                newItem->setZValue(QString(currentElement.attributes().namedItem("z").nodeValue()).toFloat());
+            }
 
         } else if (currentElement.tagName() == "attnum") {
 
@@ -396,6 +418,29 @@ void Menu::resetItemsLanguage()
             auto * newOption = new ScrollOption();
             readScrollOptionXml(newOption, section.childNodes(), name);
             addNewOption(newOption);
+        }
+    }
+}
+
+void Menu::setBoardPos(const qreal &x, const qreal &y)
+{
+    setBoardPos(QPointF(x, y));
+}
+
+void Menu::setBoardPos(const QPointF &pos)
+{
+    board->setPos(pos);
+
+    QPointF boardCenter = QPointF(board->pos().x() + board->boundingRect().width() / 2,
+                                  board->pos().y() + board->boundingRect().height() / 2);
+
+    // Place items in the middle of the board if they are marked as centeres
+    for (size_t i = 0, numberOfItems = listOfItems.size(); i != numberOfItems; ++i) {
+        auto item = listOfItems.at(i);
+        qreal itemScaledHeight = item->boundingRect().height() * 1.5;
+        if (item->getCentered()) {
+            item->setPos(QPointF(boardCenter.x() - item->boundingRect().width() / 2,
+                         boardCenter.y() - itemScaledHeight * numberOfItems / 2 + i * itemScaledHeight + itemScaledHeight / 2 - item->boundingRect().height() / 2));
         }
     }
 }

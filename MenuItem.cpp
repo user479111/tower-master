@@ -8,6 +8,7 @@ MenuItem::MenuItem(QGraphicsItem * parent) :
     title(""),
     chosen(false),
     staticSize(false),
+    centered(false),
     text(new QGraphicsTextItem)
 {
 }
@@ -122,4 +123,14 @@ void MenuItem::hide(QGraphicsScene *scene)
 {
     scene->removeItem(this);
     scene->removeItem(text);
+}
+
+bool MenuItem::getCentered() const
+{
+    return centered;
+}
+
+void MenuItem::setCentered(bool newCentered)
+{
+    centered = newCentered;
 }

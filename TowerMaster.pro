@@ -24,6 +24,7 @@ SOURCES += \
     MenuItem.cpp \
     MenuProcessor.cpp \
     Minimap.cpp \
+    PauseMenu.cpp \
     Preferences.cpp \
     ScrollOption.cpp \
     SettingsMenu.cpp \
@@ -47,6 +48,7 @@ HEADERS += \
     MenuItem.h \
     MenuProcessor.h \
     Minimap.h \
+    PauseMenu.h \
     Preferences.h \
     ScrollOption.h \
     SettingsMenu.h \

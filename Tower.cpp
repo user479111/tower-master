@@ -13,6 +13,7 @@ Tower::Tower(const QString &type,
              const QPointF &center,
              const Location * location) :
     location(location),
+    attackTimer(this),
     type(type),
     attackSpeed(MIN_ATTACK_SPEED)
 {
@@ -42,13 +43,11 @@ Tower::Tower(const QString &type,
     attackArea->setPen(QPen(Qt::DotLine));
     attackArea->setPen(QPen(QColor(255, 0, 0)));
 
-    QTimer * attackTimer = new QTimer(this);
-
     // Prepare tower for attack
-    connect(attackTimer, SIGNAL(timeout()), this, SLOT(aquireTarget()));
+    connect(&attackTimer, SIGNAL(timeout()), this, SLOT(aquireTarget()));
     // Prepare tower to clear the bullets
-    connect(attackTimer, SIGNAL(timeout()), this, SLOT(clearBullets()));
-    attackTimer->start(1000/attackSpeed);
+    connect(&attackTimer, SIGNAL(timeout()), this, SLOT(clearBullets()));
+    attackTimer.start(1000/attackSpeed);
 }
 
 Tower::~Tower()
@@ -87,6 +86,8 @@ void Tower::fire()
 
 void Tower::aquireTarget()
 {
+    attackTimer.setInterval(1000/attackSpeed);
+
     // get a list of items colliding with attack_area
     auto collidingItems = attackArea->collidingItems();
 
@@ -140,6 +141,30 @@ void Tower::setAttackSpeed(float newAttackSpeed)
         attackSpeed = MAX_ATTACK_SPEED;
     } else {
         attackSpeed = newAttackSpeed;
+    }
+}
+
+void Tower::pause()
+{
+    if (attackTimer.isActive()) {
+        timerRemainingTimeOnPause = attackTimer.remainingTime();
+        attackTimer.stop();
+    }
+
+    for (auto bullet : bullets) {
+        bullet->pause();
+    }
+}
+
+void Tower::resume()
+{
+    if (timerRemainingTimeOnPause) {
+        timerRemainingTimeOnPause = 0;
+        attackTimer.start(timerRemainingTimeOnPause);
+    }
+
+    for (auto bullet : bullets) {
+        bullet->resume();
     }
 }
 

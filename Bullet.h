@@ -37,6 +37,9 @@ public:
     const Location *getLocation() const;
     void setLocation(const Location *newLocation);
 
+    void pause();
+    void resume();
+
 public slots:
     void move();
 
@@ -45,7 +48,9 @@ signals:
 
 private:
     const Location * location;
+
     QTimer moveTimer;
+    unsigned int timerRemainingTimeOnPause;
 
     int damage;
     int speed;

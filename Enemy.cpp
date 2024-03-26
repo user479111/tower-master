@@ -19,6 +19,8 @@ Enemy::Enemy(int id,
     stepSize(ENEMY_MIN_SPEED),
     currentDestinationIndex(0),
     angle(0),
+    moveTimer(this),
+    timerRemainingTimeOnPause(0),
     totalHealthBar(new QGraphicsLineItem),
     currentHealthBar(new QGraphicsLineItem)
 {
@@ -126,6 +128,8 @@ void Enemy::setRotation(qreal angle)
 
 void Enemy::moveForward()
 {
+    moveTimer.setInterval(ENEMY_TIMER_INTERVAL);
+
     // If close to dest rotate to next dest
     QLineF line(mapToScene(boundingRect().center()),
                 route->path().elementAt(currentDestinationIndex) * route->scale());
@@ -217,8 +221,8 @@ void Enemy::setScale(qreal scale)
 
 void Enemy::prepareForRemoval()
 {
-    timerMove.stop();
-    disconnect(&timerMove, SIGNAL(timeout()), this, SLOT(moveForward()));
+    moveTimer.stop();
+    disconnect(&moveTimer, SIGNAL(timeout()), this, SLOT(moveForward()));
 
     emit outOfBattleForMinimap(this); // Allow removal of the enemy from the Minimap
     emit outOfBattleForWave(this);    // Before it will be completely removed in the Wave
@@ -240,8 +244,8 @@ int Enemy::getId() const
 void Enemy::run()
 {
     // run the enemy on the route
-    connect(&timerMove, SIGNAL(timeout()), this, SLOT(moveForward()));
-    timerMove.start(ENEMY_TIMER_INTERVAL);
+    connect(&moveTimer, SIGNAL(timeout()), this, SLOT(moveForward()));
+    moveTimer.start(ENEMY_TIMER_INTERVAL);
 }
 
 const QString &Enemy::getType() const
@@ -257,3 +261,18 @@ void Enemy::setType(const QString &newType)
     loadXmlParameters(QString(":/Data/Data/Enemies/" + QString(type.at(0).toUpper() + type.mid(1)) + "/Enemy.xml"));
 }
 
+void Enemy::pause()
+{
+    if (moveTimer.isActive()) {
+        timerRemainingTimeOnPause = moveTimer.remainingTime();
+        moveTimer.stop();
+    }
+}
+
+void Enemy::resume()
+{
+    if (timerRemainingTimeOnPause) {
+        timerRemainingTimeOnPause = 0;
+        moveTimer.start(timerRemainingTimeOnPause);
+    }
+}

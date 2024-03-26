@@ -35,6 +35,9 @@ public:
     void show(QGraphicsScene * scene);
     void hide(QGraphicsScene * scene);
 
+    bool getCentered() const;
+    void setCentered(bool newCentered);
+
 signals:
     void clicked();
 
@@ -42,6 +45,7 @@ private:
     QString title;
     bool chosen;
     bool staticSize;
+    bool centered;
 
     QGraphicsTextItem * text;
 };
