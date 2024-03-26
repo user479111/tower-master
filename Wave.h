@@ -33,6 +33,9 @@ public:
 
     const QList<Enemy*> &getGroupOfEnemies() const;
 
+    void pause();
+    void resume();
+
 private slots:
     void runEnemy();
     void processEnemyOut(Enemy * enemy);
@@ -52,6 +55,7 @@ private:
     QGraphicsScene * scene;
 
     QTimer timerBetweenEnemies;
+    unsigned int timerRemainingTimeOnPause;
 };
 
 #endif // WAVE_H

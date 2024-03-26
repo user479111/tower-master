@@ -10,7 +10,9 @@ Wave::Wave(QGraphicsScene * scene):
     dencity(1),
     currentEnemyId(0),
     enemiesOutOfBattleNum(0),
-    scene(scene)
+    scene(scene),
+    timerBetweenEnemies(this),
+    timerRemainingTimeOnPause(0)
 {
 }
 
@@ -49,6 +51,8 @@ void Wave::setDencity(float newDencity)
 
 void Wave::runEnemy()
 {
+    timerBetweenEnemies.setInterval(dencity * 1000);
+
     // If all the enemy have been run
     if (currentEnemyId >= groupOfEnemies.size()) {
 
@@ -171,4 +175,28 @@ int Wave::getId() const
 void Wave::setId(int newId)
 {
     id = newId;
+}
+
+void Wave::pause()
+{
+    if (timerBetweenEnemies.isActive()) {
+        timerRemainingTimeOnPause = timerBetweenEnemies.remainingTime();
+        timerBetweenEnemies.stop();
+    }
+
+    for (auto enemy : groupOfEnemies) {
+        enemy->pause();
+    }
+}
+
+void Wave::resume()
+{
+    if (timerBetweenEnemies.isActive()) {
+        timerRemainingTimeOnPause = 0;
+        timerBetweenEnemies.start(timerRemainingTimeOnPause);
+    }
+
+    for (auto enemy : groupOfEnemies) {
+        enemy->resume();
+    }
 }

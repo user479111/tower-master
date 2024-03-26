@@ -14,12 +14,13 @@ GameInterface::GameInterface(Preferences * preferences,
     scene(scene),
     cursor(cursor),
     battlefield(battlefield),
-    pauseMenu(new MenuItem()),
+    pauseMenuItem(new MenuItem()),
     hidePanels(new MenuItem()),
     buildTowerItem(new MenuItem()),
     currentTowerItem(0),
     scrollForward(new MenuItem()),
     scrollBackward(new MenuItem()),
+    pauseMenu(new PauseMenu(preferences)),
     hide(false)
 {
     cursor->setScrollAreaRect(battlefield->getLocation()->mapRectToScene(battlefield->getLocation()->boundingRect()));
@@ -67,25 +68,28 @@ GameInterface::GameInterface(Preferences * preferences,
     scene->addItem(playerBoard);
 
     // setup pause menu button
-    pauseMenu->setPixmap(QString(":/Data/Data/Menu/Scroll.png"));
+    pauseMenuItem->setPixmap(QString(":/Data/Data/Menu/Scroll.png"));
 
     // move to XML?
     if (preferences->getLanguage() == "English") {
-        pauseMenu->setText("Pause");
+        pauseMenuItem->setText("Pause");
     } else if (preferences->getLanguage() == "Українська") {
-        pauseMenu->setText("Пауза");
+        pauseMenuItem->setText("Пауза");
     } else if (preferences->getLanguage() == "Русский") {
-        pauseMenu->setText("Пауза");
+        pauseMenuItem->setText("Пауза");
     }
 
-    pauseMenu->setScale(0.5 /* xml */);
-    pauseMenu->setPos(QPointF(
-        playerBoard->x() + (playerBoard->boundingRect().width() - pauseMenu->boundingRect().width() * 2 * pauseMenu->scale()) / 3,
-        playerBoard->y() + pauseMenu->boundingRect().height() * pauseMenu->scale() / 2));
-    pauseMenu->setZValue(1);
-    pauseMenu->show(scene);
+    pauseMenuItem->setScale(0.5 /* xml */);
+    pauseMenuItem->setPos(QPointF(
+        playerBoard->x() + (playerBoard->boundingRect().width() -
+                               pauseMenuItem->boundingRect().width() * 2 *
+                               pauseMenuItem->scale()) / 3,
+        playerBoard->y() + pauseMenuItem->boundingRect().height() *
+                              pauseMenuItem->scale() / 2));
+    pauseMenuItem->setZValue(1);
+    pauseMenuItem->show(scene);
 
-    connect(pauseMenu, &MenuItem::clicked, this, &GameInterface::processPauseClick);
+    connect(pauseMenuItem, &MenuItem::clicked, this, &GameInterface::processPauseClick);
 
     // setup hide menu button
     hidePanels->setPixmap(QString(":/Data/Data/Menu/Scroll.png"));
@@ -147,6 +151,9 @@ GameInterface::GameInterface(Preferences * preferences,
     connect(scrollBackward, &MenuItem::clicked, this, &GameInterface::processScrollBackward);
 
     connect(battlefield, &Battlefield::enemiesHaveBeenRun, this, &GameInterface::connectMinimapWithEnemies);
+
+    connect(pauseMenu, &PauseMenu::resumeClicked, this, &GameInterface::processResumeClick);
+    connect(pauseMenu, &PauseMenu::mainMenuClicked, this, &GameInterface::processMainMenuClick);
 }
 
 GameInterface::~GameInterface()
@@ -159,7 +166,7 @@ GameInterface::~GameInterface()
 
     delete playerBoard;
 
-    delete pauseMenu;
+    delete pauseMenuItem;
 
     delete hidePanels;
 
@@ -168,6 +175,8 @@ GameInterface::~GameInterface()
     delete scrollForward;
 
     delete scrollBackward;
+
+    delete pauseMenu;
 
     auto sceneRect = scene->sceneRect();
     sceneRect.translate(-scene->sceneRect().left(), -scene->sceneRect().top());
@@ -197,14 +206,22 @@ void GameInterface::processScroll()
     playerBoard->setY(scene->sceneRect().bottom() - playerBoard->boundingRect().height() +
                       hide * (playerBoard->boundingRect().height() / 2));
 
-    pauseMenu->setPos(QPointF(
-        playerBoard->x() + (playerBoard->boundingRect().width() - pauseMenu->boundingRect().width() * pauseMenu->scale() * 2) / 3,
-        playerBoard->y() + pauseMenu->boundingRect().height() * pauseMenu->scale() / 2));
+    pauseMenuItem->setPos(QPointF(
+        playerBoard->x() + (playerBoard->boundingRect().width() -
+                            pauseMenuItem->boundingRect().width() *
+                            pauseMenuItem->scale() * 2) / 3,
+        playerBoard->y() + pauseMenuItem->boundingRect().height() *
+                          pauseMenuItem->scale() / 2));
 
     hidePanels->setPos(QPointF(
-        playerBoard->x() + playerBoard->boundingRect().width() - hidePanels->boundingRect().width() * hidePanels->scale() -
-                           (playerBoard->boundingRect().width() - hidePanels->boundingRect().width() * hidePanels->scale() * 2) / 3,
-        playerBoard->y() + hidePanels->boundingRect().height() * hidePanels->scale() / 2));
+        playerBoard->x() + playerBoard->boundingRect().width() -
+                           hidePanels->boundingRect().width() *
+                           hidePanels->scale() -
+                           (playerBoard->boundingRect().width() -
+                            hidePanels->boundingRect().width() *
+                            hidePanels->scale() * 2) / 3,
+        playerBoard->y() + hidePanels->boundingRect().height() *
+                           hidePanels->scale() / 2));
 
     buildTowerItem->setPos(QPointF(
         playerBoard->x() + playerBoard->boundingRect().width() / 2 - buildTowerItem->boundingRect().width() / 2,
@@ -260,7 +277,14 @@ void GameInterface::processBattlefieldScale()
 
 void GameInterface::processPauseClick()
 {
-    emit mainMenuSignal();
+    // Pause battlefield events
+    battlefield->pause();
+
+    // Pause map scroll
+    cursor->setScrollAreaRect(scene->sceneRect());
+
+    // Show the Pause menu
+    pauseMenu->show(scene);
 }
 
 void GameInterface::processHideClick()
@@ -331,4 +355,21 @@ void GameInterface::processBuildingTower()
 void GameInterface::connectMinimapWithEnemies()
 {
     minimap->connectWithEenemies(battlefield->getGroupOfEnemies());
+}
+
+void GameInterface::processResumeClick()
+{
+    // Hide the Pause menu
+    pauseMenu->hide(scene);
+
+    // Allow map scrolling
+    cursor->setScrollAreaRect(battlefield->getLocation()->mapRectToScene(battlefield->getLocation()->boundingRect()));
+
+    // Resume battlefield events
+    battlefield->resume();
+}
+
+void GameInterface::processMainMenuClick()
+{
+    emit mainMenuSignal();
 }

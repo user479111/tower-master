@@ -30,6 +30,9 @@ public:
 
     Location* getLocation() const;
 
+    void pause();
+    void resume();
+
 signals:
     void battlefieldScaled();
     void enemiesHaveBeenRun();
@@ -47,10 +50,13 @@ private:
     QList<Tower*> towers;
 
     QTimer timerBetweenWaves;
+    unsigned int timerRemainingTimeOnPause;
 
     int currentWaveIndex;
 
     float minScale;
+
+    bool scalingAllowed; // true by default
 };
 
 #endif // BATTLEFIELD_H

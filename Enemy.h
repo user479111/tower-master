@@ -49,6 +49,9 @@ public:
     int getCurrentHealth() const;
     void setCurrentHealth(int newCurrentHealth);
 
+    void pause();
+    void resume();
+
 private:
     void loadXmlParameters(QString inFileName);
 
@@ -73,7 +76,8 @@ private:
     int currentDestinationIndex;
     float angle;
 
-    QTimer timerMove;
+    QTimer moveTimer;
+    unsigned int timerRemainingTimeOnPause;
 
     QGraphicsLineItem * totalHealthBar;
     QGraphicsLineItem * currentHealthBar;

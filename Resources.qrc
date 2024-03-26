@@ -38,5 +38,6 @@
         <file>Data/Menu/BattleMenu.xml</file>
         <file>Data/Menu/SettingsMenu.xml</file>
         <file>Data/Preferences/Preferences.xml</file>
+        <file>Data/Menu/PauseMenu.xml</file>
     </qresource>
 </RCC>

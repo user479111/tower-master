@@ -7,6 +7,8 @@
 
 Bullet::Bullet() :
     location(nullptr),
+    moveTimer(this),
+    timerRemainingTimeOnPause(0),
     damage(MIN_BULLET_DAMAGE),
     speed(MIN_BULLET_SPEED),
     outOfBattle(false)
@@ -30,6 +32,8 @@ Bullet::~Bullet()
 
 void Bullet::move()
 {
+    moveTimer.setInterval(BULLET_TIMER_INTERVAL);
+
     setPos(pos().x() + stepSize * scale() * cos(qDegreesToRadians(angle)),
            pos().y() + stepSize * scale() * sin(qDegreesToRadians(angle)));
 
@@ -68,6 +72,22 @@ const Location *Bullet::getLocation() const
 void Bullet::setLocation(const Location *newLocation)
 {
     location = newLocation;
+}
+
+void Bullet::pause()
+{
+    if (moveTimer.isActive()) {
+        timerRemainingTimeOnPause = moveTimer.remainingTime();
+        moveTimer.stop();
+    }
+}
+
+void Bullet::resume()
+{
+    if (timerRemainingTimeOnPause) {
+        timerRemainingTimeOnPause = 0;
+        moveTimer.start(timerRemainingTimeOnPause);
+    }
 }
 
 void Bullet::shot()

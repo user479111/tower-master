@@ -43,6 +43,9 @@ public:
 
     void resetItemsLanguage();
 
+    void setBoardPos(const qreal &x, const qreal &y);
+    void setBoardPos(const QPointF &pos);
+
 signals:
     void itemClicked();
 
