@@ -16,7 +16,8 @@ Battlefield::Battlefield(QGraphicsScene * scene,
     timerRemainingTimeOnPause(0),
     currentWaveIndex(0),
     minScale(0.0),
-    scalingAllowed(true)
+    scalingAllowed(true),
+    enemyReachedNumber(0)
 {
     // display location
     scene->addItem(location);
@@ -295,6 +296,16 @@ void Battlefield::startNextWave()
 
     // Start the timer
     timerBetweenWaves.start(location->getTimeForPreparation() * 1000);
+}
+
+int Battlefield::getEnemyReachedNumber() const
+{
+    return enemyReachedNumber;
+}
+
+int Battlefield::getEnemyDamageGoal() const
+{
+    return location->getEnemyDamageGoal();
 }
 
 void Battlefield::pause()

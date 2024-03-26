@@ -33,6 +33,10 @@ public:
     void pause();
     void resume();
 
+    int getEnemyReachedNumber() const;
+
+    int getEnemyDamageGoal() const;
+
 signals:
     void battlefieldScaled();
     void enemiesHaveBeenRun();
@@ -57,6 +61,8 @@ private:
     float minScale;
 
     bool scalingAllowed; // true by default
+
+    int enemyReachedNumber; // Number of enemies that have reached the end of the route
 };
 
 #endif // BATTLEFIELD_H
