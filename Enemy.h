@@ -12,7 +12,6 @@
 
 #define ENEMY_TIMER_INTERVAL 50
 #define ENEMY_MIN_SPEED 20
-#define ENEMY_MIN_HEALTH 1
 #define ENEMY_HEALTH_BAR_WIDTH 3
 
 class Enemy : public QObject, public QGraphicsPixmapItem
@@ -52,6 +51,8 @@ public:
     void pause();
     void resume();
 
+    int getDamage() const;
+
 private:
     void loadXmlParameters(QString inFileName);
 
@@ -65,6 +66,8 @@ signals:
     void outOfBattleForWave(Enemy * enemy);
     void moved(Enemy * enemy);
 
+public:
+    static const int ENEMY_MIN_HEALTH;
 private:
     int id;
     QString type;
@@ -75,6 +78,7 @@ private:
     float stepSize; // Step size per timer interval
     int currentDestinationIndex;
     float angle;
+    int damage;
 
     QTimer moveTimer;
     unsigned int timerRemainingTimeOnPause;

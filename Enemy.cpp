@@ -7,6 +7,8 @@
 
 #include <QDebug>
 
+const int Enemy::ENEMY_MIN_HEALTH = 1;
+
 Enemy::Enemy(int id,
              const QString &type,
              const QGraphicsPathItem * route) :
@@ -19,6 +21,7 @@ Enemy::Enemy(int id,
     stepSize(ENEMY_MIN_SPEED),
     currentDestinationIndex(0),
     angle(0),
+    damage(0),
     moveTimer(this),
     timerRemainingTimeOnPause(0),
     totalHealthBar(new QGraphicsLineItem),
@@ -105,6 +108,7 @@ void Enemy::loadXmlParameters(QString inFileName)
 
             } else if (QString(node.attribute("name")) == "damage") {
                 qDebug() << QString(node.attribute("val")).toInt();
+                damage = QString(node.attribute("val")).toInt();
             } else if (QString(node.attribute("name")) == "width") {
                 qDebug() << QString(node.attribute("val")).toInt();
             } else if (QString(node.attribute("name")) == "height") {
@@ -150,6 +154,11 @@ void Enemy::moveForward()
            pos().y() + stepSize * scale() * sin(qDegreesToRadians(-1 * line.angle()))));
 
     emit moved(this);
+}
+
+int Enemy::getDamage() const
+{
+    return damage;
 }
 
 int Enemy::getCurrentHealth() const

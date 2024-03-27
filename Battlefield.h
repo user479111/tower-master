@@ -40,11 +40,13 @@ public:
 signals:
     void battlefieldScaled();
     void enemiesHaveBeenRun();
+    void enemyCausedDamage();
 
 private slots:
     void processCursorMove();
     void startWaveMove();
     void startNextWave();
+    void processEnemyAttack(const int &damage);
 
 private:
     QGraphicsScene * scene;
