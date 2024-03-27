@@ -133,13 +133,16 @@ GameInterface::GameInterface(Preferences * preferences,
     totalBaseHealthBar->setZValue(1);
     totalBaseHealthBar->setBrush(QBrush(Qt::red));
 
+    scene->addItem(totalBaseHealthBar);
+
     // Setup current health bar for base
     currentBaseHealthBar->setRect(QRectF(0, 0,
                                        hidePanels->pos().x() + hidePanels->boundingRect().width() * hidePanels->scale() - pauseMenuItem->pos().x(),
                                        pauseMenuItem->boundingRect().height() * pauseMenuItem->scale() / 2));
-    currentBaseHealthBar->setPos(pauseMenuItem->pos().x(),
-                                 playerBoard->y() +
-                                 pauseMenuItem->boundingRect().height() * pauseMenuItem->scale() / 2);
+    currentBaseHealthBar->setPos(totalBaseHealthBar->pos().x() +
+                                 totalBaseHealthBar->boundingRect().width() / 2 -
+                                 currentBaseHealthBar->boundingRect().width() / 2,
+                                 totalBaseHealthBar->pos().y());
     currentBaseHealthBar->setZValue(1);
     currentBaseHealthBar->setBrush(QBrush(Qt::green));
 
@@ -159,6 +162,8 @@ GameInterface::GameInterface(Preferences * preferences,
     healthInfo->setZValue(1);
 
     scene->addItem(healthInfo);
+
+    connect(battlefield, &Battlefield::enemyCausedDamage, this, &GameInterface::processEnemyAttack);
 
     // setup build tower icon
     towersTypes = QDir(":/Data/Data/Towers/").entryList(QDir::Dirs | QDir::NoDotAndDotDot);
@@ -264,6 +269,8 @@ GameInterface::~GameInterface()
 
     delete currentBaseHealthBar;
 
+    delete healthInfo;
+
     auto sceneRect = scene->sceneRect();
     sceneRect.translate(-scene->sceneRect().left(), -scene->sceneRect().top());
     scene->setSceneRect(sceneRect);
@@ -313,9 +320,10 @@ void GameInterface::processScroll()
                                          playerBoard->y() +
                                          pauseMenuItem->boundingRect().height() * pauseMenuItem->scale() / 2));
 
-    currentBaseHealthBar->setPos(QPointF(pauseMenuItem->pos().x(),
-                                         playerBoard->y() +
-                                         pauseMenuItem->boundingRect().height() * pauseMenuItem->scale() / 2));
+    currentBaseHealthBar->setPos(totalBaseHealthBar->pos().x() +
+                                 totalBaseHealthBar->boundingRect().width() / 2 -
+                                 currentBaseHealthBar->boundingRect().width() / 2,
+                                 totalBaseHealthBar->pos().y());
 
     healthInfo->setX(currentBaseHealthBar->x() +
                      currentBaseHealthBar->boundingRect().width() / 2 -
@@ -512,4 +520,24 @@ void GameInterface::processResumeClick()
 void GameInterface::processMainMenuClick()
 {
     emit mainMenuSignal();
+}
+
+void GameInterface::processEnemyAttack()
+{
+    // Update health information
+    healthInfo->setPlainText(QString::number(battlefield->getEnemyDamageGoal() - battlefield->getEnemyReachedNumber())
+                             + '/' + QString::number(battlefield->getEnemyDamageGoal()));
+
+    // Shorten health bar
+    currentBaseHealthBar->setRect(QRectF(0, 0,
+                                       (totalBaseHealthBar->boundingRect().width() *
+                                        (battlefield->getEnemyDamageGoal() - battlefield->getEnemyReachedNumber())) /
+                                         battlefield->getEnemyDamageGoal(),
+                                       totalBaseHealthBar->boundingRect().height()));
+
+    // Place it on the middle of total health bar
+    currentBaseHealthBar->setPos(totalBaseHealthBar->pos().x() +
+                                 totalBaseHealthBar->boundingRect().width() / 2 -
+                                 currentBaseHealthBar->boundingRect().width() / 2,
+                                 totalBaseHealthBar->pos().y());
 }

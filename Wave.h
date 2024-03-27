@@ -42,6 +42,7 @@ private slots:
 
 signals:
     void enemiesEnded();
+    void enemyAttacksTheBase(const int &damage);
 
 private:
     int id;         // Number of wave

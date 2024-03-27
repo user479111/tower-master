@@ -259,10 +259,16 @@ void Battlefield::startWaveMove()
     // Setup enemies for the wave
     location->getWaves().at(currentWaveIndex)->runEnemies(location);
 
+    // Prepare for enemy attack
+    QObject::connect(location->getWaves().at(currentWaveIndex),
+                     &Wave::enemyAttacksTheBase,
+                     this,
+                     &Battlefield::processEnemyAttack);
+
     // Emit signal to connect enemies with minimap
     emit enemiesHaveBeenRun();
 
-    // after the last enemy was killed
+    // After the last enemy was killed
     // or reached the end of the route
     // startNextWave
     QObject::connect(location->getWaves().at(currentWaveIndex),
@@ -296,6 +302,17 @@ void Battlefield::startNextWave()
 
     // Start the timer
     timerBetweenWaves.start(location->getTimeForPreparation() * 1000);
+}
+
+void Battlefield::processEnemyAttack(const int &damage)
+{
+    if (enemyReachedNumber + damage < getEnemyDamageGoal()) {
+        enemyReachedNumber += damage;
+        emit enemyCausedDamage();
+    } else {
+        // TODO: Implement Game Over menu
+        qDebug() << "Game Over!";
+    }
 }
 
 int Battlefield::getEnemyReachedNumber() const

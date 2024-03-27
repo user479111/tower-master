@@ -51,8 +51,6 @@ void Wave::setDencity(float newDencity)
 
 void Wave::runEnemy()
 {
-    timerBetweenEnemies.setInterval(dencity * 1000);
-
     // If all the enemy have been run
     if (currentEnemyId >= groupOfEnemies.size()) {
 
@@ -137,9 +135,15 @@ void Wave::setupEnemiesFromXml(QString fileName, const Location * location)
 
 void Wave::processEnemyOut(Enemy * enemy)
 {
+    // Remove the enemy from the scene
     int enemyIndex = groupOfEnemies.indexOf(enemy);
     if (groupOfEnemies.at(enemyIndex)) {
         groupOfEnemies.at(enemyIndex)->hide(scene);
+    }
+
+    // If the enemy reaches the base (the end of the route) - it causes damage
+    if (enemy->getCurrentHealth() > Enemy::ENEMY_MIN_HEALTH) {
+        emit enemyAttacksTheBase(enemy->getDamage());
     }
 
     // Check if there any enemy is still running on the battlefield

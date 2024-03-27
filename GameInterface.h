@@ -41,6 +41,7 @@ private slots:
     void connectMinimapWithEnemies();
     void processResumeClick();
     void processMainMenuClick();
+    void processEnemyAttack();
 
 signals:
     void mainMenuSignal();
