@@ -14,13 +14,7 @@ Minimap::Minimap(const QPixmap &pixmap,
 
 Minimap::~Minimap()
 {
-    for(auto tower: towers.keys()) {
-        delete towers.value(tower);
-    }
-
-    for(auto enemy: enemies.keys()) {
-        delete enemies.value(enemy);
-    }
+    clearObjects();
 }
 
 void Minimap::mousePressEvent(QGraphicsSceneMouseEvent *event)
@@ -138,6 +132,24 @@ void Minimap::connectWithEenemies(const QList<Enemy*> &currentEnemies)
         connect(enemy, &Enemy::outOfBattleForMinimap, this, &Minimap::enemyRemoved);
     }
 }
+
+void Minimap::clearObjects()
+{
+    for(auto tower: towers.keys()) {
+        if (towers.value(tower)) {
+            delete towers.value(tower);
+        }
+    }
+    towers.clear();
+
+    for(auto enemy: enemies.keys()) {
+        if (enemies.value(enemy)) {
+            delete enemies.value(enemy);
+        }
+    }
+    enemies.clear();
+}
+
 
 void Minimap::enemyRepositioned(Enemy * enemy)
 {

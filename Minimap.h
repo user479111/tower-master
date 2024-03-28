@@ -33,6 +33,8 @@ public:
 
     void connectWithEenemies(const QList<Enemy*> &currentEnemies);
 
+    void clearObjects();
+
 signals:
     void mousePressed();
 

@@ -24,10 +24,12 @@ public:
 public slots:
     void processResumeClick();
     void processMainMenuClick();
+    void processRestartClick();
 
 signals:
     void resumeClicked();
     void mainMenuClicked();
+    void restartClicked();
 
 private:
     static const QString XML_FILE_NAME;

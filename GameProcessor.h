@@ -3,7 +3,6 @@
 
 #include <QObject>
 #include <QGraphicsScene>
-#include <QMouseEvent>
 
 #include "Cursor.h"
 #include "Location.h"
@@ -24,6 +23,7 @@ public:
     ~GameProcessor();
 
 private slots:
+    void processRestartClick();
     void processMainMenuClick();
 
 signals:
@@ -32,7 +32,9 @@ signals:
 private:
     QGraphicsScene * scene;
     Cursor * cursor;
+    Preferences * preferences;
 
+    QString locationName;
     Location * location;
     Battlefield * battlefield;
 

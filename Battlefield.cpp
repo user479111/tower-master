@@ -68,9 +68,7 @@ Battlefield::Battlefield(QGraphicsScene * scene,
 
 Battlefield::~Battlefield()
 {
-    for (auto tower : towers) {
-        delete tower;
-    }
+    clearTowers();
 }
 
 bool Battlefield::eventFilter(QObject *obj, QEvent *event) {
@@ -323,6 +321,14 @@ int Battlefield::getEnemyReachedNumber() const
 int Battlefield::getEnemyDamageGoal() const
 {
     return location->getEnemyDamageGoal();
+}
+
+void Battlefield::clearTowers()
+{
+    for (auto tower : towers) {
+        delete tower;
+    }
+    towers.clear();
 }
 
 void Battlefield::pause()

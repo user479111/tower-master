@@ -32,19 +32,28 @@ private slots:
     void processScroll();
     void processPressEvent();
     void processBattlefieldScale();
+
+    void processEnemyAttack();
+
+    void connectMinimapWithEnemies();
+
+    // Player board slots
     void processPauseClick();
     void processHideClick();
     void processBuildTowerClick();
     void processScrollForward();
     void processScrollBackward();
     void processBuildingTower();
-    void connectMinimapWithEnemies();
+
+    // Pause menu slots
     void processResumeClick();
+    void processRestartClick();
     void processMainMenuClick();
-    void processEnemyAttack();
+
 
 signals:
     void mainMenuSignal();
+    void restart();
 
 private:
     static const float BUILD_ITEM_SCALE;

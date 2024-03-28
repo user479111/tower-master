@@ -37,6 +37,8 @@ public:
 
     int getEnemyDamageGoal() const;
 
+    void clearTowers();
+
 signals:
     void battlefieldScaled();
     void enemiesHaveBeenRun();

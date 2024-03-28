@@ -36,6 +36,8 @@ public:
     void pause();
     void resume();
 
+    void clearEnemies();
+
 private slots:
     void runEnemy();
     void processEnemyOut(Enemy * enemy);

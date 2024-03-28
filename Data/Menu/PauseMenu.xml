@@ -15,6 +15,14 @@
             <attstr name="text" language="Українська" val="Відновити"/>
             <attstr name="text" language="Русский" val="Возобновить"/>
         </section>
+        <section name="restart" type="menu-item">
+            <attpos x="80" y="80" z="1" val="center"/>
+            <attnum name="fixed-size" val="false"/>
+            <attstr name="image" val="Scroll.png"/>
+            <attstr name="text" language="English" val="Restart"/>
+            <attstr name="text" language="Українська" val="Спочатку"/>
+            <attstr name="text" language="Русский" val="Сначала"/>
+        </section>
         <section name="main-menu" type="menu-item">
             <attpos x="80" y="160" z="1" val="center"/>
             <attnum name="fixed-size" val="false"/>
