@@ -9,6 +9,8 @@ PauseMenu::PauseMenu(const Preferences * preferences)
     for (auto item : getListOfItems()) {
         if (item->getTitle() == "resume") {
             connect(item, &MenuItem::clicked, this, &PauseMenu::processResumeClick);
+        } else if (item->getTitle() == "restart") {
+            connect(item, &MenuItem::clicked, this, &PauseMenu::processRestartClick);
         } else if (item->getTitle() == "main-menu") {
             connect(item, &MenuItem::clicked, this, &PauseMenu::processMainMenuClick);
         }
@@ -33,7 +35,7 @@ void PauseMenu::show(QGraphicsScene *scene)
     setBoardPos(scene->sceneRect().x() +
                 scene->sceneRect().width() / 2 -
                 getBoard()->boundingRect().width() / 2,
-                0);
+                scene->sceneRect().y());
 
     // Display board with menu items
     scene->addItem(getBoard());
@@ -71,4 +73,9 @@ void PauseMenu::processResumeClick()
 void PauseMenu::processMainMenuClick()
 {
     emit mainMenuClicked();
+}
+
+void PauseMenu::processRestartClick()
+{
+    emit restartClicked();
 }

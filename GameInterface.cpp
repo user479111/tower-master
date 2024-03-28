@@ -240,6 +240,7 @@ GameInterface::GameInterface(Preferences * preferences,
     connect(battlefield, &Battlefield::enemiesHaveBeenRun, this, &GameInterface::connectMinimapWithEnemies);
 
     connect(pauseMenu, &PauseMenu::resumeClicked, this, &GameInterface::processResumeClick);
+    connect(pauseMenu, &PauseMenu::restartClicked, this, &GameInterface::processRestartClick);
     connect(pauseMenu, &PauseMenu::mainMenuClicked, this, &GameInterface::processMainMenuClick);
 }
 
@@ -515,6 +516,11 @@ void GameInterface::processResumeClick()
 
     // Resume battlefield events
     battlefield->resume();
+}
+
+void GameInterface::processRestartClick()
+{
+    emit restart();
 }
 
 void GameInterface::processMainMenuClick()
