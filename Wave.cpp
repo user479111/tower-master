@@ -18,9 +18,7 @@ Wave::Wave(QGraphicsScene * scene):
 
 Wave::~Wave()
 {
-    for (auto enemy : groupOfEnemies) {
-        delete enemy;
-    }
+    clearEnemies();
 }
 
 int Wave::getInterval() const
@@ -148,15 +146,7 @@ void Wave::processEnemyOut(Enemy * enemy)
 
     // Check if there any enemy is still running on the battlefield
     if (++enemiesOutOfBattleNum == groupOfEnemies.size()) {
-
-        // Clean memory after enemies
-        for (auto enemy : groupOfEnemies) {
-            delete enemy;
-        }
-
-        // clean enemies list;
-        groupOfEnemies.clear();
-
+        clearEnemies();
         emit enemiesEnded();
         return;
     }
@@ -203,4 +193,17 @@ void Wave::resume()
     for (auto enemy : groupOfEnemies) {
         enemy->resume();
     }
+}
+
+void Wave::clearEnemies()
+{
+    // Clean memory after enemies
+    for (auto enemy : groupOfEnemies) {
+        if (enemy) {
+            delete enemy;
+        }
+    }
+
+    // clean enemies list;
+    groupOfEnemies.clear();
 }
