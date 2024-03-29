@@ -16,6 +16,7 @@
 #include "PauseMenu.h"
 #include "Battlefield.h"
 #include "Preferences.h"
+#include "GameOverMenu.h"
 
 class GameInterface : public QObject
 {
@@ -45,11 +46,12 @@ private slots:
     void processScrollBackward();
     void processBuildingTower();
 
-    // Pause menu slots
+    void processGameOver();
+
+    // In game menus' slots
     void processResumeClick();
     void processRestartClick();
     void processMainMenuClick();
-
 
 signals:
     void mainMenuSignal();
@@ -87,8 +89,7 @@ private:
     QGraphicsTextItem * healthInfo;
 
     PauseMenu * pauseMenu;
-    //QGraphicsPixmapItem * pauseMenuBoard; <- inside PauseMenu
-    //QList<MenuItem *> listOfItems; <- inside PauseMenu
+    GameOverMenu * gameOverMenu;
     bool hide;
 };
 

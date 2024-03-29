@@ -308,8 +308,7 @@ void Battlefield::processEnemyAttack(const int &damage)
         enemyReachedNumber += damage;
         emit enemyCausedDamage();
     } else {
-        // TODO: Implement Game Over menu
-        qDebug() << "Game Over!";
+         emit gameOver();
     }
 }
 

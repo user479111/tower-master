@@ -17,6 +17,7 @@ SOURCES += \
     Cursor.cpp \
     Enemy.cpp \
     GameInterface.cpp \
+    GameOverMenu.cpp \
     GameProcessor.cpp \
     Location.cpp \
     LocationItem.cpp \
@@ -41,6 +42,7 @@ HEADERS += \
     Cursor.h \
     Enemy.h \
     GameInterface.h \
+    GameOverMenu.h \
     GameProcessor.h \
     Location.h \
     LocationItem.h \

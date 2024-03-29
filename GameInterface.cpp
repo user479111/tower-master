@@ -32,6 +32,7 @@ GameInterface::GameInterface(Preferences * preferences,
     currentBaseHealthBar(new QGraphicsRectItem(0, 0, 0, 0)),
     healthInfo(new QGraphicsTextItem),
     pauseMenu(new PauseMenu(preferences)),
+    gameOverMenu(new GameOverMenu(preferences)),
     hide(false)
 {
     cursor->setScrollAreaRect(battlefield->getLocation()->mapRectToScene(battlefield->getLocation()->boundingRect()));
@@ -238,10 +239,16 @@ GameInterface::GameInterface(Preferences * preferences,
     connect(scrollForward, &MenuItem::clicked, this, &GameInterface::processScrollForward);
 
     connect(battlefield, &Battlefield::enemiesHaveBeenRun, this, &GameInterface::connectMinimapWithEnemies);
+    connect(battlefield, &Battlefield::gameOver, this, &GameInterface::processGameOver);
 
+    // Prepare for Pause Menu signals
     connect(pauseMenu, &PauseMenu::resumeClicked, this, &GameInterface::processResumeClick);
     connect(pauseMenu, &PauseMenu::restartClicked, this, &GameInterface::processRestartClick);
     connect(pauseMenu, &PauseMenu::mainMenuClicked, this, &GameInterface::processMainMenuClick);
+
+    // Prepare for Game Over Menu signals
+    connect(gameOverMenu, &GameOverMenu::restartClicked, this, &GameInterface::processRestartClick);
+    connect(gameOverMenu, &GameOverMenu::mainMenuClicked, this, &GameInterface::processMainMenuClick);
 }
 
 GameInterface::~GameInterface()
@@ -265,6 +272,8 @@ GameInterface::~GameInterface()
     delete scrollBackward;
 
     delete pauseMenu;
+
+    delete gameOverMenu;
 
     delete totalBaseHealthBar;
 
@@ -508,6 +517,7 @@ void GameInterface::connectMinimapWithEnemies()
 
 void GameInterface::processResumeClick()
 {
+    // Needs update to support Game Over
     // Hide the Pause menu
     pauseMenu->hide(scene);
 
@@ -526,6 +536,18 @@ void GameInterface::processRestartClick()
 void GameInterface::processMainMenuClick()
 {
     emit mainMenuSignal();
+}
+
+void GameInterface::processGameOver()
+{
+    // Pause battlefield events
+    battlefield->pause();
+
+    // Pause map scroll
+    cursor->setScrollAreaRect(scene->sceneRect());
+
+    // Show the Game Over menu
+    gameOverMenu->show(scene);
 }
 
 void GameInterface::processEnemyAttack()
