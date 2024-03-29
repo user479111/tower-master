@@ -43,6 +43,7 @@ signals:
     void battlefieldScaled();
     void enemiesHaveBeenRun();
     void enemyCausedDamage();
+    void gameOver();
 
 private slots:
     void processCursorMove();

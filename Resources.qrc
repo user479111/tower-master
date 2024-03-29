@@ -39,5 +39,6 @@
         <file>Data/Menu/SettingsMenu.xml</file>
         <file>Data/Preferences/Preferences.xml</file>
         <file>Data/Menu/PauseMenu.xml</file>
+        <file>Data/Menu/GameOverMenu.xml</file>
     </qresource>
 </RCC>
