@@ -33,6 +33,7 @@ GameInterface::GameInterface(Preferences * preferences,
     healthInfo(new QGraphicsTextItem),
     pauseMenu(new PauseMenu(preferences)),
     gameOverMenu(new GameOverMenu(preferences)),
+    victoryMenu(new VictoryMenu(preferences)),
     hide(false)
 {
     cursor->setScrollAreaRect(battlefield->getLocation()->mapRectToScene(battlefield->getLocation()->boundingRect()));
@@ -240,6 +241,7 @@ GameInterface::GameInterface(Preferences * preferences,
 
     connect(battlefield, &Battlefield::enemiesHaveBeenRun, this, &GameInterface::connectMinimapWithEnemies);
     connect(battlefield, &Battlefield::gameOver, this, &GameInterface::processGameOver);
+    connect(battlefield, &Battlefield::victory, this, &GameInterface::processVictory);
 
     // Prepare for Pause Menu signals
     connect(pauseMenu, &PauseMenu::resumeClicked, this, &GameInterface::processResumeClick);
@@ -249,6 +251,10 @@ GameInterface::GameInterface(Preferences * preferences,
     // Prepare for Game Over Menu signals
     connect(gameOverMenu, &GameOverMenu::restartClicked, this, &GameInterface::processRestartClick);
     connect(gameOverMenu, &GameOverMenu::mainMenuClicked, this, &GameInterface::processMainMenuClick);
+
+    // Prepare for Victory Menu signals
+    connect(victoryMenu, &VictoryMenu::restartClicked, this, &GameInterface::processRestartClick);
+    connect(victoryMenu, &VictoryMenu::mainMenuClicked, this, &GameInterface::processMainMenuClick);
 }
 
 GameInterface::~GameInterface()
@@ -274,6 +280,8 @@ GameInterface::~GameInterface()
     delete pauseMenu;
 
     delete gameOverMenu;
+
+    delete victoryMenu;
 
     delete totalBaseHealthBar;
 
@@ -547,6 +555,18 @@ void GameInterface::processGameOver()
 
     // Show the Game Over menu
     gameOverMenu->show(scene);
+}
+
+void GameInterface::processVictory()
+{
+    // Pause battlefield events
+    battlefield->pause();
+
+    // Pause map scroll
+    cursor->setScrollAreaRect(scene->sceneRect());
+
+    // Show the Victory menu
+    victoryMenu->show(scene);
 }
 
 void GameInterface::processEnemyAttack()

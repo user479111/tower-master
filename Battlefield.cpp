@@ -289,6 +289,7 @@ void Battlefield::startNextWave()
     timerBetweenWaves.setInterval(location->getWaves().at(currentWaveIndex)->getInterval() * 1000);
 
     if (currentWaveIndex + 1 == location->getWaves().size()) {
+        emit victory();
         return;
     } else {
         currentWaveIndex++;
@@ -308,7 +309,8 @@ void Battlefield::processEnemyAttack(const int &damage)
         enemyReachedNumber += damage;
         emit enemyCausedDamage();
     } else {
-         emit gameOver();
+        enemyReachedNumber = getEnemyDamageGoal();
+        emit gameOver();
     }
 }
 
