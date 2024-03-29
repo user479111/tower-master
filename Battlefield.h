@@ -44,6 +44,7 @@ signals:
     void enemiesHaveBeenRun();
     void enemyCausedDamage();
     void gameOver();
+    void victory();
 
 private slots:
     void processCursorMove();

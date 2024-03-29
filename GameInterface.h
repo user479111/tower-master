@@ -16,6 +16,7 @@
 #include "PauseMenu.h"
 #include "Battlefield.h"
 #include "Preferences.h"
+#include "VictoryMenu.h"
 #include "GameOverMenu.h"
 
 class GameInterface : public QObject
@@ -47,6 +48,7 @@ private slots:
     void processBuildingTower();
 
     void processGameOver();
+    void processVictory();
 
     // In game menus' slots
     void processResumeClick();
@@ -90,6 +92,7 @@ private:
 
     PauseMenu * pauseMenu;
     GameOverMenu * gameOverMenu;
+    VictoryMenu * victoryMenu;
     bool hide;
 };
 
