@@ -517,7 +517,6 @@ void GameInterface::connectMinimapWithEnemies()
 
 void GameInterface::processResumeClick()
 {
-    // Needs update to support Game Over
     // Hide the Pause menu
     pauseMenu->hide(scene);
 
