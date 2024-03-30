@@ -9,6 +9,8 @@
 #include <QRectF>
 #include <QList>
 
+#include "Enemy.h"
+#include "Tower.h"
 #include "Cursor.h"
 #include "Minimap.h"
 #include "Location.h"
@@ -29,6 +31,9 @@ public:
                            Battlefield * battlefield,
                            QObject * parent = nullptr);
     ~GameInterface();
+
+    void displayTowerInfoBoard(const Tower & tower);
+    void displayEnemyInfoBoard(const Enemy & enemy);
 
 private slots:
     void processScroll();
@@ -64,14 +69,19 @@ private:
     static const float BOARD_ITEM_SCALE;
     static const float MINIMAP_SCALE;
 
+    static const QString BOARD_FILE;
+    static const QString INFO_BOARD_FILE;
+
     static const QString FONT_STYLE;
     static const int FONT_SIZE;
+    static const int TITLE_FONT_SIZE;
 
     Preferences * preferences;
     QGraphicsScene * scene;
     Cursor * cursor;
     Battlefield * battlefield;
 
+    // TODO: move board and shownArea into minimap?
     QGraphicsPixmapItem * minimapBoard;
     Minimap * minimap;
     QGraphicsRectItem * shownArea;
@@ -90,6 +100,16 @@ private:
     QGraphicsRectItem * currentBaseHealthBar;
     QGraphicsTextItem * healthInfo;
 
+    // TODO: separate class GameObjectInfoBoard
+    QGraphicsPixmapItem * objectInfoBoard;
+    QGraphicsPixmapItem * objectPreview;
+    QGraphicsRectItem * totalObjectHealthBar;
+    QGraphicsRectItem * currentObjectHealthBar;
+    QGraphicsTextItem * objectInfoTitle;
+    QGraphicsTextItem * objectInfoText;
+
+    // TODO: seems like the ierarchy is needed here
+    // (InGameMenu -> pause, game over, victory, message)
     PauseMenu * pauseMenu;
     GameOverMenu * gameOverMenu;
     VictoryMenu * victoryMenu;

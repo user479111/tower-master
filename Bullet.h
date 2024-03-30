@@ -5,6 +5,7 @@
 #include <QObject>
 #include <QTimer>
 
+#include "GameObject.h"
 #include "Location.h"
 #include "Enemy.h"
 
@@ -12,7 +13,7 @@
 #define BULLET_TIMER_INTERVAL 50
 #define MIN_BULLET_SPEED 20
 
-class Bullet : public QObject, public QGraphicsPixmapItem
+class Bullet : public GameObject
 {
     Q_OBJECT
 public:

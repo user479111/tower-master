@@ -39,6 +39,8 @@ public:
 
     void clearTowers();
 
+    bool getPaused() const;
+
 signals:
     void battlefieldScaled();
     void enemiesHaveBeenRun();
@@ -66,7 +68,7 @@ private:
 
     float minScale;
 
-    bool scalingAllowed; // true by default
+    bool paused;
 
     int enemyReachedNumber; // Number of enemies that have reached the end of the route
 };

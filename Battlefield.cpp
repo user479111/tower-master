@@ -16,7 +16,7 @@ Battlefield::Battlefield(QGraphicsScene * scene,
     timerRemainingTimeOnPause(0),
     currentWaveIndex(0),
     minScale(0.0),
-    scalingAllowed(true),
+    paused(false),
     enemyReachedNumber(0)
 {
     // display location
@@ -73,7 +73,7 @@ Battlefield::~Battlefield()
 
 bool Battlefield::eventFilter(QObject *obj, QEvent *event) {
 
-    if (obj == scene && event->type() == QEvent::GraphicsSceneWheel && scalingAllowed) {
+    if (obj == scene && event->type() == QEvent::GraphicsSceneWheel && !paused) {
 
         QGraphicsSceneWheelEvent *wheelEvent = static_cast<QGraphicsSceneWheelEvent*>(event);
 
@@ -280,6 +280,14 @@ void Battlefield::startWaveMove()
 
 void Battlefield::startNextWave()
 {
+    if (paused) {
+        // If the timer has managed to start right after the pasuse
+        // make sure to start it on resume
+        timerRemainingTimeOnPause = location->getTimeForPreparation() * 1000;
+        timerBetweenWaves.stop();
+        return;
+    }
+
     // Stop timer
     timerBetweenWaves.stop();
 
@@ -310,8 +318,14 @@ void Battlefield::processEnemyAttack(const int &damage)
         emit enemyCausedDamage();
     } else {
         enemyReachedNumber = getEnemyDamageGoal();
+        emit enemyCausedDamage();
         emit gameOver();
     }
+}
+
+bool Battlefield::getPaused() const
+{
+    return paused;
 }
 
 int Battlefield::getEnemyReachedNumber() const
@@ -334,7 +348,7 @@ void Battlefield::clearTowers()
 
 void Battlefield::pause()
 {
-    scalingAllowed = false;
+    paused = true;
 
     // Stop towers' timers
     for (auto tower : towers) {
@@ -352,19 +366,19 @@ void Battlefield::pause()
 
 void Battlefield::resume()
 {
-    scalingAllowed = true;
+    paused = false;
 
-    // Stop towers' timers
+    // Resume towers' timers
     for (auto tower : towers) {
         tower->resume();
     }
 
-    // Stop wave
+    // Resume wave
     location->getWaves().at(currentWaveIndex)->resume();
 
     if (timerRemainingTimeOnPause) {
-        timerRemainingTimeOnPause = 0;
         timerBetweenWaves.start(timerRemainingTimeOnPause);
+        timerRemainingTimeOnPause = 0;
     }
 }
 

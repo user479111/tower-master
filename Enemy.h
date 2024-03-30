@@ -10,11 +10,13 @@
 #include <QTimer>
 #include <QRectF>
 
+#include "GameObject.h"
+
 #define ENEMY_TIMER_INTERVAL 50
 #define ENEMY_MIN_SPEED 20
 #define ENEMY_HEALTH_BAR_WIDTH 3
 
-class Enemy : public QObject, public QGraphicsPixmapItem
+class Enemy : public GameObject
 {
     Q_OBJECT
 public:
