@@ -9,16 +9,18 @@
 #include <QDebug>
 #include <QTimer>
 
-Tower::Tower(const QString &type,
+Tower::Tower(const QString &directoryType,
              const QPointF &center,
              const Location * location) :
     location(location),
     attackTimer(this),
-    type(type),
+    skin(""),
+    type(""),
+    directoryType(directoryType),
     attackSpeed(MIN_ATTACK_SPEED)
 {
     // read Enemy.xml file and set MenuProcessor parameters
-    loadXmlParameters(QString(":/Data/Data/Towers/" + type + "/Tower.xml"));
+    loadXmlParameters(QString(":/Data/Data/Towers/" + directoryType + "/Tower.xml"));
 
     setScale(location->scale());
 
@@ -133,6 +135,11 @@ void Tower::clearBullets()
     }
 }
 
+const QString &Tower::getSkin() const
+{
+    return skin;
+}
+
 void Tower::setAttackSpeed(float newAttackSpeed)
 {
     if (newAttackSpeed < MIN_ATTACK_SPEED) {
@@ -174,6 +181,16 @@ const QList<Bullet*> &Tower::getBullets() const
     return bullets;
 }
 
+int Tower::getDamage() const
+{
+    return bulletPatern.getDamage();
+}
+
+float Tower::getAttackSpeed() const
+{
+    return attackSpeed;
+}
+
 void Tower::loadXmlParameters(QString inFileName)
 {
     QDomDocument MenuProcessorXml;
@@ -206,10 +223,14 @@ void Tower::loadXmlParameters(QString inFileName)
                 if (QString(towerAttribute.tagName()) == "attstr") {
 
                     if (QString(towerAttribute.attribute("name")) == "type") {
-                        qDebug() << "Tower type: " << QString(towerAttribute.attribute("val"));
+
+                        type = QString(towerAttribute.attribute("val"));
+
                     } else if (QString(towerAttribute.attribute("name")) == "skin") {
-                        qDebug() << "Tower skin: " << QString(":/Data/Data/Towers/" + type + "/" + QString(towerAttribute.attribute("val")));
-                        setPixmap(QString(":/Data/Data/Towers/" + type + "/" + QString(towerAttribute.attribute("val"))));
+
+                        skin = QString(":/Data/Data/Towers/" + directoryType + "/" + QString(towerAttribute.attribute("val")));
+                        setPixmap(skin);
+
                     }
 
                 } else if (QString(towerAttribute.tagName()) == "attnum") {
@@ -239,7 +260,7 @@ void Tower::loadXmlParameters(QString inFileName)
                 if (QString(bulletAttribute.tagName()) == "attstr") {
 
                     if (QString(bulletAttribute.attribute("name")) == "skin") {
-                        bulletPatern.setPixmap(QString(":/Data/Data/Towers/" + type + "/" + QString(bulletAttribute.attribute("val"))));
+                        bulletPatern.setPixmap(QString(":/Data/Data/Towers/" + directoryType + "/" + QString(bulletAttribute.attribute("val"))));
                     }
 
                 } else if (QString(bulletAttribute.tagName()) == "attnum") {

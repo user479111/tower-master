@@ -41,5 +41,6 @@
         <file>Data/Menu/PauseMenu.xml</file>
         <file>Data/Menu/GameOverMenu.xml</file>
         <file>Data/Menu/VictoryMenu.xml</file>
+        <file>Data/Game/InfoDesk.png</file>
     </qresource>
 </RCC>

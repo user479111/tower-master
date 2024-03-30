@@ -16,8 +16,7 @@ Bullet::Bullet() :
 }
 
 Bullet::Bullet(Bullet &bulletPatern) :
-    QObject(),
-    QGraphicsPixmapItem(),
+    GameObject(),
     outOfBattle(false)
 {
     setPixmap(bulletPatern.pixmap());

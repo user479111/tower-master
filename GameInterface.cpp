@@ -1,5 +1,4 @@
 #include "GameInterface.h"
-#include "Tower.h"
 
 #include <QDir>
 #include <QDebug>
@@ -8,7 +7,11 @@ const float GameInterface::BUILD_ITEM_SCALE = 0.8;
 const float GameInterface::BOARD_ITEM_SCALE = 0.5;
 const float GameInterface::MINIMAP_SCALE = 0.1;
 
+const QString GameInterface::BOARD_FILE = ":/Data/Data/Game/MinimapDesk.png";
+const QString GameInterface::INFO_BOARD_FILE = ":/Data/Data/Game/InfoDesk.png";
+
 const QString GameInterface::FONT_STYLE = "Helvetica [Cronyx]";
+const int GameInterface::TITLE_FONT_SIZE = 12;
 const int GameInterface::FONT_SIZE = 9;
 
 GameInterface::GameInterface(Preferences * preferences,
@@ -31,6 +34,11 @@ GameInterface::GameInterface(Preferences * preferences,
     totalBaseHealthBar(new QGraphicsRectItem(0, 0, 0, 0)),
     currentBaseHealthBar(new QGraphicsRectItem(0, 0, 0, 0)),
     healthInfo(new QGraphicsTextItem),
+    objectPreview(new QGraphicsPixmapItem),
+    totalObjectHealthBar(new QGraphicsRectItem(0, 0, 0, 0)),
+    currentObjectHealthBar(new QGraphicsRectItem(0, 0, 0, 0)),
+    objectInfoTitle(new QGraphicsTextItem),
+    objectInfoText(new QGraphicsTextItem),
     pauseMenu(new PauseMenu(preferences)),
     gameOverMenu(new GameOverMenu(preferences)),
     victoryMenu(new VictoryMenu(preferences)),
@@ -41,7 +49,7 @@ GameInterface::GameInterface(Preferences * preferences,
     connect(cursor, &Cursor::areaScrolled, this, &GameInterface::processScroll);
 
     // show minimap board
-    minimapBoard = new QGraphicsPixmapItem(QPixmap(":/Data/Data/Game/MinimapDesk.png")); // all the paths should be written somewhere
+    minimapBoard = new QGraphicsPixmapItem(QPixmap(BOARD_FILE));
     minimapBoard->setX(scene->sceneRect().right() - minimapBoard->boundingRect().width());
     minimapBoard->setY(scene->sceneRect().bottom() - minimapBoard->boundingRect().height());
     minimapBoard->setZValue(1);
@@ -74,7 +82,7 @@ GameInterface::GameInterface(Preferences * preferences,
     connect(battlefield, &Battlefield::battlefieldScaled, this, &GameInterface::processBattlefieldScale);
 
     // show player board
-    playerBoard = new QGraphicsPixmapItem(QPixmap(":/Data/Data/Game/MinimapDesk.png")); // all the paths should be written somewhere
+    playerBoard = new QGraphicsPixmapItem(QPixmap(BOARD_FILE));
     playerBoard->setX(scene->sceneRect().left());
     playerBoard->setY(scene->sceneRect().bottom() - playerBoard->boundingRect().height());
     playerBoard->setZValue(1);
@@ -239,6 +247,14 @@ GameInterface::GameInterface(Preferences * preferences,
 
     connect(scrollForward, &MenuItem::clicked, this, &GameInterface::processScrollForward);
 
+    // Prepare info board
+    objectInfoBoard = new QGraphicsPixmapItem(QPixmap(INFO_BOARD_FILE));
+    objectInfoBoard->setX(scene->sceneRect().x() +
+                          scene->sceneRect().width() / 2 -
+                          objectInfoBoard->boundingRect().width() / 2);
+    objectInfoBoard->setY(scene->sceneRect().bottom() - objectInfoBoard->boundingRect().height());
+    objectInfoBoard->setZValue(1);
+
     connect(battlefield, &Battlefield::enemiesHaveBeenRun, this, &GameInterface::connectMinimapWithEnemies);
     connect(battlefield, &Battlefield::gameOver, this, &GameInterface::processGameOver);
     connect(battlefield, &Battlefield::victory, this, &GameInterface::processVictory);
@@ -260,33 +276,29 @@ GameInterface::GameInterface(Preferences * preferences,
 GameInterface::~GameInterface()
 {
     delete minimapBoard;
-
     delete minimap;
-
     delete shownArea;
 
     delete playerBoard;
-
     delete pauseMenuItem;
-
     delete hidePanels;
-
     delete buildTowerItem;
-
     delete scrollForward;
-
     delete scrollBackward;
 
+    delete objectInfoBoard;
+    delete objectPreview;
+    delete totalObjectHealthBar;
+    delete currentObjectHealthBar;
+    delete objectInfoTitle;
+    delete objectInfoText;
+
     delete pauseMenu;
-
     delete gameOverMenu;
-
     delete victoryMenu;
 
     delete totalBaseHealthBar;
-
     delete currentBaseHealthBar;
-
     delete healthInfo;
 
     auto sceneRect = scene->sceneRect();
@@ -295,6 +307,53 @@ GameInterface::~GameInterface()
 
     // Update corresponding cursor parameters
     cursor->setScrollAreaRect(scene->sceneRect());
+}
+
+void GameInterface::displayTowerInfoBoard(const Tower & tower)
+{
+    if (cursor->getBuildMode()) {
+        objectInfoTitle->setPlainText(QString("Build Tower : ") + tower.getType());
+    } else {
+        objectInfoTitle->setPlainText(QString("Tower : ") + tower.getType());
+    }
+
+    objectInfoTitle->setDefaultTextColor(Qt::black);
+    objectInfoTitle->setFont(QFont(FONT_STYLE, TITLE_FONT_SIZE, QFont::Bold));
+    objectInfoTitle->setX(objectInfoBoard->x() +
+                     objectInfoBoard->boundingRect().width() / 2 -
+                     objectInfoTitle->boundingRect().width() / 2);
+    objectInfoTitle->setY(objectInfoBoard->y() +
+                     objectInfoTitle->boundingRect().height());
+    objectInfoTitle->setZValue(1);
+
+    objectPreview = new QGraphicsPixmapItem(QPixmap(tower.getSkin()));
+    objectPreview->setScale(0.5);
+    objectPreview->setX(objectInfoBoard->x() +
+                        objectInfoBoard->boundingRect().width() -
+                        objectPreview->boundingRect().width());
+    objectPreview->setY(objectInfoTitle->y() +
+                        objectInfoTitle->boundingRect().height());
+    objectPreview->setZValue(1);
+
+    objectInfoText->setPlainText(QString("Damage: ") + QString::number(tower.getDamage()) + "\n" +
+                                 QString("A.speed: ") + QString::number(tower.getAttackSpeed()) +
+                                 QString(" shot/sec"));
+    objectInfoText->setDefaultTextColor(Qt::black);
+    objectInfoText->setFont(QFont(FONT_STYLE, FONT_SIZE, QFont::Medium));
+    objectInfoText->setX(objectPreview->x() - objectInfoText->boundingRect().width());
+    objectInfoText->setY(objectInfoTitle->y() +
+                     objectInfoTitle->boundingRect().height());
+    objectInfoText->setZValue(1);
+
+    scene->addItem(objectInfoBoard);
+    scene->addItem(objectInfoTitle);
+    scene->addItem(objectPreview);
+    scene->addItem(objectInfoText);
+}
+
+void GameInterface::displayEnemyInfoBoard(const Enemy & enemy)
+{
+
 }
 
 // Move all the interface items with the scene
@@ -382,6 +441,30 @@ void GameInterface::processScroll()
                         pauseMenuItem->pos().y() +
                         pauseMenuItem->boundingRect().height() * pauseMenuItem->scale()) / 2 -
                         scrollForward->boundingRect().height() * scrollForward->scale() / 2);
+
+    // Update Info Board
+    objectInfoBoard->setX(scene->sceneRect().x() +
+                          scene->sceneRect().width() / 2 -
+                          objectInfoBoard->boundingRect().width() / 2);
+    objectInfoBoard->setY(scene->sceneRect().bottom() -
+                          objectInfoBoard->boundingRect().height() +
+                          hide * (objectInfoBoard->boundingRect().height() / 2));
+
+    objectInfoTitle->setX(objectInfoBoard->x() +
+                     objectInfoBoard->boundingRect().width() / 2 -
+                     objectInfoTitle->boundingRect().width() / 2);
+    objectInfoTitle->setY(objectInfoBoard->y() +
+                     objectInfoTitle->boundingRect().height());
+
+    objectPreview->setX(objectInfoBoard->x() +
+                        objectInfoBoard->boundingRect().width() -
+                        objectPreview->boundingRect().width());
+    objectPreview->setY(objectInfoTitle->y() +
+                        objectInfoTitle->boundingRect().height());
+
+    objectInfoText->setX(objectPreview->x() - objectInfoText->boundingRect().width());
+    objectInfoText->setY(objectInfoTitle->y() +
+                     objectInfoTitle->boundingRect().height());
 }
 
 void GameInterface::processPressEvent()
@@ -453,6 +536,8 @@ void GameInterface::processHideClick()
 void GameInterface::processBuildTowerClick()
 {
     cursor->setBuildMode(true, towersTypes[currentTowerItem], battlefield->getLocation()->scale());
+
+    displayTowerInfoBoard(Tower(towersTypes[currentTowerItem], cursor->pos(), battlefield->getLocation()));
 
     connect(cursor, &Cursor::mousePressed, this, &GameInterface::processBuildingTower);
 }
