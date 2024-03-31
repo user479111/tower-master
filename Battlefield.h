@@ -41,6 +41,10 @@ public:
 
     bool getPaused() const;
 
+    const QList<Tower *> &getTowers() const;
+
+    void updateGameObjectsHighlighting();
+
 signals:
     void battlefieldScaled();
     void enemiesHaveBeenRun();

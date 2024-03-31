@@ -22,6 +22,8 @@ public:
 
     ~GameProcessor();
 
+    void processEscapePress();
+
 private slots:
     void processRestartClick();
     void processMainMenuClick();

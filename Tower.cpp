@@ -50,6 +50,8 @@ Tower::Tower(const QString &directoryType,
     // Prepare tower to clear the bullets
     connect(&attackTimer, SIGNAL(timeout()), this, SLOT(clearBullets()));
     attackTimer.start(1000/attackSpeed);
+
+    highlightedObjectId = getId();
 }
 
 Tower::~Tower()
@@ -68,7 +70,7 @@ void Tower::fire()
     Bullet * bullet = new Bullet(bulletPatern);
 
     // Display the bullet
-    scene()->addItem(bullet);
+    bullet->show(scene());
     bullet->setScale(scale());
     bullet->setPos(mapToScene(boundingRect().center()));
 
@@ -127,7 +129,7 @@ void Tower::clearBullets()
     if (bullets.size() > 0) {
         for (auto bulletItem : bullets) {
             if (bulletItem->isOutOfBattle()) {
-                scene()->removeItem(bulletItem);
+                bulletItem->hide(scene());
                 bullets.removeOne(bulletItem);
                 delete bulletItem;
             }

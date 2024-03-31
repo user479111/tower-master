@@ -34,6 +34,9 @@ public:
 
     void displayTowerInfoBoard(const Tower & tower);
     void displayEnemyInfoBoard(const Enemy & enemy);
+    void removeInfoBoard();
+
+    void processEscapePress();
 
 private slots:
     void processScroll();
@@ -60,6 +63,8 @@ private slots:
     void processRestartClick();
     void processMainMenuClick();
 
+    void processTowerClicked(const GameObject * object);
+
 signals:
     void mainMenuSignal();
     void restart();
@@ -71,6 +76,7 @@ private:
 
     static const QString BOARD_FILE;
     static const QString INFO_BOARD_FILE;
+    static const float OBJECT_PREVIEW_SCALE;
 
     static const QString FONT_STYLE;
     static const int FONT_SIZE;
@@ -107,6 +113,7 @@ private:
     QGraphicsRectItem * currentObjectHealthBar;
     QGraphicsTextItem * objectInfoTitle;
     QGraphicsTextItem * objectInfoText;
+    bool infoBoardDisplayed;
 
     // TODO: seems like the ierarchy is needed here
     // (InGameMenu -> pause, game over, victory, message)

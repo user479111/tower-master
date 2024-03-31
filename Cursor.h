@@ -33,7 +33,7 @@ public:
 
     bool getBuildIsPossible() const;
 
-    void checkEscape(QKeyEvent *event);
+    void processEscapePress();
 
 private slots:
     void checkScrollArea();

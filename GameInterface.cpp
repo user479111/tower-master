@@ -10,6 +10,8 @@ const float GameInterface::MINIMAP_SCALE = 0.1;
 const QString GameInterface::BOARD_FILE = ":/Data/Data/Game/MinimapDesk.png";
 const QString GameInterface::INFO_BOARD_FILE = ":/Data/Data/Game/InfoDesk.png";
 
+const float GameInterface::OBJECT_PREVIEW_SCALE = 0.5;
+
 const QString GameInterface::FONT_STYLE = "Helvetica [Cronyx]";
 const int GameInterface::TITLE_FONT_SIZE = 12;
 const int GameInterface::FONT_SIZE = 9;
@@ -39,6 +41,7 @@ GameInterface::GameInterface(Preferences * preferences,
     currentObjectHealthBar(new QGraphicsRectItem(0, 0, 0, 0)),
     objectInfoTitle(new QGraphicsTextItem),
     objectInfoText(new QGraphicsTextItem),
+    infoBoardDisplayed(false),
     pauseMenu(new PauseMenu(preferences)),
     gameOverMenu(new GameOverMenu(preferences)),
     victoryMenu(new VictoryMenu(preferences)),
@@ -311,6 +314,8 @@ GameInterface::~GameInterface()
 
 void GameInterface::displayTowerInfoBoard(const Tower & tower)
 {
+    removeInfoBoard();
+
     if (cursor->getBuildMode()) {
         objectInfoTitle->setPlainText(QString("Build Tower : ") + tower.getType());
     } else {
@@ -326,8 +331,8 @@ void GameInterface::displayTowerInfoBoard(const Tower & tower)
                      objectInfoTitle->boundingRect().height());
     objectInfoTitle->setZValue(1);
 
-    objectPreview = new QGraphicsPixmapItem(QPixmap(tower.getSkin()));
-    objectPreview->setScale(0.5);
+    objectPreview->setPixmap(tower.getSkin());
+    objectPreview->setScale(OBJECT_PREVIEW_SCALE);
     objectPreview->setX(objectInfoBoard->x() +
                         objectInfoBoard->boundingRect().width() -
                         objectPreview->boundingRect().width());
@@ -349,11 +354,45 @@ void GameInterface::displayTowerInfoBoard(const Tower & tower)
     scene->addItem(objectInfoTitle);
     scene->addItem(objectPreview);
     scene->addItem(objectInfoText);
+
+    infoBoardDisplayed = true;
+
+    battlefield->updateGameObjectsHighlighting();
 }
 
 void GameInterface::displayEnemyInfoBoard(const Enemy & enemy)
 {
+    removeInfoBoard();
 
+    infoBoardDisplayed = true;
+
+    battlefield->updateGameObjectsHighlighting();
+}
+
+void GameInterface::removeInfoBoard()
+{
+    if (!infoBoardDisplayed) {
+        return;
+    }
+
+    scene->removeItem(objectInfoBoard);
+    scene->removeItem(objectInfoTitle);
+    scene->removeItem(objectPreview);
+    scene->removeItem(objectInfoText);
+
+    infoBoardDisplayed = false;
+
+    // Remove object highlighting
+    GameObject::resetHighlightedObjectId();
+    battlefield->updateGameObjectsHighlighting();
+}
+
+void GameInterface::processEscapePress()
+{
+    cursor->processEscapePress();
+
+    // Remove object info board
+    removeInfoBoard();
 }
 
 // Move all the interface items with the scene
@@ -594,11 +633,15 @@ void GameInterface::processBuildingTower()
 
     Tower * tower = new Tower(towersTypes[currentTowerItem], cursor->pos(), battlefield->getLocation());
 
+    connect(tower, &GameObject::clicked, this, &GameInterface::processTowerClicked);
+
     // Display the tower on the battlefield
     battlefield->addTower(tower);
 
     // Display the tower position on the minimap
     minimap->addTower(tower);
+
+    displayTowerInfoBoard(*tower);
 
     disconnect(cursor, &Cursor::mousePressed, this, &GameInterface::processBuildingTower);
 }
@@ -628,6 +671,11 @@ void GameInterface::processRestartClick()
 void GameInterface::processMainMenuClick()
 {
     emit mainMenuSignal();
+}
+
+void GameInterface::processTowerClicked(const GameObject * object)
+{
+    displayTowerInfoBoard(*dynamic_cast<const Tower *>(object));
 }
 
 void GameInterface::processGameOver()

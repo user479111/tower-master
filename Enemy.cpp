@@ -188,14 +188,14 @@ void Enemy::setTotalHealth(int newTotalHealth)
 
 void Enemy::show(QGraphicsScene * scene)
 {
-    scene->addItem(this);
+    GameObject::show(scene);
     scene->addItem(totalHealthBar);
     scene->addItem(currentHealthBar);
 }
 
 void Enemy::hide(QGraphicsScene * scene)
 {
-    scene->removeItem(this);
+    GameObject::hide(scene);
     scene->removeItem(totalHealthBar);
     scene->removeItem(currentHealthBar);
 }
@@ -216,7 +216,7 @@ void Enemy::setScale(qreal scale)
 {
     setRotation(-angle);
 
-    QGraphicsPixmapItem::setScale(this->scale() * scale);
+    GameObject::setScale(this->scale() * scale);
 
     totalHealthBar->setScale(totalHealthBar->scale() * scale);
     currentHealthBar->setScale(currentHealthBar->scale() * scale);
@@ -239,7 +239,7 @@ void Enemy::prepareForRemoval()
 
 void Enemy::setPos(const QPointF &pos)
 {
-    QGraphicsPixmapItem::setPos(pos);
+    GameObject::setPos(pos);
 
     totalHealthBar->setPos(pos);
     currentHealthBar->setPos(pos);

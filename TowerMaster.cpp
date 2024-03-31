@@ -49,7 +49,11 @@ void TowerMaster::mouseMoveEvent(QMouseEvent *event)
 
 void TowerMaster::keyPressEvent(QKeyEvent *event)
 {
-    cursor->checkEscape(event);
+    if (event->key() == Qt::Key_Escape) {
+        if (gameProcessor) {
+            gameProcessor->processEscapePress();
+        }
+    }
 }
 
 void TowerMaster::applyScreenPreferences()

@@ -194,7 +194,7 @@ bool Battlefield::eventFilter(QObject *obj, QEvent *event) {
 void Battlefield::addTower(Tower * newTower)
 {
     towers.append(newTower);
-    scene->addItem(newTower);
+    newTower->show(scene);
 }
 
 const QList<Enemy*> &Battlefield::getGroupOfEnemies() const
@@ -320,6 +320,21 @@ void Battlefield::processEnemyAttack(const int &damage)
         enemyReachedNumber = getEnemyDamageGoal();
         emit enemyCausedDamage();
         emit gameOver();
+    }
+}
+
+const QList<Tower *> &Battlefield::getTowers() const
+{
+    return towers;
+}
+
+void Battlefield::updateGameObjectsHighlighting()
+{
+    for (auto tower : towers) {
+        tower->setHighlighting();
+    }
+    for (auto enemy : getGroupOfEnemies()) {
+        enemy->setHighlighting();
     }
 }
 

@@ -13,6 +13,7 @@ Bullet::Bullet() :
     speed(MIN_BULLET_SPEED),
     outOfBattle(false)
 {
+    setSuitableForHighlighting(false);
 }
 
 Bullet::Bullet(Bullet &bulletPatern) :
