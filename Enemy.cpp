@@ -71,14 +71,12 @@ void Enemy::loadXmlParameters(QString inFileName)
         if (QString(node.tagName()) == "attstr") {
 
             if (QString(node.attribute("name")) == "skin") {
-                qDebug() << "Skin:" << QString(":/Data/Data/Enemies/" +
-                                               QString(type.at(0).toUpper() + type.mid(1)) + "/") <<
-                                               QString(node.attribute("val"));
 
+                skin = QString(":/Data/Data/Enemies/" +
+                               QString(type.at(0).toUpper() + type.mid(1)) + "/") +
+                               QString(node.attribute("val"));
                 // Set pixmap skin
-                setPixmap(QString(":/Data/Data/Enemies/" +
-                                  QString(type.at(0).toUpper() + type.mid(1)) + "/") +
-                                  QString(node.attribute("val")));
+                setPixmap(skin);
 
                 // Prepare total health bar
                 totalHealthBar->setPen(QPen(QBrush(Qt::red), ENEMY_HEALTH_BAR_WIDTH));
@@ -107,12 +105,9 @@ void Enemy::loadXmlParameters(QString inFileName)
                 setSpeed(QString(node.attribute("val")).toInt());
 
             } else if (QString(node.attribute("name")) == "damage") {
-                qDebug() << QString(node.attribute("val")).toInt();
                 damage = QString(node.attribute("val")).toInt();
             } else if (QString(node.attribute("name")) == "width") {
-                qDebug() << QString(node.attribute("val")).toInt();
             } else if (QString(node.attribute("name")) == "height") {
-                qDebug() << QString(node.attribute("val")).toInt();
             }
         }
 
@@ -156,6 +151,11 @@ void Enemy::moveForward()
     emit moved(this);
 }
 
+const QString &Enemy::getSkin() const
+{
+    return skin;
+}
+
 int Enemy::getDamage() const
 {
     return damage;
@@ -173,6 +173,10 @@ void Enemy::setCurrentHealth(int newCurrentHealth)
     if(currentHealth < totalHealth) {
         // Decrease current health bar (Green line)
         currentHealthBar->setLine(0, 0, totalHealthBar->line().length() * currentHealth / totalHealth, 0);
+
+        if (GameObject::getId() == highlightedObjectId) {
+            emit healthDecreased(this);
+        }
     }
 }
 
@@ -232,6 +236,10 @@ void Enemy::prepareForRemoval()
 {
     moveTimer.stop();
     disconnect(&moveTimer, SIGNAL(timeout()), this, SLOT(moveForward()));
+
+    if (GameObject::getId() == highlightedObjectId) {
+        emit outOfBattleForBattlefield();
+    }
 
     emit outOfBattleForMinimap(this); // Allow removal of the enemy from the Minimap
     emit outOfBattleForWave(this);    // Before it will be completely removed in the Wave

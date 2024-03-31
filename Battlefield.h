@@ -51,12 +51,18 @@ signals:
     void enemyCausedDamage();
     void gameOver();
     void victory();
+    void enemyClicked(const GameObject * object);
+    void highlightedEnemyOut();
+    void highlightedEnemyUpdate(const Enemy * enemy);
 
 private slots:
     void processCursorMove();
     void startWaveMove();
     void startNextWave();
     void processEnemyAttack(const int &damage);
+    void processEnemyClicked(const GameObject * object);
+    void processHighlightedEnemyOut();
+    void processHighlightedEnemyUpdate(const Enemy * enemy);
 
 private:
     QGraphicsScene * scene;
