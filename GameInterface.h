@@ -37,6 +37,7 @@ public:
     void removeInfoBoard();
 
     void processEscapePress();
+    void hideInfo();
 
 private slots:
     void processScroll();
@@ -63,7 +64,9 @@ private slots:
     void processRestartClick();
     void processMainMenuClick();
 
-    void processTowerClicked(const GameObject * object);
+    void processGameObjectClicked(const GameObject * object);
+    void processHighlightedEnemyOut();
+    void processHighlightedEnemyUpdate(const Enemy * enemy);
 
 signals:
     void mainMenuSignal();
@@ -109,8 +112,8 @@ private:
     // TODO: separate class GameObjectInfoBoard
     QGraphicsPixmapItem * objectInfoBoard;
     QGraphicsPixmapItem * objectPreview;
-    QGraphicsRectItem * totalObjectHealthBar;
-    QGraphicsRectItem * currentObjectHealthBar;
+    QGraphicsLineItem * totalObjectHealthBar;
+    QGraphicsLineItem * currentObjectHealthBar;
     QGraphicsTextItem * objectInfoTitle;
     QGraphicsTextItem * objectInfoText;
     bool infoBoardDisplayed;

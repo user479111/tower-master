@@ -64,15 +64,20 @@ private slots:
     void moveForward();
 
 signals:
+    void outOfBattleForBattlefield();
     void outOfBattleForMinimap(Enemy * enemy);
     void outOfBattleForWave(Enemy * enemy);
     void moved(Enemy * enemy);
+    void healthDecreased(const Enemy * enemy);
 
 public:
     static const int ENEMY_MIN_HEALTH;
+    const QString &getSkin() const;
+
 private:
     int id;
     QString type;
+    QString skin;
     const QGraphicsPathItem * route;
     int totalHealth;
     int currentHealth;

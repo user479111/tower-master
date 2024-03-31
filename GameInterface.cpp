@@ -37,8 +37,8 @@ GameInterface::GameInterface(Preferences * preferences,
     currentBaseHealthBar(new QGraphicsRectItem(0, 0, 0, 0)),
     healthInfo(new QGraphicsTextItem),
     objectPreview(new QGraphicsPixmapItem),
-    totalObjectHealthBar(new QGraphicsRectItem(0, 0, 0, 0)),
-    currentObjectHealthBar(new QGraphicsRectItem(0, 0, 0, 0)),
+    totalObjectHealthBar(new QGraphicsLineItem),
+    currentObjectHealthBar(new QGraphicsLineItem),
     objectInfoTitle(new QGraphicsTextItem),
     objectInfoText(new QGraphicsTextItem),
     infoBoardDisplayed(false),
@@ -262,6 +262,10 @@ GameInterface::GameInterface(Preferences * preferences,
     connect(battlefield, &Battlefield::gameOver, this, &GameInterface::processGameOver);
     connect(battlefield, &Battlefield::victory, this, &GameInterface::processVictory);
 
+    connect(battlefield, &Battlefield::enemyClicked, this, &GameInterface::processGameObjectClicked);
+    connect(battlefield, &Battlefield::highlightedEnemyOut, this, &GameInterface::processHighlightedEnemyOut);
+    connect(battlefield, &Battlefield::highlightedEnemyUpdate, this, &GameInterface::processHighlightedEnemyUpdate);
+
     // Prepare for Pause Menu signals
     connect(pauseMenu, &PauseMenu::resumeClicked, this, &GameInterface::processResumeClick);
     connect(pauseMenu, &PauseMenu::restartClicked, this, &GameInterface::processRestartClick);
@@ -331,6 +335,24 @@ void GameInterface::displayTowerInfoBoard(const Tower & tower)
                      objectInfoTitle->boundingRect().height());
     objectInfoTitle->setZValue(1);
 
+    // Prepare total health bar
+    totalObjectHealthBar->setPen(QPen(Qt::transparent));
+    totalObjectHealthBar->setLine(QLineF(0, 0, 0, 0));
+    totalObjectHealthBar->setX(objectInfoTitle->x());
+    totalObjectHealthBar->setY(objectInfoTitle->y() +
+                               objectInfoTitle->boundingRect().height());
+    totalObjectHealthBar->setZValue(1);
+
+    // Prepare current health bar
+    currentObjectHealthBar->setPen(QPen(Qt::transparent));
+    currentObjectHealthBar->setLine(0, 0, 0, 0);
+    currentObjectHealthBar->setX(totalObjectHealthBar->x() +
+                                 totalObjectHealthBar->boundingRect().width() / 2 -
+                                 currentObjectHealthBar->boundingRect().width() / 2);
+    currentObjectHealthBar->setY(objectInfoTitle->y() +
+                                 objectInfoTitle->boundingRect().height());
+    currentObjectHealthBar->setZValue(1);
+
     objectPreview->setPixmap(tower.getSkin());
     objectPreview->setScale(OBJECT_PREVIEW_SCALE);
     objectPreview->setX(objectInfoBoard->x() +
@@ -341,7 +363,7 @@ void GameInterface::displayTowerInfoBoard(const Tower & tower)
     objectPreview->setZValue(1);
 
     objectInfoText->setPlainText(QString("Damage: ") + QString::number(tower.getDamage()) + "\n" +
-                                 QString("A.speed: ") + QString::number(tower.getAttackSpeed()) +
+                                 QString("A.speed: ") + QString::number(tower.getAttackSpeed()) + "\n" +
                                  QString(" shot/sec"));
     objectInfoText->setDefaultTextColor(Qt::black);
     objectInfoText->setFont(QFont(FONT_STYLE, FONT_SIZE, QFont::Medium));
@@ -352,6 +374,8 @@ void GameInterface::displayTowerInfoBoard(const Tower & tower)
 
     scene->addItem(objectInfoBoard);
     scene->addItem(objectInfoTitle);
+    scene->addItem(totalObjectHealthBar);
+    scene->addItem(currentObjectHealthBar);
     scene->addItem(objectPreview);
     scene->addItem(objectInfoText);
 
@@ -363,6 +387,66 @@ void GameInterface::displayTowerInfoBoard(const Tower & tower)
 void GameInterface::displayEnemyInfoBoard(const Enemy & enemy)
 {
     removeInfoBoard();
+
+    objectInfoTitle->setPlainText(QString("Enemy : ") + enemy.getType());
+
+    objectInfoTitle->setDefaultTextColor(Qt::black);
+    objectInfoTitle->setFont(QFont(FONT_STYLE, TITLE_FONT_SIZE, QFont::Bold));
+    objectInfoTitle->setX(objectInfoBoard->x() +
+                     objectInfoBoard->boundingRect().width() / 2 -
+                     objectInfoTitle->boundingRect().width() / 2);
+    objectInfoTitle->setY(objectInfoBoard->y() +
+                     objectInfoTitle->boundingRect().height());
+    objectInfoTitle->setZValue(1);
+
+    // Prepare total health bar
+    totalObjectHealthBar->setPen(QPen(Qt::red));
+    totalObjectHealthBar->setLine(QLineF(0, 0 , objectInfoTitle->boundingRect().width(), 0));
+    totalObjectHealthBar->setX(objectInfoTitle->x());
+    totalObjectHealthBar->setY(objectInfoTitle->y() +
+                               objectInfoTitle->boundingRect().height());
+    totalObjectHealthBar->setZValue(1);
+
+    // Prepare current health bar
+    currentObjectHealthBar->setPen(QPen(Qt::green));
+    currentObjectHealthBar->setLine(0,
+                                    0,
+                                    totalObjectHealthBar->line().length() *
+                                    enemy.getCurrentHealth() /
+                                    enemy.getTotalHealth(),
+                                    0);
+    currentObjectHealthBar->setX(totalObjectHealthBar->x() +
+                                 totalObjectHealthBar->boundingRect().width() / 2 -
+                                 currentObjectHealthBar->boundingRect().width() / 2);
+    currentObjectHealthBar->setY(objectInfoTitle->y() +
+                                 objectInfoTitle->boundingRect().height());
+    currentObjectHealthBar->setZValue(1);
+
+    objectPreview->setPixmap(enemy.getSkin());
+    objectPreview->setScale(OBJECT_PREVIEW_SCALE);
+    objectPreview->setX(objectInfoBoard->x() +
+                        objectInfoBoard->boundingRect().width() -
+                        objectPreview->boundingRect().width());
+    objectPreview->setY(objectInfoTitle->y() +
+                        objectInfoTitle->boundingRect().height());
+    objectPreview->setZValue(1);
+
+    objectInfoText->setPlainText(QString("Damage: ") + QString::number(enemy.getDamage()) + "\n" +
+                                 QString("Speed: ") + QString::number(enemy.getSpeed()) + "\n" +
+                                 QString(" mm/sec"));
+    objectInfoText->setDefaultTextColor(Qt::black);
+    objectInfoText->setFont(QFont(FONT_STYLE, FONT_SIZE, QFont::Medium));
+    objectInfoText->setX(objectPreview->x() - objectInfoText->boundingRect().width());
+    objectInfoText->setY(objectInfoTitle->y() +
+                     objectInfoTitle->boundingRect().height());
+    objectInfoText->setZValue(1);
+
+    scene->addItem(objectInfoBoard);
+    scene->addItem(objectInfoTitle);
+    scene->addItem(totalObjectHealthBar);
+    scene->addItem(currentObjectHealthBar);
+    scene->addItem(objectPreview);
+    scene->addItem(objectInfoText);
 
     infoBoardDisplayed = true;
 
@@ -377,22 +461,29 @@ void GameInterface::removeInfoBoard()
 
     scene->removeItem(objectInfoBoard);
     scene->removeItem(objectInfoTitle);
+    scene->removeItem(totalObjectHealthBar);
+    scene->removeItem(currentObjectHealthBar);
     scene->removeItem(objectPreview);
     scene->removeItem(objectInfoText);
 
     infoBoardDisplayed = false;
-
-    // Remove object highlighting
-    GameObject::resetHighlightedObjectId();
-    battlefield->updateGameObjectsHighlighting();
 }
 
 void GameInterface::processEscapePress()
 {
     cursor->processEscapePress();
 
+    hideInfo();
+}
+
+void GameInterface::hideInfo()
+{
     // Remove object info board
     removeInfoBoard();
+
+    // Remove object highlighting
+    GameObject::resetHighlightedObjectId();
+    battlefield->updateGameObjectsHighlighting();
 }
 
 // Move all the interface items with the scene
@@ -494,6 +585,16 @@ void GameInterface::processScroll()
                      objectInfoTitle->boundingRect().width() / 2);
     objectInfoTitle->setY(objectInfoBoard->y() +
                      objectInfoTitle->boundingRect().height());
+
+    totalObjectHealthBar->setX(objectInfoTitle->x());
+    totalObjectHealthBar->setY(objectInfoTitle->y() +
+                               objectInfoTitle->boundingRect().height());
+
+    currentObjectHealthBar->setX(totalObjectHealthBar->x() +
+                                 totalObjectHealthBar->boundingRect().width() / 2 -
+                                 currentObjectHealthBar->boundingRect().width() / 2);
+    currentObjectHealthBar->setY(objectInfoTitle->y() +
+                                 objectInfoTitle->boundingRect().height());
 
     objectPreview->setX(objectInfoBoard->x() +
                         objectInfoBoard->boundingRect().width() -
@@ -633,7 +734,7 @@ void GameInterface::processBuildingTower()
 
     Tower * tower = new Tower(towersTypes[currentTowerItem], cursor->pos(), battlefield->getLocation());
 
-    connect(tower, &GameObject::clicked, this, &GameInterface::processTowerClicked);
+    connect(tower, &GameObject::clicked, this, &GameInterface::processGameObjectClicked);
 
     // Display the tower on the battlefield
     battlefield->addTower(tower);
@@ -673,9 +774,23 @@ void GameInterface::processMainMenuClick()
     emit mainMenuSignal();
 }
 
-void GameInterface::processTowerClicked(const GameObject * object)
+void GameInterface::processGameObjectClicked(const GameObject *object)
 {
-    displayTowerInfoBoard(*dynamic_cast<const Tower *>(object));
+    if (auto * tower = dynamic_cast<const Tower *>(object)) {
+        displayTowerInfoBoard(*tower);
+    } else if (auto * enemy = dynamic_cast<const Enemy *>(object)) {
+        displayEnemyInfoBoard(*enemy);
+    }
+}
+
+void GameInterface::processHighlightedEnemyOut()
+{
+    hideInfo();
+}
+
+void GameInterface::processHighlightedEnemyUpdate(const Enemy *enemy)
+{
+    displayEnemyInfoBoard(*enemy);
 }
 
 void GameInterface::processGameOver()

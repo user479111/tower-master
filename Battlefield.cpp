@@ -266,6 +266,12 @@ void Battlefield::startWaveMove()
     // Emit signal to connect enemies with minimap
     emit enemiesHaveBeenRun();
 
+    for (auto enemy : getGroupOfEnemies()) {
+        connect(enemy, &GameObject::clicked, this, &Battlefield::processEnemyClicked);
+        connect(enemy, &Enemy::outOfBattleForBattlefield, this, &Battlefield::processHighlightedEnemyOut);
+        connect(enemy, &Enemy::healthDecreased, this, &Battlefield::processHighlightedEnemyUpdate);
+    }
+
     // After the last enemy was killed
     // or reached the end of the route
     // startNextWave
@@ -321,6 +327,21 @@ void Battlefield::processEnemyAttack(const int &damage)
         emit enemyCausedDamage();
         emit gameOver();
     }
+}
+
+void Battlefield::processEnemyClicked(const GameObject *object)
+{
+    emit enemyClicked(object);
+}
+
+void Battlefield::processHighlightedEnemyOut()
+{
+    emit highlightedEnemyOut();
+}
+
+void Battlefield::processHighlightedEnemyUpdate(const Enemy *enemy)
+{
+    emit highlightedEnemyUpdate(enemy);
 }
 
 const QList<Tower *> &Battlefield::getTowers() const
