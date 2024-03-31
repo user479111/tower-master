@@ -40,6 +40,11 @@ GameProcessor::~GameProcessor()
     }
 }
 
+void GameProcessor::processEscapePress()
+{
+    gameInterface->processEscapePress();
+}
+
 void GameProcessor::processRestartClick()
 {
     scene->setSceneRect(QRectF(0, 0, scene->sceneRect().width(), scene->sceneRect().height()));
