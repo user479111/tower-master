@@ -45,5 +45,7 @@
         <file>Data/Towers/Tower_001/Tower.xml</file>
         <file>Data/Enemies/FireAtronarch/Enemy.xml</file>
         <file>Data/Enemies/FireAtronarch/FireAtronarch.png</file>
+        <file>Data/Locations/Tutorial/Location.xml</file>
+        <file>Data/Locations/Tutorial/Tutorial.png</file>
     </qresource>
 </RCC>

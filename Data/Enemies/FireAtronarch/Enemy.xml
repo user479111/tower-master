@@ -2,7 +2,7 @@
 <params name="enemy">
     <attnum name="health" val="30"/>
     <attnum name="speed" val="60" unit='px/sec'/>
-    <attnum name="damage" val="1"/>
+    <attnum name="damage" val="2"/>
     <attstr name="skin" val="FireAtronarch.png"/>
     <attnum name="width" val="100"/>
     <attnum name="height" val="100"/>
