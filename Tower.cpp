@@ -239,14 +239,10 @@ void Tower::loadXmlParameters(QString inFileName)
 
                     if (QString(towerAttribute.attribute("name")) == "attack-speed") {
 
-                        qDebug() << "Tower attack-speed: " << QString(towerAttribute.attribute("val")).toInt();
-
                         setAttackSpeed(QString(towerAttribute.attribute("val")).toInt());
 
                     } else if (QString(towerAttribute.attribute("name")) == "width") {
-                        qDebug() << "Tower width: " << QString(towerAttribute.attribute("val")).toInt();
                     } else if (QString(towerAttribute.attribute("name")) == "height") {
-                        qDebug() << "Tower height: " << QString(towerAttribute.attribute("val")).toInt();
                     }
                 }
             }
