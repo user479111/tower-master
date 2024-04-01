@@ -42,5 +42,6 @@
         <file>Data/Menu/GameOverMenu.xml</file>
         <file>Data/Menu/VictoryMenu.xml</file>
         <file>Data/Game/InfoDesk.png</file>
+        <file>Data/Towers/Tower_001/Tower.xml</file>
     </qresource>
 </RCC>
