@@ -75,7 +75,6 @@ signals:
 private:
     static const float BUILD_ITEM_SCALE;
     static const float BOARD_ITEM_SCALE;
-    static const float MINIMAP_SCALE;
 
     static const QString BOARD_FILE;
     static const QString INFO_BOARD_FILE;

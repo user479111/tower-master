@@ -7,7 +7,7 @@
         <attnum name="width" val="1000"/>
         <attnum name="height" val="2000"/>
 
-        <attstr name="image" val="VerticalTest.png"/>
+        <attstr name="image" val="SuburbanForest.png"/>
 
         <attnum name="time-for-preparation" val="5" unit="sec"/>
 
@@ -93,11 +93,11 @@
             <attnum name="interval" val="5" unit="sec"/>
             <attnum name="dencity" val="0.8"/>
             <attenemy id="0" type="ghost" route="1"/>
-            <attenemy id="1" type="ghost" route="0"/>
+            <attenemy id="1" type="FireAtronarch" route="0"/>
             <attenemy id="2" type="ghost" route="1"/>
-            <attenemy id="3" type="ghost" route="0"/>
+            <attenemy id="3" type="FireAtronarch" route="0"/>
             <attenemy id="4" type="ghost" route="1"/>
-            <attenemy id="5" type="ghost" route="0"/>
+            <attenemy id="5" type="FireAtronarch" route="0"/>
         </section>
         <section name="wave" id="2">
             <attnum name="interval" val="5" unit="sec"/>
@@ -106,6 +106,8 @@
             <attenemy id="1" type="FireAtronarch" route="0"/>
             <attenemy id="2" type="FireAtronarch" route="1"/>
             <attenemy id="3" type="FireAtronarch" route="0"/>
+            <attenemy id="4" type="Ghost" route="0"/>
+            <attenemy id="5" type="Ghost" route="1"/>
         </section>
     </section>
 </params>
