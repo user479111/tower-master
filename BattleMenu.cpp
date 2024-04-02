@@ -37,7 +37,8 @@ void BattleMenu::prepare()
     mapPreview->setPos(mapPreviewPos);
     mapPreview->setScale(mapPreviewScale);
 
-    locationInfo->setPos(locationInfoPos);
+    locationInfo->setPos(mapPreview->pos().x(),
+                         mapPreview->pos().y() + mapPreview->boundingRect().width() * mapPreview->scale());
     locationInfo->setDefaultTextColor(Qt::black);
     locationInfo->setFont(QFont("Helvetica [Cronyx]", locationInfoFontSize, QFont::Medium));
 
@@ -146,6 +147,9 @@ void BattleMenu::processLocationsClick()
                                       item->getDirectoryName() +
                                       "/" +
                                       item->getLocationImage()));
+
+        locationInfo->setPos(mapPreview->pos().x(),
+                             mapPreview->pos().y() + mapPreview->boundingRect().height() * mapPreview->scale());
 
         if (preferences->getLanguage() == "English") {
             locationInfo->setPlainText("Name: " + item->getLocationFullName() + "\n"

@@ -19,7 +19,7 @@ Minimap::~Minimap()
 
 void Minimap::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    clickPosition = QPointF(event->pos().x() * 0.1 /* move scale to xml */, event->pos().y() * 0.1 /* move scale to xml */);
+    clickPosition = QPointF(event->pos().x() * scale(), event->pos().y() * scale());
 
     // Calculate the point on the map that represents the click point on the minimap
     // X
@@ -69,11 +69,11 @@ void Minimap::addTower(Tower * tower)
     QGraphicsRectItem * towerRect =
             new QGraphicsRectItem(0,
                                   0,
-                                  0.1 /* TODO */ * tower->boundingRect().width(),
-                                  0.1 /* TODO */ * tower->boundingRect().height());
+                                  scale() * tower->boundingRect().width(),
+                                  scale() * tower->boundingRect().height());
 
-    towerRect->setPos(x() + tower->pos().x() / tower->scale() * 0.1,
-                      y() + tower->pos().y() / tower->scale() * 0.1);
+    towerRect->setPos(x() + tower->pos().x() / tower->scale() * scale(),
+                      y() + tower->pos().y() / tower->scale() * scale());
     towerRect->setZValue(1);
     towerRect->setBrush(QBrush(Qt::green));
 
@@ -92,8 +92,8 @@ void Minimap::setPos(const QPointF &pos)
             continue;
         }
 
-        towers.value(tower)->setPos(x() + tower->pos().x() / tower->scale() * 0.1,
-                                    y() + tower->pos().y() / tower->scale() * 0.1);
+        towers.value(tower)->setPos(x() + tower->pos().x() / tower->scale() * scale(),
+                                    y() + tower->pos().y() / tower->scale() * scale());
     }
 
     for(auto enemy: enemies.keys()) {
@@ -102,8 +102,8 @@ void Minimap::setPos(const QPointF &pos)
             continue;
         }
 
-        enemies.value(enemy)->setPos(x() + enemy->pos().x() / enemy->scale() * 0.1,
-                                    y() + enemy->pos().y() / enemy->scale() * 0.1);
+        enemies.value(enemy)->setPos(x() + enemy->pos().x() / enemy->scale() * scale(),
+                                    y() + enemy->pos().y() / enemy->scale() * scale());
     }
 }
 
@@ -113,11 +113,11 @@ void Minimap::connectWithEenemies(const QList<Enemy*> &currentEnemies)
         QGraphicsRectItem * enemyRect =
                 new QGraphicsRectItem(0,
                                       0,
-                                      0.1 /* TODO */ * enemy->boundingRect().width(),
-                                      0.1 /* TODO */ * enemy->boundingRect().height());
+                                      scale() * enemy->boundingRect().width(),
+                                      scale() * enemy->boundingRect().height());
 
-        enemyRect->setPos(x() + enemy->pos().x() / enemy->scale() * 0.1,
-                          y() + enemy->pos().y() / enemy->scale() * 0.1);
+        enemyRect->setPos(x() + enemy->pos().x() / enemy->scale() * scale(),
+                          y() + enemy->pos().y() / enemy->scale() * scale());
         enemyRect->setZValue(1);
 
         // Make it visible only if it's within the map
@@ -153,8 +153,8 @@ void Minimap::clearObjects()
 
 void Minimap::enemyRepositioned(Enemy * enemy)
 {
-    enemies.value(enemy)->setPos(x() + enemy->pos().x() / enemy->scale() * 0.1,
-                                 y() + enemy->pos().y() / enemy->scale() * 0.1);
+    enemies.value(enemy)->setPos(x() + enemy->pos().x() / enemy->scale() * scale(),
+                                 y() + enemy->pos().y() / enemy->scale() * scale());
 
     // Show the enemy position rect only if it's within the map
     if (mapRectToScene(boundingRect()).contains(enemies.value(enemy)->pos()) &&

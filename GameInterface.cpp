@@ -5,7 +5,6 @@
 
 const float GameInterface::BUILD_ITEM_SCALE = 0.8;
 const float GameInterface::BOARD_ITEM_SCALE = 0.5;
-const float GameInterface::MINIMAP_SCALE = 0.1;
 
 const QString GameInterface::BOARD_FILE = ":/Data/Data/Game/MinimapDesk.png";
 const QString GameInterface::INFO_BOARD_FILE = ":/Data/Data/Game/InfoDesk.png";
@@ -60,11 +59,17 @@ GameInterface::GameInterface(Preferences * preferences,
 
     // show minimap
     minimap = new Minimap(QPixmap(battlefield->getLocation()->getLocationImagePath()));
-    minimap->setScale(MINIMAP_SCALE);
-    minimap->setX(minimapBoard->x() +
-                    (minimapBoard->boundingRect().width() - minimap->boundingRect().width() * minimap->scale()) / 2);
-    minimap->setY(minimapBoard->y() +
-                    (minimapBoard->boundingRect().height() - minimap->boundingRect().height() * minimap->scale()) / 2);
+
+    if (minimap->boundingRect().width() <= minimap->boundingRect().height()) {
+        minimap->setScale(minimapBoard->boundingRect().height() * 0.8 / minimap->boundingRect().height());
+    } else {
+        minimap->setScale(minimapBoard->boundingRect().width() * 0.8 / minimap->boundingRect().width());
+    }
+
+    minimap->setX(minimapBoard->x() + minimapBoard->boundingRect().width() / 2 -
+                  minimap->boundingRect().width() / 2 * minimap->scale());
+    minimap->setY(minimapBoard->y() + minimapBoard->boundingRect().height() / 2 -
+                  minimap->boundingRect().height() / 2 * minimap->scale());
     minimap->setZValue(1);
     scene->addItem(minimap);
 
@@ -72,10 +77,10 @@ GameInterface::GameInterface(Preferences * preferences,
     connect(minimap, &Minimap::mousePressed, this, &GameInterface::processPressEvent);
 
     // draw shown area on minimap
-    shownArea = new QGraphicsRectItem(0, 0, scene->sceneRect().width() * MINIMAP_SCALE,
-                                            scene->sceneRect().height() * MINIMAP_SCALE);
-    shownArea->setPos(minimap->x() + scene->sceneRect().x()* MINIMAP_SCALE,
-                      minimap->y() + scene->sceneRect().y()* MINIMAP_SCALE);
+    shownArea = new QGraphicsRectItem(0, 0, scene->sceneRect().width() * minimap->scale(),
+                                            scene->sceneRect().height() * minimap->scale());
+    shownArea->setPos(minimap->x() + scene->sceneRect().x() * minimap->scale(),
+                      minimap->y() + scene->sceneRect().y() * minimap->scale());
     shownArea->setZValue(1);
     shownArea->setBrush(Qt::transparent); // Set the fill color
     shownArea->setPen(QPen(Qt::red));
@@ -493,14 +498,13 @@ void GameInterface::processScroll()
     minimapBoard->setY(scene->sceneRect().bottom() - minimapBoard->boundingRect().height() +
                        hide * (playerBoard->boundingRect().height() / 2));
 
-    minimap->setPos(QPointF(
-                       minimapBoard->x() + (minimapBoard->boundingRect().width() -
-                                            minimap->boundingRect().width() * minimap->scale()) / 2,
-                       minimapBoard->y() + (minimapBoard->boundingRect().height() -
-                                            minimap->boundingRect().height() * minimap->scale()) / 2));
+    minimap->setPos(QPointF(minimapBoard->x() + minimapBoard->boundingRect().width() / 2 -
+                  minimap->boundingRect().width() / 2 * minimap->scale(),
+                            minimapBoard->y() +minimapBoard->boundingRect().height() / 2 -
+                  minimap->boundingRect().height() / 2 * minimap->scale()));
 
     auto scenePosOnMap = battlefield->getLocation()->mapFromScene(scene->sceneRect().topLeft());
-    shownArea->setPos(minimap->pos() + scenePosOnMap * MINIMAP_SCALE);
+    shownArea->setPos(minimap->pos() + scenePosOnMap * minimap->scale());
 
     playerBoard->setX(scene->sceneRect().left());
     playerBoard->setY(scene->sceneRect().bottom() - playerBoard->boundingRect().height() +
@@ -637,9 +641,9 @@ void GameInterface::processBattlefieldScale()
 
     // Redraw shownArea on minimap
     auto scenePosOnMap = battlefield->getLocation()->mapFromScene(scene->sceneRect().topLeft());
-    shownArea->setPos(minimap->pos() + scenePosOnMap * MINIMAP_SCALE);
+    shownArea->setPos(minimap->pos() + scenePosOnMap * minimap->scale());
     shownArea->setScale(
-                (minimap->boundingRect().width() * MINIMAP_SCALE * scene->sceneRect().width() /
+                (minimap->boundingRect().width() * minimap->scale() * scene->sceneRect().width() /
                  (battlefield->getLocation()->boundingRect().width() * battlefield->getLocation()->scale())) /
                 shownArea->boundingRect().width());
 
