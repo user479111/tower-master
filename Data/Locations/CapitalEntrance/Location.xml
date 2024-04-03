@@ -7,11 +7,11 @@
         <attnum name="width" val="2000"/>
         <attnum name="height" val="2000"/>
 
-        <attstr name="image" val="SquareTest.png"/>
+        <attstr name="image" val="CapitalEntrance.png"/>
 
         <attnum name="time-for-preparation" val="5" unit="sec"/>
 
-        <attnum name="enemy-damage-goal" val="5"/>
+        <attnum name="enemy-damage-goal" val="10"/>
     </section>
 
     <section name="enemy-routes">
@@ -96,28 +96,48 @@
             <attnum name="dencity" val="1.0"/>
             <attenemy id="0" type="Ghost" route="0"/>
             <attenemy id="1" type="Ghost" route="1"/>
-            <attenemy id="2" type="Ghost" route="0"/>
-            <attenemy id="3" type="Ghost" route="1"/>
+            <attenemy id="2" type="Ghost" route="2"/>
+            <attenemy id="3" type="Ghost" route="3"/>
             <attenemy id="4" type="Ghost" route="0"/>
             <attenemy id="5" type="Ghost" route="1"/>
+            <attenemy id="6" type="Ghost" route="2"/>
+            <attenemy id="7" type="Ghost" route="3"/>
+            <attenemy id="8" type="FireAtronarch" route="0"/>
+            <attenemy id="9" type="FireAtronarch" route="1"/>
+            <attenemy id="10" type="FireAtronarch" route="2"/>
+            <attenemy id="11" type="FireAtronarch" route="3"/>
         </section>
         <section name="wave" id="1">
             <attnum name="interval" val="5" unit="sec"/>
             <attnum name="dencity" val="0.8"/>
-            <attenemy id="0" type="ghost" route="1"/>
-            <attenemy id="1" type="ghost" route="0"/>
-            <attenemy id="2" type="ghost" route="1"/>
-            <attenemy id="3" type="ghost" route="0"/>
-            <attenemy id="4" type="ghost" route="1"/>
-            <attenemy id="5" type="ghost" route="0"/>
+            <attenemy id="0" type="Ghost" route="0"/>
+            <attenemy id="1" type="Ghost" route="1"/>
+            <attenemy id="2" type="Ghost" route="2"/>
+            <attenemy id="3" type="Ghost" route="3"/>
+            <attenemy id="4" type="FireAtronarch" route="0"/>
+            <attenemy id="5" type="FireAtronarch" route="1"/>
+            <attenemy id="6" type="FireAtronarch" route="2"/>
+            <attenemy id="7" type="FireAtronarch" route="3"/>
+            <attenemy id="8" type="FireAtronarch" route="0"/>
+            <attenemy id="9" type="FireAtronarch" route="1"/>
+            <attenemy id="10" type="FireAtronarch" route="2"/>
+            <attenemy id="11" type="FireAtronarch" route="3"/>
         </section>
         <section name="wave" id="2">
             <attnum name="interval" val="5" unit="sec"/>
             <attnum name="dencity" val="1.0"/>
-            <attenemy id="0" type="FireAtronarch" route="1"/>
-            <attenemy id="1" type="FireAtronarch" route="0"/>
-            <attenemy id="2" type="FireAtronarch" route="1"/>
-            <attenemy id="3" type="FireAtronarch" route="0"/>
+            <attenemy id="0" type="FireAtronarch" route="0"/>
+            <attenemy id="1" type="FireAtronarch" route="1"/>
+            <attenemy id="2" type="FireAtronarch" route="2"/>
+            <attenemy id="3" type="FireAtronarch" route="3"/>
+            <attenemy id="4" type="FireAtronarch" route="0"/>
+            <attenemy id="5" type="FireAtronarch" route="1"/>
+            <attenemy id="6" type="FireAtronarch" route="2"/>
+            <attenemy id="7" type="FireAtronarch" route="3"/>
+            <attenemy id="8" type="FireAtronarch" route="0"/>
+            <attenemy id="9" type="FireAtronarch" route="1"/>
+            <attenemy id="10" type="FireAtronarch" route="2"/>
+            <attenemy id="11" type="FireAtronarch" route="3"/>
         </section>
     </section>
 </params>
