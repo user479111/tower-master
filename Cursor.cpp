@@ -2,12 +2,19 @@
 
 #include <QDebug>
 
-Cursor::Cursor(QGraphicsScene * scene,
-               const QRectF &inScrollAreaRect) :
+// Define the margin (distance from edge to start moving the view)
+const int Cursor::MARGIN_CLOSE = 20;
+const int Cursor::FAST_SCROLL = 20;
+
+const int Cursor::MARGIN_FAR = 40;
+const int Cursor::SLOW_SCROLL = 10;
+
+Cursor::Cursor(QGraphicsScene * scene) :
     scene(scene),
-    scrollAreaRect(inScrollAreaRect),
+    scrollAreaRect(scene->sceneRect()),
     buildMode(false),
-    buildIsPossible(false)
+    buildIsPossible(false),
+    scrollingAllowed(false)
 {
     setPixmap(QPixmap(":/Data/Data/Cursor/Cursor.png")); // TODO: move hardcoded paths somewhere
 
@@ -22,9 +29,12 @@ Cursor::Cursor(QGraphicsScene * scene,
     scrollTimer.start(50); // Adjust the interval as needed (e.g., 50 milliseconds)
 }
 
-// TODO: margin and 10s should be defined in a different way
 void Cursor::checkScrollArea()
 {
+    if (!scrollingAllowed) {
+        return;
+    }
+
     // Get the current cursor rectangle
     QRectF currentRect = mapRectToScene(boundingRect());
 
@@ -34,39 +44,87 @@ void Cursor::checkScrollArea()
     // Keep the current scene rectangle for comparison
     QRectF previousSceneRect = currentSceneRect;
 
-    // Define the margin (distance from edge to start moving the view)
-    int margin = 5;
 
     // Check if the mouse is close to the edge of the view
-    if ((currentSceneRect.left() > scrollAreaRect.left()) &&            // prevent scroll out of the left border
-            ((currentRect.x() < currentSceneRect.x() + margin) ||
-            ((currentRect.center().x() < currentSceneRect.x() + margin) && buildMode))) {
+    if (((currentRect.x() < currentSceneRect.x() + MARGIN_CLOSE) ||
+            ((currentRect.center().x() < currentSceneRect.x() + MARGIN_CLOSE) && buildMode)) &&
+            (currentSceneRect.left() > scrollAreaRect.left())) // prevent scroll out of the left border
+    {
 
-        currentSceneRect.translate(-10, 0); // Move view to the left
-        QGraphicsPixmapItem::setPos(QPointF(currentRect.left() - 10, currentRect.top()));
+        // Move view to the left
+        currentSceneRect.translate(-FAST_SCROLL, 0);
+        // Move cursor correspondingly
+        QGraphicsPixmapItem::setPos(QPointF(currentRect.left() - FAST_SCROLL, currentRect.top()));
 
-    } else if ((currentSceneRect.right() < scrollAreaRect.right()) &&   // prevent scroll out of the right border
-               ((currentRect.x() > currentSceneRect.right() - margin) ||
-               ((currentRect.center().x() > currentSceneRect.right() - margin) && buildMode))) {
+    } else if (((currentRect.x() < currentSceneRect.x() + MARGIN_FAR) ||
+               ((currentRect.center().x() < currentSceneRect.x() + MARGIN_FAR) && buildMode)) &&
+               (currentSceneRect.left() > scrollAreaRect.left())) // prevent scroll out of the left border
+    {
 
-        currentSceneRect.translate(10, 0); // Move view to the right
-        QGraphicsPixmapItem::setPos(QPointF(currentRect.left() + 10, currentRect.top()));
+        // Move view to the left
+        currentSceneRect.translate(-SLOW_SCROLL, 0);
+        // Move cursor correspondingly
+        QGraphicsPixmapItem::setPos(QPointF(currentRect.left() - SLOW_SCROLL, currentRect.top()));
 
-    }
+    } else if (((currentRect.x() + currentRect.width() / 2 > currentSceneRect.right() - MARGIN_CLOSE) ||
+                ((currentRect.center().x() > currentSceneRect.right() - MARGIN_CLOSE) && buildMode)) &&
+               (currentSceneRect.right() < scrollAreaRect.right())) // prevent scroll out of the right border
+    {
 
-    if ((currentSceneRect.top() > scrollAreaRect.top()) &&              // prevent scroll out of the top border
-            ((currentRect.top() < currentSceneRect.top() + margin) ||
-            ((currentRect.center().y() < currentSceneRect.top() + margin) && buildMode))) {
+        // Move view to the right
+        currentSceneRect.translate(FAST_SCROLL, 0);
+        // Move cursor correspondingly
+        QGraphicsPixmapItem::setPos(QPointF(currentRect.left() + FAST_SCROLL, currentRect.top()));
 
-        currentSceneRect.translate(0, -10); // Move view upwards
-        QGraphicsPixmapItem::setPos(QPointF(currentRect.left(), currentRect.top() - 10));
+    } else if (((currentRect.x() + currentRect.width() / 2 > currentSceneRect.right() - MARGIN_FAR) ||
+              ((currentRect.center().x() > currentSceneRect.right() - MARGIN_FAR) && buildMode)) &&
+            (currentSceneRect.right() < scrollAreaRect.right())) // prevent scroll out of the right border
+    {
 
-    } else if ((currentSceneRect.bottom() < scrollAreaRect.bottom()) && // prevent scroll out of the bottom border
-               ((currentRect.top() > currentSceneRect.bottom() - margin) ||
-                ((currentRect.center().y() > currentSceneRect.bottom() - margin) && buildMode))) {
+       // Move view to the right
+       currentSceneRect.translate(SLOW_SCROLL, 0);
+       // Move cursor correspondingly
+       QGraphicsPixmapItem::setPos(QPointF(currentRect.left() + SLOW_SCROLL, currentRect.top()));
 
-        currentSceneRect.translate(0, 10); // Move view downwards
-        QGraphicsPixmapItem::setPos(QPointF(currentRect.left(), currentRect.top() + 10));
+    } else if (((currentRect.top() < currentSceneRect.top() + MARGIN_CLOSE) ||
+                ((currentRect.center().y() < currentSceneRect.top() + MARGIN_CLOSE) && buildMode)) &&
+               (currentSceneRect.top() > scrollAreaRect.top())) // prevent scroll out of the top border
+    {
+
+        // Move view upwards
+        currentSceneRect.translate(0, -FAST_SCROLL);
+        // Move cursor correspondingly
+        QGraphicsPixmapItem::setPos(QPointF(currentRect.left(), currentRect.top() - FAST_SCROLL));
+
+    } else if (((currentRect.top() < currentSceneRect.top() + MARGIN_FAR) ||
+                   ((currentRect.center().y() < currentSceneRect.top() + MARGIN_FAR) && buildMode)) &&
+                   (currentSceneRect.top() > scrollAreaRect.top())) // prevent scroll out of the top border
+    {
+
+        // Move view upwards
+        currentSceneRect.translate(0, -SLOW_SCROLL);
+        // Move cursor correspondingly
+        QGraphicsPixmapItem::setPos(QPointF(currentRect.left(), currentRect.top() - SLOW_SCROLL));
+
+    } else if (((currentRect.top() + currentRect.height() / 2 > currentSceneRect.bottom() - MARGIN_CLOSE) ||
+                ((currentRect.center().y() > currentSceneRect.bottom() - MARGIN_CLOSE) && buildMode)) &&
+               (currentSceneRect.bottom() < scrollAreaRect.bottom())) // prevent scroll out of the bottom border
+    {
+
+        // Move view downwards
+        currentSceneRect.translate(0, FAST_SCROLL);
+        // Move cursor correspondingly
+        QGraphicsPixmapItem::setPos(QPointF(currentRect.left(), currentRect.top() + FAST_SCROLL));
+
+    } else if (((currentRect.top() + currentRect.height() / 2 > currentSceneRect.bottom() - MARGIN_FAR) ||
+                   ((currentRect.center().y() > currentSceneRect.bottom() - MARGIN_FAR) && buildMode)) &&
+               (currentSceneRect.bottom() < scrollAreaRect.bottom())) // prevent scroll out of the bottom border
+    {
+
+        // Move view downwards
+        currentSceneRect.translate(0, SLOW_SCROLL);
+        // Move cursor correspondingly
+        QGraphicsPixmapItem::setPos(QPointF(currentRect.left(), currentRect.top() + SLOW_SCROLL));
 
     }
 
@@ -75,6 +133,16 @@ void Cursor::checkScrollArea()
         scene->setSceneRect(currentSceneRect);
         emit areaScrolled();
     }
+}
+
+bool Cursor::getScrollingAllowed() const
+{
+    return scrollingAllowed;
+}
+
+void Cursor::setScrollingAllowed(bool newScrollingAllowed)
+{
+    scrollingAllowed = newScrollingAllowed;
 }
 
 bool Cursor::getBuildIsPossible() const
@@ -172,5 +240,6 @@ void Cursor::setScrollAreaRect(const QRectF &newScrollAreaRect)
 //       procedure won't be called
 void Cursor::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
+    QGraphicsPixmapItem::mousePressEvent(event);
     emit mousePressed();
 }

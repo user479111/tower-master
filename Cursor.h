@@ -15,7 +15,7 @@ class Cursor : public QObject, public QGraphicsPixmapItem
 {
     Q_OBJECT
 public:
-    Cursor(QGraphicsScene * scene, const QRectF &inScrollAreaRect);
+    Cursor(QGraphicsScene * scene);
 
     void mousePressEvent(QGraphicsSceneMouseEvent * event);
 
@@ -35,6 +35,9 @@ public:
 
     void processEscapePress();
 
+    bool getScrollingAllowed() const;
+    void setScrollingAllowed(bool newScrollingAllowed);
+
 private slots:
     void checkScrollArea();
 
@@ -44,6 +47,11 @@ signals:
     void cursorMoved();
 
 private:
+    static const int MARGIN_CLOSE;
+    static const int FAST_SCROLL;
+
+    static const int MARGIN_FAR;
+    static const int SLOW_SCROLL;
     QGraphicsScene * scene;
 
     QTimer scrollTimer;
@@ -53,6 +61,7 @@ private:
 
     bool buildMode;
     bool buildIsPossible;
+    bool scrollingAllowed;
 };
 
 #endif // CURSOR_H

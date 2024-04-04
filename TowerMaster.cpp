@@ -20,7 +20,7 @@ TowerMaster::TowerMaster() :
 
     // set cursor
     setMouseTracking(true);
-    cursor = new Cursor(scene, scene->sceneRect());
+    cursor = new Cursor(scene);
 
     menuProcessor = new MenuProcessor(preferences, scene);
 
@@ -45,6 +45,24 @@ TowerMaster::~TowerMaster()
 void TowerMaster::mouseMoveEvent(QMouseEvent *event)
 {
     cursor->setPos(mapToScene(event->pos()));
+}
+
+void TowerMaster::mousePressEvent(QMouseEvent *event)
+{
+    QGraphicsView::mousePressEvent(event);
+
+    if (event->button() == Qt::RightButton) {
+        cursor->setScrollingAllowed(true);
+    }
+}
+
+void TowerMaster::mouseReleaseEvent(QMouseEvent *event)
+{
+    QGraphicsView::mouseReleaseEvent(event);
+
+    if (event->button() == Qt::RightButton) {
+        cursor->setScrollingAllowed(false);
+    }
 }
 
 void TowerMaster::keyPressEvent(QKeyEvent *event)
