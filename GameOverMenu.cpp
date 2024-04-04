@@ -1,7 +1,9 @@
 #include "GameOverMenu.h"
 
 const QString GameOverMenu::XML_FILE_NAME  = "GameOverMenu.xml";
-const QString GameOverMenu::GAME_OVER_TEXT = "Game Over";
+const QString GameOverMenu::GAME_OVER_TEXT_EN = "Game Over!";
+const QString GameOverMenu::GAME_OVER_TEXT_UA = "Поразка!";
+const QString GameOverMenu::GAME_OVER_TEXT_RU = "Поражение!";
 
 const QString GameOverMenu::FONT_STYLE = "Helvetica [Cronyx]";
 const int     GameOverMenu::FONT_SIZE  = 15;
@@ -10,6 +12,14 @@ GameOverMenu::GameOverMenu(const Preferences * preferences)
     : Menu(preferences, XML_FILE_NAME),
       gameOverTextItem(new QGraphicsTextItem)
 {
+    if (preferences->getLanguage() == "English") {
+        gameOverTextItem->setPlainText(GAME_OVER_TEXT_EN);
+    } else if (preferences->getLanguage() == "Українська") {
+        gameOverTextItem->setPlainText(GAME_OVER_TEXT_UA);
+    } else if (preferences->getLanguage() == "Русский") {
+        gameOverTextItem->setPlainText(GAME_OVER_TEXT_RU);
+    }
+
     // Prepare items
     for (auto item : getListOfItems()) {
         if (item->getTitle() == "restart") {
@@ -50,7 +60,6 @@ void GameOverMenu::show(QGraphicsScene *scene)
     }
 
     // Show the "Game Over" message
-    gameOverTextItem->setPlainText(GAME_OVER_TEXT);
     gameOverTextItem->setDefaultTextColor(Qt::white);
     gameOverTextItem->setFont(QFont(FONT_STYLE, FONT_SIZE, QFont::Bold));
     gameOverTextItem->setPos(getBoard()->x() + getBoard()->boundingRect().width() / 2 - gameOverTextItem->boundingRect().width() / 2,

@@ -32,7 +32,9 @@ signals:
 
 private:
     static const QString XML_FILE_NAME;
-    static const QString VICTORY_TEXT;
+    static const QString VICTORY_TEXT_EN;
+    static const QString VICTORY_TEXT_UA;
+    static const QString VICTORY_TEXT_RU;
 
     static const QString FONT_STYLE;
     static const int     FONT_SIZE;

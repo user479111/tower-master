@@ -1,7 +1,9 @@
 #include "VictoryMenu.h"
 
 const QString VictoryMenu::XML_FILE_NAME  = "VictoryMenu.xml";
-const QString VictoryMenu::VICTORY_TEXT = "You win!";
+const QString VictoryMenu::VICTORY_TEXT_EN = "You win!";
+const QString VictoryMenu::VICTORY_TEXT_UA = "Перемога!";
+const QString VictoryMenu::VICTORY_TEXT_RU = "Победа!";
 
 const QString VictoryMenu::FONT_STYLE = "Helvetica [Cronyx]";
 const int     VictoryMenu::FONT_SIZE  = 15;
@@ -10,6 +12,14 @@ VictoryMenu::VictoryMenu(const Preferences * preferences)
     : Menu(preferences, XML_FILE_NAME),
       victoryTextItem(new QGraphicsTextItem)
 {
+    if (preferences->getLanguage() == "English") {
+        victoryTextItem->setPlainText(VICTORY_TEXT_EN);
+    } else if (preferences->getLanguage() == "Українська") {
+        victoryTextItem->setPlainText(VICTORY_TEXT_UA);
+    } else if (preferences->getLanguage() == "Русский") {
+        victoryTextItem->setPlainText(VICTORY_TEXT_RU);
+    }
+
     // Prepare items
     for (auto item : getListOfItems()) {
         if (item->getTitle() == "restart") {
@@ -50,7 +60,6 @@ void VictoryMenu::show(QGraphicsScene *scene)
     }
 
     // Show the "You win!" message
-    victoryTextItem->setPlainText(VICTORY_TEXT);
     victoryTextItem->setDefaultTextColor(Qt::white);
     victoryTextItem->setFont(QFont(FONT_STYLE, FONT_SIZE, QFont::Bold));
     victoryTextItem->setPos(getBoard()->x() + getBoard()->boundingRect().width() / 2 - victoryTextItem->boundingRect().width() / 2,
