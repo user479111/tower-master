@@ -109,6 +109,15 @@ private:
     QGraphicsTextItem * healthInfo;
 
     // TODO: separate class GameObjectInfoBoard
+    static const QStringList TOWER_INFO_EN;
+    static const QStringList TOWER_INFO_UA;
+    static const QStringList TOWER_INFO_RU;
+
+    static const QStringList ENEMY_INFO_EN;
+    static const QStringList ENEMY_INFO_UA;
+    static const QStringList ENEMY_INFO_RU;
+
+    const QStringList * currentInfo;
     QGraphicsPixmapItem * objectInfoBoard;
     QGraphicsPixmapItem * objectPreview;
     QGraphicsLineItem * totalObjectHealthBar;

@@ -15,6 +15,14 @@ const QString GameInterface::FONT_STYLE = "Helvetica [Cronyx]";
 const int GameInterface::TITLE_FONT_SIZE = 12;
 const int GameInterface::FONT_SIZE = 9;
 
+const QStringList GameInterface::TOWER_INFO_EN = {"Build tower: " , "Tower : ", "Damage: ", "A.speed: ", " shot/sec"};
+const QStringList GameInterface::TOWER_INFO_UA = {"Побудова вежі : " , "Вежа : ", "Сила: ", "Швидкість атаки: ", " постріл./с"};
+const QStringList GameInterface::TOWER_INFO_RU = {"Постройка башни : " , "Башня : ", "Урон: ", "Скорость атаки: ", " выстрел./с"};;
+
+const QStringList GameInterface::ENEMY_INFO_EN = {"Enemy : ", "Damage: ", "Speed: ", " mm/sec"};
+const QStringList GameInterface::ENEMY_INFO_UA = {"Ворог : ", "Сила: ", "Швидкість: ", " мм/с"};
+const QStringList GameInterface::ENEMY_INFO_RU = {"Враг : ", "Урон: ", "Скорость: ", " мм/с"};;
+
 GameInterface::GameInterface(Preferences * preferences,
                              QGraphicsScene * scene,
                              Cursor * cursor,
@@ -325,10 +333,18 @@ void GameInterface::displayTowerInfoBoard(const Tower & tower)
 {
     removeInfoBoard();
 
+    if (preferences->getLanguage() == "English") {
+        currentInfo = &TOWER_INFO_EN;
+    } else if (preferences->getLanguage() == "Українська") {
+        currentInfo = &TOWER_INFO_UA;
+    } else if (preferences->getLanguage() == "Русский") {
+        currentInfo = &TOWER_INFO_RU;
+    }
+
     if (cursor->getBuildMode()) {
-        objectInfoTitle->setPlainText(QString("Build Tower : ") + tower.getType());
+        objectInfoTitle->setPlainText(currentInfo->at(0) + tower.getType());
     } else {
-        objectInfoTitle->setPlainText(QString("Tower : ") + tower.getType());
+        objectInfoTitle->setPlainText(currentInfo->at(1) + tower.getType());
     }
 
     objectInfoTitle->setDefaultTextColor(Qt::black);
@@ -367,9 +383,9 @@ void GameInterface::displayTowerInfoBoard(const Tower & tower)
                         objectInfoTitle->boundingRect().height());
     objectPreview->setZValue(1);
 
-    objectInfoText->setPlainText(QString("Damage: ") + QString::number(tower.getDamage()) + "\n" +
-                                 QString("A.speed: ") + QString::number(tower.getAttackSpeed()) + "\n" +
-                                 QString(" shot/sec"));
+    objectInfoText->setPlainText(currentInfo->at(2) + QString::number(tower.getDamage()) + "\n" +
+                                 currentInfo->at(3) + QString::number(tower.getAttackSpeed()) + "\n" +
+                                 currentInfo->at(4));
     objectInfoText->setDefaultTextColor(Qt::black);
     objectInfoText->setFont(QFont(FONT_STYLE, FONT_SIZE, QFont::Medium));
     objectInfoText->setX(objectPreview->x() - objectInfoText->boundingRect().width());
@@ -393,7 +409,15 @@ void GameInterface::displayEnemyInfoBoard(const Enemy & enemy)
 {
     removeInfoBoard();
 
-    objectInfoTitle->setPlainText(QString("Enemy : ") + enemy.getType());
+    if (preferences->getLanguage() == "English") {
+        currentInfo = &ENEMY_INFO_EN;
+    } else if (preferences->getLanguage() == "Українська") {
+        currentInfo = &ENEMY_INFO_UA;
+    } else if (preferences->getLanguage() == "Русский") {
+        currentInfo = &ENEMY_INFO_RU;
+    }
+
+    objectInfoTitle->setPlainText(currentInfo->at(0) + enemy.getType());
 
     objectInfoTitle->setDefaultTextColor(Qt::black);
     objectInfoTitle->setFont(QFont(FONT_STYLE, TITLE_FONT_SIZE, QFont::Bold));
@@ -436,9 +460,9 @@ void GameInterface::displayEnemyInfoBoard(const Enemy & enemy)
                         objectInfoTitle->boundingRect().height());
     objectPreview->setZValue(1);
 
-    objectInfoText->setPlainText(QString("Damage: ") + QString::number(enemy.getDamage()) + "\n" +
-                                 QString("Speed: ") + QString::number(enemy.getSpeed()) + "\n" +
-                                 QString(" mm/sec"));
+    objectInfoText->setPlainText(currentInfo->at(1) + QString::number(enemy.getDamage()) + "\n" +
+                                 currentInfo->at(2) + QString::number(enemy.getSpeed()) + "\n" +
+                                 currentInfo->at(3));
     objectInfoText->setDefaultTextColor(Qt::black);
     objectInfoText->setFont(QFont(FONT_STYLE, FONT_SIZE, QFont::Medium));
     objectInfoText->setX(objectPreview->x() - objectInfoText->boundingRect().width());

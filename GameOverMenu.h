@@ -32,7 +32,9 @@ signals:
 
 private:
     static const QString XML_FILE_NAME;
-    static const QString GAME_OVER_TEXT;
+    static const QString GAME_OVER_TEXT_EN;
+    static const QString GAME_OVER_TEXT_UA;
+    static const QString GAME_OVER_TEXT_RU;
 
     static const QString FONT_STYLE;
     static const int     FONT_SIZE;
