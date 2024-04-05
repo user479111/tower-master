@@ -10,6 +10,7 @@
 
 #include "Menu.h"
 #include "BaseMenu.h"
+#include "CompanyMenu.h"
 #include "BattleMenu.h"
 #include "Preferences.h"
 #include "SettingsMenu.h"
@@ -39,7 +40,7 @@ private:
 
     Menu * currentMenu;
     BaseMenu * baseMenu;
-    //CompanyMenu * subMenuCompany;
+    CompanyMenu * companyMenu;
     BattleMenu * battleMenu;
     SettingsMenu * settingsMenu;
     //CreditsMenu * subMenuCreadits;

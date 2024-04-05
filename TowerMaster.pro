@@ -14,6 +14,7 @@ SOURCES += \
     BattleMenu.cpp \
     Battlefield.cpp \
     Bullet.cpp \
+    CompanyMenu.cpp \
     Cursor.cpp \
     Enemy.cpp \
     GameInterface.cpp \
@@ -42,6 +43,7 @@ HEADERS += \
     BattleMenu.h \
     Battlefield.h \
     Bullet.h \
+    CompanyMenu.h \
     Cursor.h \
     Enemy.h \
     GameInterface.h \

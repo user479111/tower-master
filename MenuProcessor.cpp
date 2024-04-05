@@ -7,14 +7,12 @@ MenuProcessor::MenuProcessor(Preferences * preferences,
     preferences(preferences),
     scene(scene),
     baseMenu(new BaseMenu(preferences)),
+    companyMenu(new CompanyMenu(preferences)),
     battleMenu(new BattleMenu(preferences)),
     settingsMenu(new SettingsMenu(preferences)),
     choice(StayInMenu),
     locationChoice("")
 {
-    // do the preparation with all the XML parameters read
-    battleMenu->prepare();
-
     // start with Base Menu
     currentMenu = baseMenu;
 
@@ -22,6 +20,7 @@ MenuProcessor::MenuProcessor(Preferences * preferences,
     currentMenu->show(scene);
 
     connect(baseMenu, &Menu::itemClicked, this, &MenuProcessor::processItemClick);
+    connect(companyMenu, &Menu::itemClicked, this, &MenuProcessor::processItemClick);
     connect(battleMenu, &Menu::itemClicked, this, &MenuProcessor::processItemClick);
     connect(settingsMenu, &Menu::itemClicked, this, &MenuProcessor::processItemClick);
 }
@@ -44,7 +43,7 @@ void MenuProcessor::processItemClick()
     if (dynamic_cast<BaseMenu*>(currentMenu)) {
 
         if (currentMenu->transition() == "company") {
-            // Process CompanyMenu class.
+            currentMenu = companyMenu;
         } else if (currentMenu->transition() == "battle") {
             currentMenu = battleMenu;
         } else if (currentMenu->transition() == "settings") {
@@ -58,6 +57,18 @@ void MenuProcessor::processItemClick()
 
         } else {
             qDebug() << "Incorrect transition: " << currentMenu->transition();
+        }
+
+    } else if (dynamic_cast<CompanyMenu*>(currentMenu)) {
+
+        if (currentMenu->transition() == "back") {
+            currentMenu = baseMenu;
+        } else if (currentMenu->transition() == "load") {
+
+            /*if (!(levelChoice = companyMenu->getLevelChoice()).isEmpty()) {
+                choice = StartGame;
+                emit  keyChoiseMade();
+            }*/
         }
 
     } else if (dynamic_cast<BattleMenu*>(currentMenu)) {
@@ -80,7 +91,7 @@ void MenuProcessor::processItemClick()
 
             dynamic_cast<SettingsMenu*>(currentMenu)->applySettings();
 
-            //companyMenu->resetItemsLanguage();
+            companyMenu->resetItemsLanguage();
             baseMenu->resetItemsLanguage();
             battleMenu->resetItemsLanguage();
             settingsMenu->resetItemsLanguage();
