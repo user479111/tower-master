@@ -185,7 +185,7 @@ void Wave::pause()
 
 void Wave::resume()
 {
-    if (timerBetweenEnemies.isActive()) {
+    if (timerRemainingTimeOnPause) {
         timerRemainingTimeOnPause = 0;
         timerBetweenEnemies.start(timerRemainingTimeOnPause);
     }

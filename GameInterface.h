@@ -20,6 +20,7 @@
 #include "Preferences.h"
 #include "VictoryMenu.h"
 #include "GameOverMenu.h"
+#include "MessageMenu.h"
 
 class GameInterface : public QObject
 {
@@ -39,6 +40,8 @@ public:
     void processEscapePress();
     void hideInfo();
 
+    void warnThePlayer();
+
 private slots:
     void processScroll();
     void processPressEvent();
@@ -46,7 +49,7 @@ private slots:
 
     void processEnemyAttack();
 
-    void connectMinimapWithEnemies();
+    void processEnemiesStartMove();
 
     // Player board slots
     void processPauseClick();
@@ -63,6 +66,7 @@ private slots:
     void processResumeClick();
     void processRestartClick();
     void processMainMenuClick();
+    void processCloseClick();
 
     void processGameObjectClicked(const GameObject * object);
     void processHighlightedEnemyOut();
@@ -131,6 +135,7 @@ private:
     PauseMenu * pauseMenu;
     GameOverMenu * gameOverMenu;
     VictoryMenu * victoryMenu;
+    MessageMenu * messageMenu;
     bool hide;
 };
 

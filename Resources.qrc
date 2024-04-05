@@ -53,5 +53,6 @@
         <file>Data/Locations/Test/SquareTest.png</file>
         <file>Data/Locations/CapitalEntrance/CapitalEntrance.png</file>
         <file>Data/Locations/CapitalEntrance/Location.xml</file>
+        <file>Data/Menu/MessageMenu.xml</file>
     </qresource>
 </RCC>

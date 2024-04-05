@@ -52,6 +52,7 @@ GameInterface::GameInterface(Preferences * preferences,
     pauseMenu(new PauseMenu(preferences)),
     gameOverMenu(new GameOverMenu(preferences)),
     victoryMenu(new VictoryMenu(preferences)),
+    messageMenu(new MessageMenu(preferences)),
     hide(false)
 {
     cursor->setScrollAreaRect(battlefield->getLocation()->mapRectToScene(battlefield->getLocation()->boundingRect()));
@@ -271,7 +272,7 @@ GameInterface::GameInterface(Preferences * preferences,
     objectInfoBoard->setY(scene->sceneRect().bottom() - objectInfoBoard->boundingRect().height());
     objectInfoBoard->setZValue(1);
 
-    connect(battlefield, &Battlefield::enemiesHaveBeenRun, this, &GameInterface::connectMinimapWithEnemies);
+    connect(battlefield, &Battlefield::enemiesHaveBeenRun, this, &GameInterface::processEnemiesStartMove);
     connect(battlefield, &Battlefield::gameOver, this, &GameInterface::processGameOver);
     connect(battlefield, &Battlefield::victory, this, &GameInterface::processVictory);
 
@@ -291,6 +292,9 @@ GameInterface::GameInterface(Preferences * preferences,
     // Prepare for Victory Menu signals
     connect(victoryMenu, &VictoryMenu::restartClicked, this, &GameInterface::processRestartClick);
     connect(victoryMenu, &VictoryMenu::mainMenuClicked, this, &GameInterface::processMainMenuClick);
+
+    // Prepare for Message Menu signals
+    connect(messageMenu, &MessageMenu::closeClicked, this, &GameInterface::processCloseClick);
 }
 
 GameInterface::~GameInterface()
@@ -513,6 +517,20 @@ void GameInterface::hideInfo()
     // Remove object highlighting
     GameObject::resetHighlightedObjectId();
     battlefield->updateGameObjectsHighlighting();
+}
+
+void GameInterface::warnThePlayer()
+{
+    // Pause battlefield events
+    battlefield->pause();
+
+    // Pause map scroll
+    cursor->setScrollAreaRect(scene->sceneRect());
+
+    messageMenu->setMessageText("Enemies are comming!");
+
+    // Show the Pause menu
+    messageMenu->show(scene);
 }
 
 // Move all the interface items with the scene
@@ -775,8 +793,10 @@ void GameInterface::processBuildingTower()
     disconnect(cursor, &Cursor::mousePressed, this, &GameInterface::processBuildingTower);
 }
 
-void GameInterface::connectMinimapWithEnemies()
+void GameInterface::processEnemiesStartMove()
 {
+    warnThePlayer();
+
     minimap->connectWithEenemies(battlefield->getGroupOfEnemies());
 }
 
@@ -800,6 +820,18 @@ void GameInterface::processRestartClick()
 void GameInterface::processMainMenuClick()
 {
     emit mainMenuSignal();
+}
+
+void GameInterface::processCloseClick()
+{
+    // Hide the Pause menu
+    messageMenu->hide(scene);
+
+    // Allow map scrolling
+    cursor->setScrollAreaRect(battlefield->getLocation()->mapRectToScene(battlefield->getLocation()->boundingRect()));
+
+    // Resume battlefield events
+    battlefield->resume();
 }
 
 void GameInterface::processGameObjectClicked(const GameObject *object)
