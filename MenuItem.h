@@ -7,10 +7,15 @@
 #include <QGraphicsScene>
 #include <QObject>
 
+
 class MenuItem : public QObject, public QGraphicsPixmapItem
 {
     Q_OBJECT
 public:
+    enum Align { Global, // to Scene coordinates
+                 TopLeft, // to top-left of the menu
+                 Center}; // to the center of the menu
+
     MenuItem(QGraphicsItem * parent = 0);
     ~MenuItem();
 
@@ -35,8 +40,8 @@ public:
     void show(QGraphicsScene * scene);
     void hide(QGraphicsScene * scene);
 
-    bool getCentered() const;
-    void setCentered(bool newCentered);
+    Align getAlign() const;
+    void setAlign(Align newAlign);
 
 signals:
     void clicked();
@@ -45,7 +50,8 @@ private:
     QString title;
     bool chosen;
     bool staticSize;
-    bool centered;
+
+    Align align;
 
     QGraphicsTextItem * text;
 };

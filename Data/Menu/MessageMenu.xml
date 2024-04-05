@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<params name="message-menu">
+
+    <section name="menu">
+        <attstr name="menu-image" val="SettingsBoard.png"/>
+        <attpos x="0" y="0" z='1' val="center"/>
+    </section>
+
+    <section name="menu-content">
+        <section name="close" type="menu-item">
+            <attpos x="495" y="395" z="1" val="top-left"/>
+            <attnum name="fixed-size" val="false"/>
+            <attstr name="image" val="Scroll.png"/>
+            <attstr name="text" language="English" val="Close"/>
+            <attstr name="text" language="Українська" val="Закрити"/>
+            <attstr name="text" language="Русский" val="Закрыть"/>
+        </section>
+    </section>
+
+</params>

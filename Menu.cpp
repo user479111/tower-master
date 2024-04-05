@@ -172,8 +172,13 @@ void Menu::readMenuItemXml(MenuItem * newItem, const QDomNodeList &menuItemAttri
 
             // Set item's coordinates
             if (QString(currentElement.attributes().namedItem("val").nodeValue()) == "center") {
-                newItem->setCentered(true);
+                newItem->setAlign(MenuItem::Align::Center);
             } else {
+
+                if (QString(currentElement.attributes().namedItem("val").nodeValue()) == "top-left") {
+                    newItem->setAlign(MenuItem::Align::TopLeft);
+                }
+
                 newItem->setPos(QPointF(
                                     QString(
                                         currentElement.
@@ -438,9 +443,23 @@ void Menu::setBoardPos(const QPointF &pos)
     for (size_t i = 0, numberOfItems = listOfItems.size(); i != numberOfItems; ++i) {
         auto item = listOfItems.at(i);
         qreal itemScaledHeight = item->boundingRect().height() * 1.5;
-        if (item->getCentered()) {
-            item->setPos(QPointF(boardCenter.x() - item->boundingRect().width() / 2,
-                         boardCenter.y() - itemScaledHeight * numberOfItems / 2 + i * itemScaledHeight + itemScaledHeight / 2 - item->boundingRect().height() / 2));
+
+        switch (item->getAlign()) {
+            case MenuItem::Align::Center: {
+                item->setPos(QPointF(boardCenter.x() - item->boundingRect().width() / 2,
+                                     boardCenter.y() - itemScaledHeight * numberOfItems / 2 +
+                                     i * itemScaledHeight + itemScaledHeight / 2 -
+                                     item->boundingRect().height() / 2));
+                break;
+            }
+            case MenuItem::Align::TopLeft: {
+                item->setPos(QPointF(board->x() + item->x(), board->y() + item->y()));
+                break;
+            }
+            case MenuItem::Align::Global: {
+                // leave position as it is
+                break;
+            }
         }
     }
 }

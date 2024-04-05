@@ -263,9 +263,6 @@ void Battlefield::startWaveMove()
                      this,
                      &Battlefield::processEnemyAttack);
 
-    // Emit signal to connect enemies with minimap
-    emit enemiesHaveBeenRun();
-
     for (auto enemy : getGroupOfEnemies()) {
         connect(enemy, &GameObject::clicked, this, &Battlefield::processEnemyClicked);
         connect(enemy, &Enemy::outOfBattleForBattlefield, this, &Battlefield::processHighlightedEnemyOut);
@@ -282,6 +279,9 @@ void Battlefield::startWaveMove()
 
     // Start the timer
     timerBetweenWaves.start(location->getTimeForPreparation() * 1000);
+
+    // Emit signal to connect enemies with minimap
+    emit enemiesHaveBeenRun();
 }
 
 void Battlefield::startNextWave()
