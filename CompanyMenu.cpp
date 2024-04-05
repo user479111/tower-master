@@ -1,21 +1,19 @@
-#include "BattleMenu.h"
+#include "CompanyMenu.h"
 
-#include <QCoreApplication>
 #include <QStringList>
 #include <QFileInfo>
-#include <QDir>
 #include <QDebug>
 #include <QColor>
 
-const QString BattleMenu::XML_FILE_NAME = "BattleMenu.xml";
-const QString BattleMenu::LOCATIONS_DIRECTORY = ":/Data/Data/Locations/";
+const QString CompanyMenu::XML_FILE_NAME = "BattleMenu.xml";
+const QString CompanyMenu::LOCATIONS_DIRECTORY = ":/Data/Data/Locations/";
 
-BattleMenu::BattleMenu(const Preferences * preferences)
-    : Menu(preferences, XML_FILE_NAME),
-      preferences(preferences),
-      mapPreview(new QGraphicsPixmapItem()),
-      locationInfo(new QGraphicsTextItem()),
-      locationChoice("")
+CompanyMenu::CompanyMenu(const Preferences *preferences)
+  : Menu(preferences, XML_FILE_NAME),
+    preferences(preferences),
+    mapPreview(new QGraphicsPixmapItem()),
+    levelInfo(new QGraphicsTextItem()),
+    levelChoice("")
 {
     loadXmlParameters();
 
@@ -23,54 +21,23 @@ BattleMenu::BattleMenu(const Preferences * preferences)
     prepare();
 }
 
-BattleMenu::~BattleMenu()
+CompanyMenu::~CompanyMenu()
 {
-    for (auto locationItem : locations) {
-        delete locationItem;
+    for (auto levelItem : levels) {
+        delete levelItem;
     }
 
-    delete locationInfo;
+    delete levelInfo;
 
     delete mapPreview;
 }
 
-void BattleMenu::prepare()
+void CompanyMenu::prepare()
 {
-    mapPreview->setPixmap(QPixmap(MENU_DIRECTORY + mapPreviewImage));
-    mapPreview->setPos(mapPreviewPos);
-    mapPreview->setScale(mapPreviewScale);
 
-    locationInfo->setPos(mapPreview->pos().x(),
-                         mapPreview->pos().y() + mapPreview->boundingRect().width() * mapPreview->scale());
-    locationInfo->setDefaultTextColor(Qt::black);
-    locationInfo->setFont(QFont("Helvetica [Cronyx]", locationInfoFontSize, QFont::Medium));
-
-    QStringList subdirectories = QDir(LOCATIONS_DIRECTORY).entryList(QDir::Dirs | QDir::NoDotAndDotDot);
-
-    foreach(const QString &subdir, subdirectories) {
-
-        QFileInfo fileInfo(LOCATIONS_DIRECTORY + subdir + "/Location.xml");
-
-        if (fileInfo.exists() && fileInfo.isFile()) {
-
-
-            LocationItem * location = new LocationItem(subdir,
-                                                       locationListWidth,
-                                                       locationListFontSize,
-                                                       QPointF(locationListPos.x(),
-                                                               locationListPos.y() +
-                                                                (locationListFontSize + locationListInterval) *
-                                                                    locations.size())); // Each new item should be lower that previous
-
-            connect(location, &LocationItem::clicked, this, &BattleMenu::processLocationsClick);
-
-            locations.append(location);
-        } else {
-        }
-    }
 }
 
-void BattleMenu::show(QGraphicsScene * scene)
+void CompanyMenu::show(QGraphicsScene *scene)
 {
     // Load image
     QPixmap backgroundImage(MENU_DIRECTORY + getBackgroundImage());
@@ -89,12 +56,12 @@ void BattleMenu::show(QGraphicsScene * scene)
     scene->addItem(mapPreview);
 
     // Display the information about location
-    scene->addItem(locationInfo);
+    scene->addItem(levelInfo);
 
     // Show locations list
-    foreach (auto item, locations) {
-        scene->addItem(item->getBackgroundRect());
-        scene->addItem(item);
+    foreach (auto level, levels) {
+        scene->addItem(level->getBackgroundRect());
+        scene->addItem(level);
     }
 
     // Show menu items
@@ -104,21 +71,21 @@ void BattleMenu::show(QGraphicsScene * scene)
     }
 }
 
-void BattleMenu::hide(QGraphicsScene * scene)
+void CompanyMenu::hide(QGraphicsScene *scene)
 {
     scene->removeItem(getBoard());
 
     scene->removeItem(mapPreview);
-    scene->removeItem(locationInfo);
+    scene->removeItem(levelInfo);
 
     // Hide locations
-    for (auto item : locations) {
-        scene->removeItem(item->getBackgroundRect());
-        scene->removeItem(item);
+    for (auto level : levels) {
+        scene->removeItem(level->getBackgroundRect());
+        scene->removeItem(level);
     }
 
     // Clear location info
-    locationInfo->setPlainText("");
+    levelInfo->setPlainText("");
 
     // Hide items
     for (auto item : getListOfItems()) {
@@ -126,53 +93,57 @@ void BattleMenu::hide(QGraphicsScene * scene)
     }
 }
 
-void BattleMenu::processLocationsClick()
+void CompanyMenu::setLevelListFontSize(int newLevelListFontSize)
 {
-    foreach (auto item, locations) {
-        if (!item->isChosen())
-        {
-            continue;
-        }
-
-        foreach (auto subitem, locations) {
-            subitem->setDefaultTextColor(Qt::black);
-            subitem->getBackgroundRect()->setBrush(Qt::transparent);
-        }
-
-        item->setChosen(false);
-
-        item->setDefaultTextColor(Qt::white);
-        item->getBackgroundRect()->setBrush(QColor(153, 76, 0));
-
-        locationChoice = item->getDirectoryName();
-
-        mapPreview->setPixmap(QPixmap(LOCATIONS_DIRECTORY +
-                                      item->getDirectoryName() +
-                                      "/" +
-                                      item->getLocationImage()));
-
-        locationInfo->setPos(mapPreview->pos().x(),
-                             mapPreview->pos().y() + mapPreview->boundingRect().height() * mapPreview->scale());
-
-        if (preferences->getLanguage() == "English") {
-            locationInfo->setPlainText("Name: " + item->getLocationFullName() + "\n"
-                                       + "Vawes: " + QString::number(item->getWavesNum()));
-        } else if (preferences->getLanguage() == "Українська") {
-            locationInfo->setPlainText("Назва: " + item->getLocationFullName() + "\n"
-                                       + "Хвилі: " + QString::number(item->getWavesNum()));
-        } else if (preferences->getLanguage() == "Русский") {
-            locationInfo->setPlainText("Название: " + item->getLocationFullName() + "\n"
-                                       + "Волны: " + QString::number(item->getWavesNum()));
-        }
-    }
+    levelListFontSize = newLevelListFontSize;
 }
 
-const QString &BattleMenu::getLocationChoice() const
+void CompanyMenu::setLevelListInterval(int newLevelListInterval)
 {
-    return locationChoice;
+    levelListInterval = newLevelListInterval;
 }
 
-void BattleMenu::loadXmlParameters()
+void CompanyMenu::setMapPreviewImage(const QString &newMapPreviewImage)
+{
+    mapPreviewImage = newMapPreviewImage;
+}
+
+void CompanyMenu::setMapPreviewPos(QPointF newMapPreviewPos)
+{
+    mapPreviewPos = newMapPreviewPos;
+}
+
+void CompanyMenu::setMapPreviewScale(float newMapPreviewScale)
+{
+    mapPreviewScale = newMapPreviewScale;
+}
+
+void CompanyMenu::setLevelInfoPos(QPointF newLevelInfoPos)
+{
+    levelInfoPos = newLevelInfoPos;
+}
+
+void CompanyMenu::setLevelInfoFontSize(float newLevelInfoFontSize)
+{
+    levelInfoFontSize = newLevelInfoFontSize;
+}
+
+void CompanyMenu::setLevelListPos(QPointF newLevelListPos)
+{
+    levelListPos = newLevelListPos;
+}
+
+void CompanyMenu::setLevelListWidth(int newLevelListWidth)
+{
+    levelListWidth = newLevelListWidth;
+}
+
+const QString &CompanyMenu::getLevelChoice() const
+{
+    return levelChoice;
+}
+
+void CompanyMenu::loadXmlParameters()
 {
     QDomDocument MenuProcessorXml;
 
@@ -194,7 +165,7 @@ void BattleMenu::loadXmlParameters()
             continue;
         }
 
-        if (QString(node.attribute("name")) == "locations-list") {
+        if (QString(node.attribute("name")) == "levels-list") {
 
             QDomNodeList menuSecondaryAttributes = node.childNodes();
             for (size_t j = 0, menuItemsNum = menuSecondaryAttributes.size(); j != menuItemsNum; j++) {
@@ -203,7 +174,7 @@ void BattleMenu::loadXmlParameters()
 
                     if (QString(currentElement.attribute("name")).contains("font-size")) {
 
-                        setLocationListFontSize(QString(currentElement.
+                        setLevelListFontSize(QString(currentElement.
                                                         attributes().
                                                         namedItem("val").
                                                         nodeValue()).
@@ -211,7 +182,7 @@ void BattleMenu::loadXmlParameters()
 
                     } else if (QString(currentElement.attribute("name")).contains("interval")) {
 
-                        setLocationListInterval(QString(currentElement.
+                        setLevelListInterval(QString(currentElement.
                                                         attributes().
                                                         namedItem("val").
                                                         nodeValue()).
@@ -219,7 +190,7 @@ void BattleMenu::loadXmlParameters()
 
                     } else if (QString(currentElement.attribute("name")).contains("width")) {
 
-                        setLocationListWidth(QString(currentElement.
+                        setLevelListWidth(QString(currentElement.
                                                      attributes().
                                                      namedItem("val").
                                                      nodeValue()).
@@ -234,8 +205,8 @@ void BattleMenu::loadXmlParameters()
 
                 } else if (currentElement.tagName() == "attpos") {
 
-                    // Set locations list coordinates
-                    setLocationListPos(QPointF(QString(
+                    // Set levels list coordinates
+                    setLevelListPos(QPointF(QString(
                                                    currentElement.
                                                    attributes().
                                                    namedItem("x").
@@ -299,7 +270,7 @@ void BattleMenu::loadXmlParameters()
                 }
             }
 
-        } else if (QString(node.attribute("name")) == "location-info") {
+        } else if (QString(node.attribute("name")) == "level-info") {
 
             QDomNodeList menuSecondaryAttributes = node.childNodes();
             for (size_t j = 0, menuItemsNum = menuSecondaryAttributes.size(); j != menuItemsNum; j++) {
@@ -309,7 +280,7 @@ void BattleMenu::loadXmlParameters()
 
                     if (QString(currentElement.attribute("name")).contains("font-size")) {
 
-                        setLocationInfoFontSize(QString(currentElement.
+                        setLevelInfoFontSize(QString(currentElement.
                                                         attributes().
                                                         namedItem("val").
                                                         nodeValue()).
@@ -319,8 +290,8 @@ void BattleMenu::loadXmlParameters()
 
                 } else if (currentElement.tagName() == "attpos") {
 
-                    // Set location information coordinates
-                    setLocationInfoPos(QPointF(QString(currentElement.
+                    // Set level information coordinates
+                    setLevelInfoPos(QPointF(QString(currentElement.
                                                        attributes().
                                                        namedItem("x").
                                                        nodeValue()).
@@ -339,47 +310,43 @@ void BattleMenu::loadXmlParameters()
     }
 }
 
-void BattleMenu::setLocationListWidth(int newLocationListWidth)
+void CompanyMenu::processLevelClick()
 {
-    locationListWidth = newLocationListWidth;
-}
+    foreach (auto item, levels) {
+        if (!item->isChosen())
+        {
+            continue;
+        }
 
-void BattleMenu::setLocationListPos(QPointF newLocationListPos)
-{
-    locationListPos = newLocationListPos;
-}
+        foreach (auto subitem, levels) {
+            subitem->setDefaultTextColor(Qt::black);
+            subitem->getBackgroundRect()->setBrush(Qt::transparent);
+        }
 
-void BattleMenu::setLocationListInterval(int newLocationListInterval)
-{
-    locationListInterval = newLocationListInterval;
-}
+        item->setChosen(false);
 
-void BattleMenu::setLocationInfoFontSize(float newLocationInfoFontSize)
-{
-    locationInfoFontSize = newLocationInfoFontSize;
-}
+        item->setDefaultTextColor(Qt::white);
+        item->getBackgroundRect()->setBrush(QColor(153, 76, 0));
 
-void BattleMenu::setLocationInfoPos(QPointF newLocationInfoPos)
-{
-    locationInfoPos = newLocationInfoPos;
-}
+        levelChoice = item->getDirectoryName();
 
-void BattleMenu::setMapPreviewScale(float newMapPreviewScale)
-{
-    mapPreviewScale = newMapPreviewScale;
-}
+        mapPreview->setPixmap(QPixmap(LOCATIONS_DIRECTORY +
+                                      item->getDirectoryName() +
+                                      "/" +
+                                      item->getLocationImage()));
 
-void BattleMenu::setMapPreviewPos(QPointF newMapPreviewPos)
-{
-    mapPreviewPos = newMapPreviewPos;
-}
+        levelInfo->setPos(mapPreview->pos().x(),
+                             mapPreview->pos().y() + mapPreview->boundingRect().height() * mapPreview->scale());
 
-void BattleMenu::setMapPreviewImage(const QString &newMapPreviewImage)
-{
-    mapPreviewImage = newMapPreviewImage;
-}
-
-void BattleMenu::setLocationListFontSize(int newLocationListFontSize)
-{
-    locationListFontSize = newLocationListFontSize;
+        if (preferences->getLanguage() == "English") {
+            levelInfo->setPlainText("Name: " + item->getLocationFullName() + "\n"
+                                       + "Vawes: " + QString::number(item->getWavesNum()));
+        } else if (preferences->getLanguage() == "Українська") {
+            levelInfo->setPlainText("Назва: " + item->getLocationFullName() + "\n"
+                                       + "Хвилі: " + QString::number(item->getWavesNum()));
+        } else if (preferences->getLanguage() == "Русский") {
+            levelInfo->setPlainText("Название: " + item->getLocationFullName() + "\n"
+                                       + "Волны: " + QString::number(item->getWavesNum()));
+        }
+    }
 }

@@ -54,5 +54,6 @@
         <file>Data/Locations/CapitalEntrance/CapitalEntrance.png</file>
         <file>Data/Locations/CapitalEntrance/Location.xml</file>
         <file>Data/Menu/MessageMenu.xml</file>
+        <file>Data/Menu/CompanyMenu.xml</file>
     </qresource>
 </RCC>
