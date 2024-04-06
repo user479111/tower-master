@@ -40,21 +40,29 @@ public:
     int getWavesNum() const;
     void setWavesNum(int newWavesNum);
 
+    bool getActive() const;
+    void setActive(bool newActive);
+
+    const QString &getDescription() const;
+    void setDescription(const QString &newDescription);
+
 private:
     void loadXmlParameters(QString inFileName);
 
 signals:
-    void clicked();
+    void clicked(LocationItem * choise);
 
 private:
     QGraphicsRectItem * backgroundRect;
     QString directoryName;
     QString locationFullName;
     QString locationImage;
+    QString description;
     int locationWidth;
     int locationHeight;
     int wavesNum;
     bool chosen;
+    bool active;
 };
 
 #endif // LOCATIONITEM_H

@@ -46,7 +46,7 @@ protected:
     void loadXmlParameters();
 
 public slots:
-    void processLocationsClick();
+    void processLocationsClick(LocationItem * choise);
 
 private:
     static const QString XML_FILE_NAME;

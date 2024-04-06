@@ -18,6 +18,7 @@ public:
     virtual ~CompanyMenu();
 
     void prepare();
+    void prepareLevel(const QString & id, bool active);
 
     void show(QGraphicsScene * scene);
     void hide(QGraphicsScene * scene);
@@ -42,15 +43,20 @@ public:
 
     const QString &getLevelChoice() const;
 
+    void setLevelInfoWidth(int newLevelInfoWidth);
+
 protected:
     void loadXmlParameters();
 
 public slots:
-    void processLevelClick();
+    void processLevelClick(LocationItem * choise);
 
 private:
     static const QString XML_FILE_NAME;
+    static const QString SAVE_COMPANY_FILE;
     static const QString LOCATIONS_DIRECTORY;
+    static const QString LEVEL_DIR_PREFIX;
+    static const QString LEVEL_FILE_NAME;
     const Preferences * preferences;
 
     QList<LocationItem*> levels;
@@ -67,6 +73,7 @@ private:
     QGraphicsTextItem* levelInfo;
     QPointF levelInfoPos;
     float levelInfoFontSize;
+    int levelInfoWidth;
 
     QString levelChoice;
 };

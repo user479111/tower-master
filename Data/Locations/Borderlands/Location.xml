@@ -3,71 +3,91 @@
 
     <section name="main-info">
         <attstr name="name" val="The borderlands"/>
+
         <attnum name="width" val="2000"/>
         <attnum name="height" val="1000"/>
+
         <attstr name="image" val="Borderlands.png"/>
 
-        <!-- time-for-preparation in seconds -->
-        <attnum name="time-for-preparation" val="5"/>
+        <attnum name="time-for-preparation" val="5" unit="sec"/>
+
         <attnum name="enemy-damage-goal" val="5"/>
     </section>
 
     <section name="enemy-routes">
-        <section name="route" id="1">
+        <section name="route" id="0">
             <attpos x="950" y="-50"/>
-            <attpos x="950" y="450"/>
-            <attpos x="550" y="500"/>
+            <attpos x="950" y="400"/>
+            <attpos x="550" y="650"/>
             <attpos x="50" y="1050"/>
         </section>
-        <section name="route" id="2">
+        <section name="route" id="1">
             <attpos x="1050" y="-50"/>
-            <attpos x="1050" y="450"/>
-            <attpos x="1450" y="500"/>
+            <attpos x="1050" y="400"/>
+            <attpos x="1450" y="650"/>
             <attpos x="1950" y="1050"/>
         </section>
     </section>
 
     <section name="possible-build-positions">
-        <section name="polygon" id="1">
+        <section name="polygon" id="0">
             <attpos x="600" y="1000"/>
-            <attpos x="600" y="525"/>
-            <attpos x="1400" y="525"/>
+            <attpos x="600" y="700"/>
+            <attpos x="700" y="625"/>
+            <attpos x="1300" y="625"/>
+            <attpos x="1400" y="700"/>
             <attpos x="1400" y="1000"/>
             <attpos x="1250" y="1000"/>
-            <attpos x="1250" y="700"/>
-            <attpos x="750" y="700"/>
+            <attpos x="1250" y="750"/>
+            <attpos x="750" y="750"/>
             <attpos x="750" y="1000"/>
         </section>
-        <section name="polygon" id="2">
-            <attpos x="100" y="100"/>
-            <attpos x="900" y="0"/>
+        <section name="polygon" id="1">
+            <attpos x="100" y="650"/>
+            <attpos x="800" y="50"/>
+            <attpos x="900" y="50"/>
             <attpos x="900" y="350"/>
-            <attpos x="0" y="950"/>
+            <attpos x="300" y="750"/>
+            <attpos x="100" y="750"/>
         </section>
-        <section name="polygon" id="3">
-            <attpos x="1900" y="100"/>
-            <attpos x="1100" y="0"/>
+        <section name="polygon" id="2">
+            <attpos x="1900" y="650"/>
+            <attpos x="1200" y="50"/>
+            <attpos x="1100" y="50"/>
             <attpos x="1100" y="350"/>
-            <attpos x="2000" y="950"/>
+            <attpos x="1700" y="750"/>
+            <attpos x="1900" y="750"/>
         </section>
     </section>
 
-    <section name="vawes">
-        <section name="vawe" id="1">
-            <attenemy type="ghost" route="1"/>
-            <attenemy type="ghost" route="2"/>
-            <attenemy type="ghost" route="1"/>
-            <attenemy type="ghost" route="2"/>
-            <attenemy type="ghost" route="1"/>
-            <attenemy type="ghost" route="2"/>
+    <section name="waves">
+        <section name="wave" id="0">
+            <attnum name="interval" val="5" unit="sec"/>
+            <attnum name="dencity" val="1.0"/>
+            <attenemy id="0" type="Ghost" route="0"/>
+            <attenemy id="1" type="Ghost" route="1"/>
+            <attenemy id="2" type="Ghost" route="0"/>
+            <attenemy id="3" type="Ghost" route="1"/>
+            <attenemy id="4" type="Ghost" route="0"/>
+            <attenemy id="5" type="Ghost" route="1"/>
         </section>
-        <section name="vawe" id="2">
-            <attenemy type="ghost" route="2"/>
-            <attenemy type="ghost" route="1"/>
-            <attenemy type="ghost" route="2"/>
-            <attenemy type="ghost" route="1"/>
-            <attenemy type="ghost" route="2"/>
-            <attenemy type="ghost" route="1"/>
+        <section name="wave" id="1">
+            <attnum name="interval" val="5" unit="sec"/>
+            <attnum name="dencity" val="0.8"/>
+            <attenemy id="0" type="ghost" route="1"/>
+            <attenemy id="1" type="ghost" route="0"/>
+            <attenemy id="2" type="ghost" route="1"/>
+            <attenemy id="3" type="ghost" route="0"/>
+            <attenemy id="4" type="ghost" route="1"/>
+            <attenemy id="5" type="ghost" route="0"/>
+        </section>
+        <section name="wave" id="2">
+            <attnum name="interval" val="5" unit="sec"/>
+            <attnum name="dencity" val="1.0"/>
+            <attenemy id="0" type="FireAtronarch" route="1"/>
+            <attenemy id="1" type="FireAtronarch" route="0"/>
+            <attenemy id="2" type="FireAtronarch" route="1"/>
+            <attenemy id="3" type="FireAtronarch" route="0"/>
         </section>
     </section>
 </params>

@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<params name="save-company">
+ <attnum name="level" id='0' active="1"/>
+ <attnum name="level" id='1' active="0"/>
+ <attnum name="level" id='2' active="0"/>
+</params>

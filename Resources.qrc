@@ -45,8 +45,6 @@
         <file>Data/Towers/Tower_001/Tower.xml</file>
         <file>Data/Enemies/FireAtronarch/Enemy.xml</file>
         <file>Data/Enemies/FireAtronarch/FireAtronarch.png</file>
-        <file>Data/Locations/Tutorial/Location.xml</file>
-        <file>Data/Locations/Tutorial/Tutorial.png</file>
         <file>Data/Locations/Test/VerticalTest.png</file>
         <file>Data/Locations/SuburbanForest/Location.xml</file>
         <file>Data/Locations/SuburbanForest/SuburbanForest.png</file>
@@ -55,5 +53,9 @@
         <file>Data/Locations/CapitalEntrance/Location.xml</file>
         <file>Data/Menu/MessageMenu.xml</file>
         <file>Data/Menu/CompanyMenu.xml</file>
+        <file>Data/Company/SaveCompany.xml</file>
+        <file>Data/Company/Levels/level_0/Level.xml</file>
+        <file>Data/Company/Levels/level_1/Level.xml</file>
+        <file>Data/Company/Levels/level_2/Level.xml</file>
     </qresource>
 </RCC>

@@ -36,7 +36,6 @@ BattleMenu::~BattleMenu()
 
 void BattleMenu::prepare()
 {
-    mapPreview->setPixmap(QPixmap(MENU_DIRECTORY + mapPreviewImage));
     mapPreview->setPos(mapPreviewPos);
     mapPreview->setScale(mapPreviewScale);
 
@@ -86,6 +85,7 @@ void BattleMenu::show(QGraphicsScene * scene)
     scene->addItem(getBoard());
 
     // Display preview image of location map
+    mapPreview->setPixmap(QPixmap(MENU_DIRECTORY + mapPreviewImage));
     scene->addItem(mapPreview);
 
     // Display the information about location
@@ -113,6 +113,7 @@ void BattleMenu::hide(QGraphicsScene * scene)
 
     // Hide locations
     for (auto item : locations) {
+        item->setChosen(false);
         scene->removeItem(item->getBackgroundRect());
         scene->removeItem(item);
     }
@@ -126,44 +127,33 @@ void BattleMenu::hide(QGraphicsScene * scene)
     }
 }
 
-void BattleMenu::processLocationsClick()
+void BattleMenu::processLocationsClick(LocationItem * choise)
 {
     foreach (auto item, locations) {
-        if (!item->isChosen())
-        {
-            continue;
+        if (item != choise) {
+            item->setChosen(false);
         }
+    }
 
-        foreach (auto subitem, locations) {
-            subitem->setDefaultTextColor(Qt::black);
-            subitem->getBackgroundRect()->setBrush(Qt::transparent);
-        }
+    locationChoice = choise->getDirectoryName();
 
-        item->setChosen(false);
+    mapPreview->setPixmap(QPixmap(LOCATIONS_DIRECTORY +
+                                  choise->getDirectoryName() +
+                                  "/" +
+                                  choise->getLocationImage()));
 
-        item->setDefaultTextColor(Qt::white);
-        item->getBackgroundRect()->setBrush(QColor(153, 76, 0));
+    locationInfo->setPos(mapPreview->pos().x(),
+                         mapPreview->pos().y() + mapPreview->boundingRect().height() * mapPreview->scale());
 
-        locationChoice = item->getDirectoryName();
-
-        mapPreview->setPixmap(QPixmap(LOCATIONS_DIRECTORY +
-                                      item->getDirectoryName() +
-                                      "/" +
-                                      item->getLocationImage()));
-
-        locationInfo->setPos(mapPreview->pos().x(),
-                             mapPreview->pos().y() + mapPreview->boundingRect().height() * mapPreview->scale());
-
-        if (preferences->getLanguage() == "English") {
-            locationInfo->setPlainText("Name: " + item->getLocationFullName() + "\n"
-                                       + "Vawes: " + QString::number(item->getWavesNum()));
-        } else if (preferences->getLanguage() == "Українська") {
-            locationInfo->setPlainText("Назва: " + item->getLocationFullName() + "\n"
-                                       + "Хвилі: " + QString::number(item->getWavesNum()));
-        } else if (preferences->getLanguage() == "Русский") {
-            locationInfo->setPlainText("Название: " + item->getLocationFullName() + "\n"
-                                       + "Волны: " + QString::number(item->getWavesNum()));
-        }
+    if (preferences->getLanguage() == "English") {
+        locationInfo->setPlainText("Name: " + choise->getLocationFullName() + "\n"
+                                   + "Vawes: " + QString::number(choise->getWavesNum()));
+    } else if (preferences->getLanguage() == "Українська") {
+        locationInfo->setPlainText("Назва: " + choise->getLocationFullName() + "\n"
+                                   + "Хвилі: " + QString::number(choise->getWavesNum()));
+    } else if (preferences->getLanguage() == "Русский") {
+        locationInfo->setPlainText("Название: " + choise->getLocationFullName() + "\n"
+                                   + "Волны: " + QString::number(choise->getWavesNum()));
     }
 }
 

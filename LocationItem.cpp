@@ -11,7 +11,10 @@ LocationItem::LocationItem(QString dyrectoryName,
                            int fontSize,
                            QPointF pos,
                            QGraphicsItem * parent) :
-    QGraphicsTextItem(parent)
+    QGraphicsTextItem(parent),
+    description(""),
+    chosen(false),
+    active(true)
 {
     directoryName = dyrectoryName;
     setPos(pos);
@@ -41,9 +44,10 @@ void LocationItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     QGraphicsTextItem::mouseReleaseEvent(event);
 
-    setChosen(true);
-
-    emit clicked();
+    if (active) {
+        setChosen(true);
+        emit clicked(this);
+    }
 }
 
 const QString &LocationItem::getDirectoryName() const
@@ -64,6 +68,23 @@ bool LocationItem::isChosen() const
 void LocationItem::setChosen(bool newChosen)
 {
     chosen = newChosen;
+
+    if (chosen) {
+
+        setDefaultTextColor(Qt::white);
+        backgroundRect->setBrush(QColor(153, 76, 0));
+
+    } else {
+
+        if (active) {
+            setDefaultTextColor(Qt::black);
+        } else {
+            setDefaultTextColor(Qt::gray);
+        }
+
+        backgroundRect->setBrush(Qt::transparent);
+
+    }
 }
 
 QGraphicsRectItem* LocationItem::getBackgroundRect() const
@@ -132,6 +153,34 @@ void LocationItem::loadXmlParameters(QString inFileName)
         }
 
         node = node.nextSibling().toElement();
+    }
+}
+
+const QString &LocationItem::getDescription() const
+{
+    return description;
+}
+
+void LocationItem::setDescription(const QString &newDescription)
+{
+    description = newDescription;
+
+    setPlainText(description);
+}
+
+bool LocationItem::getActive() const
+{
+    return active;
+}
+
+void LocationItem::setActive(bool newActive)
+{
+    active = newActive;
+
+    if (active) {
+        setDefaultTextColor(Qt::black);
+    } else {
+        setDefaultTextColor(Qt::gray);
     }
 }
 
