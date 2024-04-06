@@ -22,17 +22,17 @@ Preferences::Preferences()
 
 void Preferences::loadXmlParameters()
 {
-    QDomDocument MenuProcessorXml;
+    QDomDocument PreferencesXml;
 
     QFile xmlFile(PREFERENCES_FILE);
     if (!xmlFile.open(QIODevice::ReadOnly))
     {
         qDebug() << "Error while loading file: " << PREFERENCES_FILE;
     }
-    MenuProcessorXml.setContent(&xmlFile);
+    PreferencesXml.setContent(&xmlFile);
     xmlFile.close();
 
-    QDomElement root = MenuProcessorXml.documentElement();
+    QDomElement root = PreferencesXml.documentElement();
     QDomElement node = root.firstChild().toElement();
 
     // Language should be read first

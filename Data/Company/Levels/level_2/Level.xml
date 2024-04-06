@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<params name="level">
+ <section name="title">
+  <attstr name="text" language="English" val="Battle for the capital"/>
+  <attstr name="text" language="Українська" val="Битва за столицю"/>
+  <attstr name="text" language="Русский" val="Битва за столицу"/>
+ </section>
+ <attstr name="location" val="CapitalEntrance"/>
+ <section name="message">
+  <attstr name="text" language="English" val=""/>
+  <attstr name="text" language="Українська" val=""/>
+  <attstr name="text" language="Русский" val=""/>
+ </section>
+</params>

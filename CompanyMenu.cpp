@@ -5,8 +5,11 @@
 #include <QDebug>
 #include <QColor>
 
-const QString CompanyMenu::XML_FILE_NAME = "BattleMenu.xml";
+const QString CompanyMenu::XML_FILE_NAME = "CompanyMenu.xml";
+const QString CompanyMenu::SAVE_COMPANY_FILE = "./Data/Company/SaveCompany.xml";
 const QString CompanyMenu::LOCATIONS_DIRECTORY = ":/Data/Data/Locations/";
+const QString CompanyMenu::LEVEL_DIR_PREFIX = ":/Data/Data/Company/Levels/level_";
+const QString CompanyMenu::LEVEL_FILE_NAME = "Level.xml";
 
 CompanyMenu::CompanyMenu(const Preferences *preferences)
   : Menu(preferences, XML_FILE_NAME),
@@ -34,7 +37,106 @@ CompanyMenu::~CompanyMenu()
 
 void CompanyMenu::prepare()
 {
+    mapPreview->setPos(mapPreviewPos);
+    mapPreview->setScale(mapPreviewScale);
 
+    levelInfo->setPos(mapPreview->pos().x(),
+                         mapPreview->pos().y() + mapPreview->boundingRect().width() * mapPreview->scale());
+    levelInfo->setDefaultTextColor(Qt::black);
+    levelInfo->setFont(QFont("Helvetica [Cronyx]", levelInfoFontSize, QFont::Medium));
+
+    QDomDocument SaveCompanyXml;
+
+    QFile xmlFile(SAVE_COMPANY_FILE);
+    if (!xmlFile.open(QIODevice::ReadOnly))
+    {
+        qDebug() << "Error while loading file: " << SAVE_COMPANY_FILE;
+    }
+    SaveCompanyXml.setContent(&xmlFile);
+    xmlFile.close();
+
+    QDomElement root = SaveCompanyXml.documentElement();
+    QDomElement node = root.firstChild().toElement();
+
+    // Read company file
+    node = root.firstChild().toElement();
+    while(!node.isNull())
+    {
+        if (QString(node.tagName()) == "attnum") {
+            QString name = QString(node.attribute("name"));
+            if (name == "level") {
+                prepareLevel(QString(node.attribute("id")),
+                             QString(node.attribute("active")).toInt());
+            }
+        }
+        node = node.nextSibling().toElement();
+    }
+}
+
+void CompanyMenu::prepareLevel(const QString &id, bool active)
+{
+    QDomDocument levelXml;
+
+    QFile xmlFile(LEVEL_DIR_PREFIX + id + "/" + LEVEL_FILE_NAME);
+    if (!xmlFile.open(QIODevice::ReadOnly))
+    {
+        qDebug() << "Error while loading file: " << LEVEL_DIR_PREFIX + id + "/" + LEVEL_FILE_NAME;
+    }
+    levelXml.setContent(&xmlFile);
+    xmlFile.close();
+
+    QDomElement root = levelXml.documentElement();
+    QDomElement node = root.firstChild().toElement();
+
+    LocationItem * level = nullptr;
+    QString title = "", location = "";
+    // Read level parameters
+    node = root.firstChild().toElement();
+    while(!node.isNull())
+    {
+        if (QString(node.tagName()) == "section") {
+
+            if (QString(node.attribute("name")) == "title") {
+                auto titleNodes = node.childNodes();
+                for (size_t i = 0, titleNodesNum = titleNodes.size(); i != titleNodesNum; i++) {
+                    auto titleNode = titleNodes.at(i).toElement();
+
+                    if (QString(titleNode.attribute("name")).contains("text") &&
+                            (QString(titleNode.attribute("language")).contains(preferences->getLanguage()) ||
+                             QString(titleNode.attribute("language")).contains("Any"))) {
+
+                        // Set text for the title
+                        title = QString(titleNode.attributes().namedItem("val").nodeValue());
+                        break;
+                    }
+                }
+            }
+
+        } else if (QString(node.tagName()) == "attstr") {
+            QString name = QString(node.attribute("name"));
+            if (name == "title") {
+                title = QString(node.attribute("val"));
+            } else if (name == "location") {
+                location = QString(node.attribute("val"));
+
+            }
+        }
+        node = node.nextSibling().toElement();
+    }
+
+    level = new LocationItem(location, levelListWidth, levelListFontSize,
+                             QPointF(levelListPos.x(), levelListPos.y() +
+                                     (levelListFontSize + levelListInterval) *
+                                     levels.size())); // Each new item should be lower that previous
+
+    level->setDescription(title);
+    level->setActive(active);
+
+    connect(level, &LocationItem::clicked, this, &CompanyMenu::processLevelClick);
+
+    levels.append(level);
+
+    levelInfo->setTextWidth(levelInfoWidth);
 }
 
 void CompanyMenu::show(QGraphicsScene *scene)
@@ -53,6 +155,7 @@ void CompanyMenu::show(QGraphicsScene *scene)
     scene->addItem(getBoard());
 
     // Display preview image of location map
+    mapPreview->setPixmap(QPixmap(MENU_DIRECTORY + mapPreviewImage));
     scene->addItem(mapPreview);
 
     // Display the information about location
@@ -80,6 +183,7 @@ void CompanyMenu::hide(QGraphicsScene *scene)
 
     // Hide locations
     for (auto level : levels) {
+        level->setChosen(false);
         scene->removeItem(level->getBackgroundRect());
         scene->removeItem(level);
     }
@@ -145,17 +249,17 @@ const QString &CompanyMenu::getLevelChoice() const
 
 void CompanyMenu::loadXmlParameters()
 {
-    QDomDocument MenuProcessorXml;
+    QDomDocument CompanyMenuXml;
 
     QFile xmlFile(MENU_DIRECTORY + XML_FILE_NAME);
     if (!xmlFile.open(QIODevice::ReadOnly))
     {
         qDebug() << "Error while loading file: " << MENU_DIRECTORY + XML_FILE_NAME;
     }
-    MenuProcessorXml.setContent(&xmlFile);
+    CompanyMenuXml.setContent(&xmlFile);
     xmlFile.close();
 
-    auto root = MenuProcessorXml.documentElement();
+    auto root = CompanyMenuXml.documentElement();
     auto node = root.firstChild().toElement();
 
     while(!node.isNull())
@@ -286,6 +390,14 @@ void CompanyMenu::loadXmlParameters()
                                                         nodeValue()).
                                                 toFloat());
 
+                    } else if (QString(currentElement.attribute("name")).contains("width")) {
+
+                        setLevelInfoWidth(QString(currentElement.
+                                                        attributes().
+                                                        namedItem("val").
+                                                        nodeValue()).
+                                                toInt());
+
                     }
 
                 } else if (currentElement.tagName() == "attpos") {
@@ -310,43 +422,40 @@ void CompanyMenu::loadXmlParameters()
     }
 }
 
-void CompanyMenu::processLevelClick()
+void CompanyMenu::processLevelClick(LocationItem * choise)
 {
     foreach (auto item, levels) {
-        if (!item->isChosen())
-        {
-            continue;
-        }
-
-        foreach (auto subitem, levels) {
-            subitem->setDefaultTextColor(Qt::black);
-            subitem->getBackgroundRect()->setBrush(Qt::transparent);
-        }
-
-        item->setChosen(false);
-
-        item->setDefaultTextColor(Qt::white);
-        item->getBackgroundRect()->setBrush(QColor(153, 76, 0));
-
-        levelChoice = item->getDirectoryName();
-
-        mapPreview->setPixmap(QPixmap(LOCATIONS_DIRECTORY +
-                                      item->getDirectoryName() +
-                                      "/" +
-                                      item->getLocationImage()));
-
-        levelInfo->setPos(mapPreview->pos().x(),
-                             mapPreview->pos().y() + mapPreview->boundingRect().height() * mapPreview->scale());
-
-        if (preferences->getLanguage() == "English") {
-            levelInfo->setPlainText("Name: " + item->getLocationFullName() + "\n"
-                                       + "Vawes: " + QString::number(item->getWavesNum()));
-        } else if (preferences->getLanguage() == "Українська") {
-            levelInfo->setPlainText("Назва: " + item->getLocationFullName() + "\n"
-                                       + "Хвилі: " + QString::number(item->getWavesNum()));
-        } else if (preferences->getLanguage() == "Русский") {
-            levelInfo->setPlainText("Название: " + item->getLocationFullName() + "\n"
-                                       + "Волны: " + QString::number(item->getWavesNum()));
+        if (item != choise) {
+            item->setChosen(false);
         }
     }
+
+    levelChoice = choise->getDirectoryName();
+
+    mapPreview->setPixmap(QPixmap(LOCATIONS_DIRECTORY +
+                                  choise->getDirectoryName() +
+                                  "/" +
+                                  choise->getLocationImage()));
+
+    levelInfo->setPos(mapPreview->pos().x(),
+                         mapPreview->pos().y() + mapPreview->boundingRect().height() * mapPreview->scale());
+
+    if (preferences->getLanguage() == "English") {
+        levelInfo->setPlainText("Name: " + choise->getLocationFullName() + "\n"
+                                + "Vawes: " + QString::number(choise->getWavesNum()) + "\n"
+                                + "Description: " + QString(choise->getDescription()));
+    } else if (preferences->getLanguage() == "Українська") {
+        levelInfo->setPlainText("Назва: " + choise->getLocationFullName() + "\n"
+                                + "Хвилі: " + QString::number(choise->getWavesNum()) + "\n"
+                                + "Опис: " + QString(choise->getDescription()));
+    } else if (preferences->getLanguage() == "Русский") {
+        levelInfo->setPlainText("Название: " + choise->getLocationFullName() + "\n"
+                                + "Волны: " + QString::number(choise->getWavesNum()) + "\n"
+                                + "Описание: " + QString(choise->getDescription()));
+    }
+}
+
+void CompanyMenu::setLevelInfoWidth(int newLevelInfoWidth)
+{
+    levelInfoWidth = newLevelInfoWidth;
 }

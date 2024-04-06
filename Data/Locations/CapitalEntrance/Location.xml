@@ -2,7 +2,7 @@
 <params name="location">
 
     <section name="main-info">
-        <attstr name="name" val="Test"/>
+        <attstr name="name" val="Capital entrance"/>
 
         <attnum name="width" val="2000"/>
         <attnum name="height" val="2000"/>

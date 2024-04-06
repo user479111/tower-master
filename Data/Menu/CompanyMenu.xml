@@ -32,10 +32,10 @@
     </section>
 
     <section name="levels-list">
-        <attpos x="120" y="120"/>
+        <attpos x="100" y="120"/>
         <attnum name="font-size" val="16"/>
         <attnum name="interval" val="2"/>
-        <attnum name="width" val="300"/>
+        <attnum name="width" val="350"/>
         <attnum name="height" val="200"/>
     </section>
 
@@ -48,6 +48,7 @@
     <section name="level-info">
         <attpos x="545" y="200"/>
         <attnum name="font-size" val="10"/>
+        <attnum name="width" val="150"/>
     </section>
 
 </params>

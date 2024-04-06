@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<params name="level">
+ <section name="title">
+  <attstr name="text" language="English" val="Battle in the suburban forest"/>
+  <attstr name="text" language="Українська" val="Битва в передміському лісі"/>
+  <attstr name="text" language="Русский" val="Битва в пригородном лесу"/>
+ </section>
+ <attstr name="location" val="SuburbanForest"/>
+ <section name="message">
+  <attstr name="text" language="English" val=""/>
+  <attstr name="text" language="Українська" val=""/>
+  <attstr name="text" language="Русский" val=""/>
+ </section>
+</params>

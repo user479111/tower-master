@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<params name="level">
+ <section name="title">
+  <attstr name="text" language="English" val="The border has been broken"/>
+  <attstr name="text" language="Українська" val="Кордон прорваний"/>
+  <attstr name="text" language="Русский" val="Граница пробита"/>
+ </section>
+ <attstr name="location" val="Borderlands"/>
+ <section name="message">
+  <attstr name="text" language="English" val=""/>
+  <attstr name="text" language="Українська" val=""/>
+  <attstr name="text" language="Русский" val=""/>
+ </section>
+</params>
