@@ -8,10 +8,10 @@
 
 Battlefield::Battlefield(QGraphicsScene * scene,
                          Cursor * cursor,
-                         Location * location) :
+                         Level * level) :
     scene(scene),
     cursor(cursor),
-    location(location),
+    level(level),
     timerBetweenWaves(this),
     timerRemainingTimeOnPause(0),
     currentWaveIndex(0),
@@ -20,10 +20,10 @@ Battlefield::Battlefield(QGraphicsScene * scene,
     enemyReachedNumber(0)
 {
     // display location
-    scene->addItem(location);
+    scene->addItem(level->getLocation());
 
     // Temporarily dysplay polygons
-    for (auto polygonItem: location->getBuildAreas()) {
+    for (auto polygonItem: level->getLocation()->getBuildAreas()) {
 
         // Set the pen color and style
         QPen pen(Qt::red);              // Set pen color to red
@@ -38,7 +38,7 @@ Battlefield::Battlefield(QGraphicsScene * scene,
     }
 
     // Temporarily dysplay enemy routes
-    for (auto routeItem: location->getEnemyRoutes()) {
+    for (auto routeItem: level->getLocation()->getEnemyRoutes()) {
 
         // Set the pen color and style
         QPen pen(Qt::blue);         // Set pen color to red
@@ -50,14 +50,14 @@ Battlefield::Battlefield(QGraphicsScene * scene,
 
     scene->installEventFilter(this);
 
-    minScale = location->boundingRect().height() < location->boundingRect().width() ?
-                scene->sceneRect().height() / location->boundingRect().height() :
-                scene->sceneRect().width() / location->boundingRect().width();
+    minScale = level->getLocation()->boundingRect().height() < level->getLocation()->boundingRect().width() ?
+                scene->sceneRect().height() / level->getLocation()->boundingRect().height() :
+                scene->sceneRect().width() / level->getLocation()->boundingRect().width();
 
     connect(cursor, &Cursor::cursorMoved, this, &Battlefield::processCursorMove);
 
     // Set the interval to the time for preparation in milliseconds
-    timerBetweenWaves.setInterval(location->getTimeForPreparation() * 1000);
+    timerBetweenWaves.setInterval(level->getLocation()->getTimeForPreparation() * 1000);
 
     // Start waves move on timeout
     QObject::connect(&timerBetweenWaves, &QTimer::timeout, this, &Battlefield::startWaveMove);
@@ -80,25 +80,25 @@ bool Battlefield::eventFilter(QObject *obj, QEvent *event) {
         qreal scaleFactor = 1.0 + (wheelEvent->delta() / 1200.0); // Calculate scale factor
 
         auto sceneRect = scene->sceneRect();
-        auto sceneCenterPointBeforeScale = location->mapFromScene(sceneRect.center());
+        auto sceneCenterPointBeforeScale = level->getLocation()->mapFromScene(sceneRect.center());
 
         // Scale location
-        if ((location->scale() * scaleFactor >= minScale &&      // scene rect shouldn't be bigger than map
+        if ((level->getLocation()->scale() * scaleFactor >= minScale &&      // scene rect shouldn't be bigger than map
                 scaleFactor < 1) ||                              // allow increase
-                (location->scale() * scaleFactor <= MAX_SCALE && // scene rect shouldn't be too small
+                (level->getLocation()->scale() * scaleFactor <= MAX_SCALE && // scene rect shouldn't be too small
                 scaleFactor > 1))                                // allow decrease
         {
             // Scale the location based on the wheel scroll
-            location->setScale(location->scale() * scaleFactor);
+            level->getLocation()->setScale(level->getLocation()->scale() * scaleFactor);
 
             // Scale build areas
-            for (auto area: location->getBuildAreas()) {
-                area->setScale(location->scale());
+            for (auto area: level->getLocation()->getBuildAreas()) {
+                area->setScale(level->getLocation()->scale());
             }
 
             // Scale enemy routes
-            for (auto route: location->getEnemyRoutes()) {
-                route->setScale(location->scale());
+            for (auto route: level->getLocation()->getEnemyRoutes()) {
+                route->setScale(level->getLocation()->scale());
             }
 
             // Scale all the built towers
@@ -108,7 +108,7 @@ bool Battlefield::eventFilter(QObject *obj, QEvent *event) {
                     continue;
                 }
 
-                towerItem->setScale(location->scale());
+                towerItem->setScale(level->getLocation()->scale());
 
                 // Place tower on the "scaled" position on the location
                 towerItem->setPos(towerItem->pos() * scaleFactor);
@@ -141,14 +141,14 @@ bool Battlefield::eventFilter(QObject *obj, QEvent *event) {
         }
 
         // Get the scene center point after the location scaling
-        auto sceneCenterPointAfterScale = location->mapToScene(sceneCenterPointBeforeScale);
+        auto sceneCenterPointAfterScale = level->getLocation()->mapToScene(sceneCenterPointBeforeScale);
 
         // Calculate scene rect center translation
         int dx = sceneCenterPointAfterScale.x() - sceneRect.center().x(),
             dy = sceneCenterPointAfterScale.y() - sceneRect.center().y();
 
         // Get location rect coordinates relative to the scene coordinate system
-        auto locationRect = location->mapRectToScene(location->boundingRect());
+        auto locationRect = level->getLocation()->mapRectToScene(level->getLocation()->boundingRect());
 
         // Do not allow the scene to be out of map's borders
         if (sceneRect.top() < locationRect.top()) {
@@ -169,7 +169,7 @@ bool Battlefield::eventFilter(QObject *obj, QEvent *event) {
 
         // Keep scaling for the cursor in build mode
         if (cursor->getBuildMode()) {
-            cursor->setScale(location->scale());
+            cursor->setScale(level->getLocation()->scale());
             cursor->setPos(QPointF(cursor->pos().x() + dx + cursor->pixmap().width() / 2,
                                    cursor->pos().y() + dy + cursor->pixmap().height() / 2));
         } else {
@@ -178,7 +178,7 @@ bool Battlefield::eventFilter(QObject *obj, QEvent *event) {
         }
 
         // Update corresponding cursor parameters
-        cursor->setScrollAreaRect(location->mapRectToScene(location->boundingRect()));
+        cursor->setScrollAreaRect(level->getLocation()->mapRectToScene(level->getLocation()->boundingRect()));
 
         emit battlefieldScaled(); // return the signal to the GameInterface
 
@@ -199,7 +199,7 @@ void Battlefield::addTower(Tower * newTower)
 
 const QList<Enemy*> &Battlefield::getGroupOfEnemies() const
 {
-    return location->getWaves().at(currentWaveIndex)->getGroupOfEnemies();
+    return level->getLocation()->getWaves().at(currentWaveIndex)->getGroupOfEnemies();
 }
 
 void Battlefield::processCursorMove()
@@ -214,12 +214,13 @@ void Battlefield::processCursorMove()
     bool containsPixmap = false;
 
     // Check if any point of the cursor bounding rectangle is contained within the build areas
-    for (auto polygonItem: location->getBuildAreas()) {
+    for (auto polygonItem: level->getLocation()->getBuildAreas()) {
 
         // Calculate the resulting polygon after scaling
         QPolygonF scaledPolygon;
         for (const auto& point : polygonItem->polygon()) {
-            scaledPolygon << QPointF(point.x() * location->scale(), point.y() * location->scale());
+            scaledPolygon << QPointF(point.x() * level->getLocation()->scale(),
+                                     point.y() * level->getLocation()->scale());
         }
         QGraphicsPolygonItem poly(scaledPolygon);
 
@@ -255,10 +256,10 @@ void Battlefield::startWaveMove()
     QObject::disconnect(&timerBetweenWaves, &QTimer::timeout, this, &Battlefield::startWaveMove);
 
     // Setup enemies for the wave
-    location->getWaves().at(currentWaveIndex)->runEnemies(location);
+    level->getLocation()->getWaves().at(currentWaveIndex)->runEnemies(level->getLocation());
 
     // Prepare for enemy attack
-    QObject::connect(location->getWaves().at(currentWaveIndex),
+    QObject::connect(level->getLocation()->getWaves().at(currentWaveIndex),
                      &Wave::enemyAttacksTheBase,
                      this,
                      &Battlefield::processEnemyAttack);
@@ -272,13 +273,13 @@ void Battlefield::startWaveMove()
     // After the last enemy was killed
     // or reached the end of the route
     // startNextWave
-    QObject::connect(location->getWaves().at(currentWaveIndex),
+    QObject::connect(level->getLocation()->getWaves().at(currentWaveIndex),
                      &Wave::enemiesEnded,
                      this,
                      &Battlefield::startNextWave);
 
     // Start the timer
-    timerBetweenWaves.start(location->getTimeForPreparation() * 1000);
+    timerBetweenWaves.start(level->getLocation()->getTimeForPreparation() * 1000);
 
     // Emit signal to connect enemies with minimap
     emit enemiesHaveBeenRun();
@@ -289,7 +290,7 @@ void Battlefield::startNextWave()
     if (paused) {
         // If the timer has managed to start right after the pasuse
         // make sure to start it on resume
-        timerRemainingTimeOnPause = location->getTimeForPreparation() * 1000;
+        timerRemainingTimeOnPause = level->getLocation()->getTimeForPreparation() * 1000;
         timerBetweenWaves.stop();
         return;
     }
@@ -300,9 +301,9 @@ void Battlefield::startNextWave()
     QObject::disconnect(&timerBetweenWaves, &QTimer::timeout, this, &Battlefield::startNextWave);
 
     // run the next wave
-    timerBetweenWaves.setInterval(location->getWaves().at(currentWaveIndex)->getInterval() * 1000);
+    timerBetweenWaves.setInterval(level->getLocation()->getWaves().at(currentWaveIndex)->getInterval() * 1000);
 
-    if (currentWaveIndex + 1 == location->getWaves().size()) {
+    if (currentWaveIndex + 1 == level->getLocation()->getWaves().size()) {
         emit victory();
         return;
     } else {
@@ -314,7 +315,7 @@ void Battlefield::startNextWave()
     QObject::connect(&timerBetweenWaves, &QTimer::timeout, this, &Battlefield::startWaveMove);
 
     // Start the timer
-    timerBetweenWaves.start(location->getTimeForPreparation() * 1000);
+    timerBetweenWaves.start(level->getLocation()->getTimeForPreparation() * 1000);
 }
 
 void Battlefield::processEnemyAttack(const int &damage)
@@ -344,6 +345,11 @@ void Battlefield::processHighlightedEnemyUpdate(const Enemy *enemy)
     emit highlightedEnemyUpdate(enemy);
 }
 
+Level *Battlefield::getLevel() const
+{
+    return level;
+}
+
 const QList<Tower *> &Battlefield::getTowers() const
 {
     return towers;
@@ -371,7 +377,7 @@ int Battlefield::getEnemyReachedNumber() const
 
 int Battlefield::getEnemyDamageGoal() const
 {
-    return location->getEnemyDamageGoal();
+    return level->getLocation()->getEnemyDamageGoal();
 }
 
 void Battlefield::clearTowers()
@@ -392,7 +398,7 @@ void Battlefield::pause()
     }
 
     // Stop wave
-    location->getWaves().at(currentWaveIndex)->pause();
+    level->getLocation()->getWaves().at(currentWaveIndex)->pause();
 
     if (timerBetweenWaves.isActive()) {
         timerRemainingTimeOnPause = timerBetweenWaves.remainingTime();
@@ -410,15 +416,17 @@ void Battlefield::resume()
     }
 
     // Resume wave
-    location->getWaves().at(currentWaveIndex)->resume();
+    level->getLocation()->getWaves().at(currentWaveIndex)->resume();
 
-    if (timerRemainingTimeOnPause) {
+    if (timerRemainingTimeOnPause > 0) {
         timerBetweenWaves.start(timerRemainingTimeOnPause);
         timerRemainingTimeOnPause = 0;
+    } else {
+        timerBetweenWaves.start();
     }
 }
 
 Location *Battlefield::getLocation() const
 {
-    return location;
+    return level->getLocation();
 }

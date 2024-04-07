@@ -11,7 +11,7 @@ MenuProcessor::MenuProcessor(Preferences * preferences,
     battleMenu(new BattleMenu(preferences)),
     settingsMenu(new SettingsMenu(preferences)),
     choice(StayInMenu),
-    locationChoice("")
+    levelChoiceId(0)
 {
     // start with Base Menu
     currentMenu = baseMenu;
@@ -53,7 +53,7 @@ void MenuProcessor::processItemClick()
         } else if (currentMenu->transition() == "quit") {
 
             choice = Quit;
-            emit keyChoiseMade();
+            emit keyChoiceMade();
 
         } else {
             qDebug() << "Incorrect transition: " << currentMenu->transition();
@@ -64,11 +64,10 @@ void MenuProcessor::processItemClick()
         if (currentMenu->transition() == "back") {
             currentMenu = baseMenu;
         } else if (currentMenu->transition() == "load") {
-
-            /*if (!(levelChoice = companyMenu->getLevelChoice()).isEmpty()) {
-                choice = StartGame;
-                emit  keyChoiseMade();
-            }*/
+            levelChoiceId = companyMenu->getLevelChoiceId();
+            choice = StartGame;
+            preferences->setGameMode(Preferences::GameMode::Company);
+            emit  keyChoiceMade();
         }
 
     } else if (dynamic_cast<BattleMenu*>(currentMenu)) {
@@ -76,11 +75,10 @@ void MenuProcessor::processItemClick()
         if (currentMenu->transition() == "back") {
             currentMenu = baseMenu;
         } else if (currentMenu->transition() == "load") {
-
-            if (!(locationChoice = battleMenu->getLocationChoice()).isEmpty()) {
-                choice = StartGame;
-                emit  keyChoiseMade();
-            }
+            levelChoiceId = battleMenu->getLevelChoiceId();
+            choice = StartGame;
+            preferences->setGameMode(Preferences::GameMode::Battle);
+            emit  keyChoiceMade();
         }
 
     } else if (dynamic_cast<SettingsMenu*>(currentMenu)) {
@@ -98,7 +96,7 @@ void MenuProcessor::processItemClick()
             //creditsMenu->resetItemsLanguage();
 
             choice = ApplySettings;
-            emit  keyChoiseMade();
+            emit  keyChoiceMade();
 
             choice = StayInMenu;
         }
@@ -112,9 +110,9 @@ void MenuProcessor::processItemClick()
     }
 }
 
-const QString &MenuProcessor::getLocationChoice() const
+int MenuProcessor::getLevelChoiceId() const
 {
-    return locationChoice;
+    return levelChoiceId;
 }
 
 MenuProcessor::Choice MenuProcessor::getChoice() const

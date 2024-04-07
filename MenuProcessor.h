@@ -26,13 +26,13 @@ public:
     enum Choice { StayInMenu, StartGame, ApplySettings, Quit };
     Choice getChoice() const;
 
-    const QString &getLocationChoice() const;
+    int getLevelChoiceId() const;
 
 private slots:
     void processItemClick();
 
 signals:
-    void keyChoiseMade();
+    void keyChoiceMade();
 
 private:
     Preferences * preferences;
@@ -46,7 +46,7 @@ private:
     //CreditsMenu * subMenuCreadits;
 
     Choice choice;
-    QString locationChoice;
+    int levelChoiceId;
 };
 
 #endif // MENUPROCESSOR_H

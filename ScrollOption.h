@@ -33,7 +33,7 @@ public:
     const QString &getTitle() const;
     void setTitle(const QString &newTitle);
 
-    QString getOptionChoise() const;
+    QString getOptionChoice() const;
 
     void setCurrentOption(const QString &optionName);
 

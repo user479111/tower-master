@@ -11,7 +11,8 @@ Preferences::Preferences()
     : fullscreen(false),
       fullscreenString("Off"),
       resolutionString("800x600"),
-      language("English")
+      language("English"),
+      gameMode(GameMode::Battle)
 {
     // Set default values for resolution
     setResolution(resolutionString);
@@ -60,6 +61,16 @@ void Preferences::loadXmlParameters()
         }
         node = node.nextSibling().toElement();
     }
+}
+
+void Preferences::setGameMode(GameMode newGameMode)
+{
+    gameMode = newGameMode;
+}
+
+Preferences::GameMode Preferences::getGameMode() const
+{
+    return gameMode;
 }
 
 const QString &Preferences::getResolutionString() const

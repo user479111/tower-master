@@ -295,6 +295,10 @@ GameInterface::GameInterface(Preferences * preferences,
 
     // Prepare for Message Menu signals
     connect(messageMenu, &MessageMenu::closeClicked, this, &GameInterface::processCloseClick);
+
+    if (preferences->getGameMode() == Preferences::GameMode::Company) {
+        showStartMessage();
+    }
 }
 
 GameInterface::~GameInterface()
@@ -519,6 +523,20 @@ void GameInterface::hideInfo()
     battlefield->updateGameObjectsHighlighting();
 }
 
+void GameInterface::showStartMessage()
+{
+    // Pause battlefield events
+    battlefield->pause();
+
+    // Pause map scroll
+    cursor->setScrollAreaRect(scene->sceneRect());
+
+    messageMenu->setMessageText(battlefield->getLevel()->getStartMessage());
+
+    // Show the Pause menu
+    messageMenu->show(scene);
+}
+
 void GameInterface::warnThePlayer()
 {
     // Pause battlefield events
@@ -527,7 +545,13 @@ void GameInterface::warnThePlayer()
     // Pause map scroll
     cursor->setScrollAreaRect(scene->sceneRect());
 
-    messageMenu->setMessageText("Enemies are comming!");
+    if (preferences->getLanguage() == "English") {
+        messageMenu->setMessageText("Enemies are comming!");
+    } else if (preferences->getLanguage() == "Українська") {
+        messageMenu->setMessageText("Ворог наближається!");
+    } else if (preferences->getLanguage() == "Русский") {
+        messageMenu->setMessageText("Враг атакует!");
+    }
 
     // Show the Pause menu
     messageMenu->show(scene);

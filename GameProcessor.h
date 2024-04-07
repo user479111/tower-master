@@ -4,8 +4,8 @@
 #include <QObject>
 #include <QGraphicsScene>
 
+#include "Level.h"
 #include "Cursor.h"
-#include "Location.h"
 #include "GameInterface.h"
 #include "Battlefield.h"
 #include "Preferences.h"
@@ -16,7 +16,7 @@ class GameProcessor : public QObject
 public:
     explicit GameProcessor(Preferences * preferences,
                            QGraphicsScene * scene,
-                           QString locationName,
+                           int levelId,
                            Cursor * cursor,
                            QObject * parent = nullptr);
 
@@ -36,8 +36,8 @@ private:
     Cursor * cursor;
     Preferences * preferences;
 
-    QString locationName;
-    Location * location;
+    int levelId;
+    Level * level;
     Battlefield * battlefield;
 
     GameInterface * gameInterface;

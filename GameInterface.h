@@ -40,6 +40,7 @@ public:
     void processEscapePress();
     void hideInfo();
 
+    void showStartMessage();
     void warnThePlayer();
 
 private slots:

@@ -6,7 +6,8 @@
 #include <QFile>
 #include <QDebug>
 
-Location::Location(QGraphicsScene * scene, QString name) :
+Location::Location(QGraphicsScene * scene,
+                   QString name) :
     scene(scene),
     name(name),
     locationImage(""),

@@ -1,21 +1,19 @@
 #include "BattleMenu.h"
 
-#include <QCoreApplication>
 #include <QStringList>
-#include <QFileInfo>
-#include <QDir>
 #include <QDebug>
 #include <QColor>
 
 const QString BattleMenu::XML_FILE_NAME = "BattleMenu.xml";
 const QString BattleMenu::LOCATIONS_DIRECTORY = ":/Data/Data/Locations/";
+const QString BattleMenu::SAVE_COMPANY_FILE = "./Data/Company/SaveCompany.xml";
 
 BattleMenu::BattleMenu(const Preferences * preferences)
     : Menu(preferences, XML_FILE_NAME),
       preferences(preferences),
       mapPreview(new QGraphicsPixmapItem()),
-      locationInfo(new QGraphicsTextItem()),
-      locationChoice("")
+      info(new QGraphicsTextItem()),
+      levelChoiceId(0)
 {
     loadXmlParameters();
 
@@ -25,11 +23,15 @@ BattleMenu::BattleMenu(const Preferences * preferences)
 
 BattleMenu::~BattleMenu()
 {
-    for (auto locationItem : locations) {
-        delete locationItem;
+    for(auto level: levels.keys()) {
+        if (levels.value(level)) {
+            delete levels.value(level);
+        }
+        delete level;
     }
+    levels.clear();
 
-    delete locationInfo;
+    delete info;
 
     delete mapPreview;
 }
@@ -39,33 +41,46 @@ void BattleMenu::prepare()
     mapPreview->setPos(mapPreviewPos);
     mapPreview->setScale(mapPreviewScale);
 
-    locationInfo->setPos(mapPreview->pos().x(),
+    info->setPos(mapPreview->pos().x(),
                          mapPreview->pos().y() + mapPreview->boundingRect().width() * mapPreview->scale());
-    locationInfo->setDefaultTextColor(Qt::black);
-    locationInfo->setFont(QFont("Helvetica [Cronyx]", locationInfoFontSize, QFont::Medium));
+    info->setDefaultTextColor(Qt::black);
+    info->setFont(QFont("Helvetica [Cronyx]", infoFontSize, QFont::Medium));
 
-    QStringList subdirectories = QDir(LOCATIONS_DIRECTORY).entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+    QDomDocument SaveCompanyXml;
 
-    foreach(const QString &subdir, subdirectories) {
+    QFile xmlFile(SAVE_COMPANY_FILE);
+    if (!xmlFile.open(QIODevice::ReadOnly))
+    {
+        qDebug() << "Error while loading file: " << SAVE_COMPANY_FILE;
+    }
+    SaveCompanyXml.setContent(&xmlFile);
+    xmlFile.close();
 
-        QFileInfo fileInfo(LOCATIONS_DIRECTORY + subdir + "/Location.xml");
+    QDomElement root = SaveCompanyXml.documentElement();
+    QDomElement node = root.firstChild().toElement();
 
-        if (fileInfo.exists() && fileInfo.isFile()) {
+    // Read company file
+    node = root.firstChild().toElement();
+    while(!node.isNull())
+    {
+        if (QString(node.tagName()) == "attnum") {
+            QString name = QString(node.attribute("name"));
+            if (name == "level") {
+                LevelInfo * levelInfo = new LevelInfo(preferences,
+                                                      QString(node.attribute("id")).toInt());
+                MenuTextItem * menuTextItem = new MenuTextItem(levelInfo->getLocationName(),
+                                                               levelListWidth,
+                                                               levelListFontSize,
+                                                               QPointF(levelListPos.x(), levelListPos.y() +
+                                                                       (levelListFontSize + levelListInterval) *
+                                                                       levels.size()));
 
+                connect(menuTextItem, &MenuTextItem::clicked, this, &BattleMenu::processLevelClick);
 
-            LocationItem * location = new LocationItem(subdir,
-                                                       locationListWidth,
-                                                       locationListFontSize,
-                                                       QPointF(locationListPos.x(),
-                                                               locationListPos.y() +
-                                                                (locationListFontSize + locationListInterval) *
-                                                                    locations.size())); // Each new item should be lower that previous
-
-            connect(location, &LocationItem::clicked, this, &BattleMenu::processLocationsClick);
-
-            locations.append(location);
-        } else {
+                levels.insert(levelInfo, menuTextItem);
+            }
         }
+        node = node.nextSibling().toElement();
     }
 }
 
@@ -89,10 +104,10 @@ void BattleMenu::show(QGraphicsScene * scene)
     scene->addItem(mapPreview);
 
     // Display the information about location
-    scene->addItem(locationInfo);
+    scene->addItem(info);
 
-    // Show locations list
-    foreach (auto item, locations) {
+    // Show levels list
+    foreach (auto item, levels.values()) {
         scene->addItem(item->getBackgroundRect());
         scene->addItem(item);
     }
@@ -109,17 +124,17 @@ void BattleMenu::hide(QGraphicsScene * scene)
     scene->removeItem(getBoard());
 
     scene->removeItem(mapPreview);
-    scene->removeItem(locationInfo);
+    scene->removeItem(info);
 
     // Hide locations
-    for (auto item : locations) {
+    for (auto item : levels.values()) {
         item->setChosen(false);
         scene->removeItem(item->getBackgroundRect());
         scene->removeItem(item);
     }
 
     // Clear location info
-    locationInfo->setPlainText("");
+    info->setPlainText("");
 
     // Hide items
     for (auto item : getListOfItems()) {
@@ -127,39 +142,33 @@ void BattleMenu::hide(QGraphicsScene * scene)
     }
 }
 
-void BattleMenu::processLocationsClick(LocationItem * choise)
+void BattleMenu::processLevelClick(MenuTextItem * Choice)
 {
-    foreach (auto item, locations) {
-        if (item != choise) {
+    foreach (auto item, levels.values()) {
+        if (item != Choice) {
             item->setChosen(false);
         }
     }
 
-    locationChoice = choise->getDirectoryName();
+    auto levelInfo = levels.key(Choice);
 
-    mapPreview->setPixmap(QPixmap(LOCATIONS_DIRECTORY +
-                                  choise->getDirectoryName() +
-                                  "/" +
-                                  choise->getLocationImage()));
+    levelChoiceId = levelInfo->getId();
 
-    locationInfo->setPos(mapPreview->pos().x(),
+    mapPreview->setPixmap(QPixmap(levelInfo->getLocationImage()));
+
+    info->setPos(mapPreview->pos().x(),
                          mapPreview->pos().y() + mapPreview->boundingRect().height() * mapPreview->scale());
 
     if (preferences->getLanguage() == "English") {
-        locationInfo->setPlainText("Name: " + choise->getLocationFullName() + "\n"
-                                   + "Vawes: " + QString::number(choise->getWavesNum()));
+        info->setPlainText("Name: " + levelInfo->getLocationName() + "\n"
+                                   + "Vawes: " + QString::number(levelInfo->getWavesNum()));
     } else if (preferences->getLanguage() == "Українська") {
-        locationInfo->setPlainText("Назва: " + choise->getLocationFullName() + "\n"
-                                   + "Хвилі: " + QString::number(choise->getWavesNum()));
+        info->setPlainText("Назва: " + levelInfo->getLocationName() + "\n"
+                                   + "Хвилі: " + QString::number(levelInfo->getWavesNum()));
     } else if (preferences->getLanguage() == "Русский") {
-        locationInfo->setPlainText("Название: " + choise->getLocationFullName() + "\n"
-                                   + "Волны: " + QString::number(choise->getWavesNum()));
+        info->setPlainText("Название: " + levelInfo->getLocationName() + "\n"
+                                   + "Волны: " + QString::number(levelInfo->getWavesNum()));
     }
-}
-
-const QString &BattleMenu::getLocationChoice() const
-{
-    return locationChoice;
 }
 
 void BattleMenu::loadXmlParameters()
@@ -193,27 +202,27 @@ void BattleMenu::loadXmlParameters()
 
                     if (QString(currentElement.attribute("name")).contains("font-size")) {
 
-                        setLocationListFontSize(QString(currentElement.
-                                                        attributes().
-                                                        namedItem("val").
-                                                        nodeValue()).
-                                                toFloat());
+                        setLevelListFontSize(QString(currentElement.
+                                                     attributes().
+                                                     namedItem("val").
+                                                     nodeValue()).
+                                             toFloat());
 
                     } else if (QString(currentElement.attribute("name")).contains("interval")) {
 
-                        setLocationListInterval(QString(currentElement.
-                                                        attributes().
-                                                        namedItem("val").
-                                                        nodeValue()).
-                                                toInt());
-
-                    } else if (QString(currentElement.attribute("name")).contains("width")) {
-
-                        setLocationListWidth(QString(currentElement.
+                        setLevelListInterval(QString(currentElement.
                                                      attributes().
                                                      namedItem("val").
                                                      nodeValue()).
                                              toInt());
+
+                    } else if (QString(currentElement.attribute("name")).contains("width")) {
+
+                        setLevelListWidth(QString(currentElement.
+                                                     attributes().
+                                                     namedItem("val").
+                                                     nodeValue()).
+                                          toInt());
 
 
                     } else if (QString(currentElement.attribute("name")).contains("height")) {
@@ -225,18 +234,16 @@ void BattleMenu::loadXmlParameters()
                 } else if (currentElement.tagName() == "attpos") {
 
                     // Set locations list coordinates
-                    setLocationListPos(QPointF(QString(
-                                                   currentElement.
-                                                   attributes().
-                                                   namedItem("x").
-                                                   nodeValue()).
-                                               toFloat(),
-                                               QString(
-                                                   currentElement.
-                                                   attributes().
-                                                   namedItem("y").
-                                                   nodeValue()).
-                                               toFloat()));
+                    setLevelListPos(QPointF(QString(currentElement.
+                                                    attributes().
+                                                    namedItem("x").
+                                                    nodeValue()).
+                                            toFloat(),
+                                            QString(currentElement.
+                                                    attributes().
+                                                    namedItem("y").
+                                                    nodeValue()).
+                                            toFloat()));
 
                 }
             }
@@ -299,27 +306,27 @@ void BattleMenu::loadXmlParameters()
 
                     if (QString(currentElement.attribute("name")).contains("font-size")) {
 
-                        setLocationInfoFontSize(QString(currentElement.
-                                                        attributes().
-                                                        namedItem("val").
-                                                        nodeValue()).
-                                                toFloat());
+                        setInfoFontSize(QString(currentElement.
+                                                attributes().
+                                                namedItem("val").
+                                                nodeValue()).
+                                        toFloat());
 
                     }
 
                 } else if (currentElement.tagName() == "attpos") {
 
                     // Set location information coordinates
-                    setLocationInfoPos(QPointF(QString(currentElement.
-                                                       attributes().
-                                                       namedItem("x").
-                                                       nodeValue()).
-                                               toFloat(),
-                                               QString(currentElement.
-                                                       attributes().
-                                                       namedItem("y").
-                                                       nodeValue()).
-                                               toFloat()));
+                    setInfoPos(QPointF(QString(currentElement.
+                                               attributes().
+                                               namedItem("x").
+                                               nodeValue()).
+                                       toFloat(),
+                                       QString(currentElement.
+                                               attributes().
+                                               namedItem("y").
+                                               nodeValue()).
+                                       toFloat()));
 
                 }
             }
@@ -329,29 +336,39 @@ void BattleMenu::loadXmlParameters()
     }
 }
 
-void BattleMenu::setLocationListWidth(int newLocationListWidth)
+void BattleMenu::setInfoWidth(int newInfoWidth)
 {
-    locationListWidth = newLocationListWidth;
+    infoWidth = newInfoWidth;
 }
 
-void BattleMenu::setLocationListPos(QPointF newLocationListPos)
+void BattleMenu::setLevelListWidth(int newLevelListWidth)
 {
-    locationListPos = newLocationListPos;
+    levelListWidth = newLevelListWidth;
 }
 
-void BattleMenu::setLocationListInterval(int newLocationListInterval)
+const int BattleMenu::getLevelChoiceId() const
 {
-    locationListInterval = newLocationListInterval;
+    return levelChoiceId;
 }
 
-void BattleMenu::setLocationInfoFontSize(float newLocationInfoFontSize)
+void BattleMenu::setLevelListPos(QPointF newLevelListPos)
 {
-    locationInfoFontSize = newLocationInfoFontSize;
+    levelListPos = newLevelListPos;
 }
 
-void BattleMenu::setLocationInfoPos(QPointF newLocationInfoPos)
+void BattleMenu::setLevelListInterval(int newLevelListInterval)
 {
-    locationInfoPos = newLocationInfoPos;
+    levelListInterval = newLevelListInterval;
+}
+
+void BattleMenu::setInfoFontSize(float newInfoFontSize)
+{
+    infoFontSize = newInfoFontSize;
+}
+
+void BattleMenu::setInfoPos(QPointF newInfoPos)
+{
+    infoPos = newInfoPos;
 }
 
 void BattleMenu::setMapPreviewScale(float newMapPreviewScale)
@@ -369,7 +386,7 @@ void BattleMenu::setMapPreviewImage(const QString &newMapPreviewImage)
     mapPreviewImage = newMapPreviewImage;
 }
 
-void BattleMenu::setLocationListFontSize(int newLocationListFontSize)
+void BattleMenu::setLevelListFontSize(int newLevelListFontSize)
 {
-    locationListFontSize = newLocationListFontSize;
+    levelListFontSize = newLevelListFontSize;
 }

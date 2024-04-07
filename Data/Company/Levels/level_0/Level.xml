@@ -6,9 +6,9 @@
   <attstr name="text" language="Русский" val="Граница пробита"/>
  </section>
  <attstr name="location" val="Borderlands"/>
- <section name="message">
-  <attstr name="text" language="English" val=""/>
-  <attstr name="text" language="Українська" val=""/>
-  <attstr name="text" language="Русский" val=""/>
+ <section name="start-message">
+  <attstr name="text" language="English" val="Sir, our intelligence reports about hordes of ancient monsters moving from the north and destroying everything in their path. We will not be able to hold the defense on the border and will have to retreat to the capital in order to encircle the enemy’s wedge and seize the strategic advantage. We must hold back as many monsters as possible to cover the retreat and exhaust the enemy saboteurs."/>
+  <attstr name="text" language="Українська" val="Пане, наша розвідка повідомляє про орди стародавніх монстрів, які рухають із півночі і знищують усе на своєму шляху. Нам не вдасться утримати оборону на кордоні і доведеться відступати до столиці, щоб узяти клин супротивника в оточення та перехопити стратегічну перевагу. Ми повинні стримати якнайбільше монстрів для прикриття відходу та виснаження диверсантів противника."/>
+  <attstr name="text" language="Русский" val="Господин, наша разведка сообщает об ордах древних монстров, двигающих с севера и уничтожающих все на своем пути. Нам не удастся удержать оборону на границе и придется отступать до столицы, чтобы взять клин противника в окружение и перехватить стратегическое преимущество. Мы должны сдержать как можно больше монстров для прикрытия отхода и истощения диверсантов противника."/>
  </section>
 </params>

@@ -186,8 +186,10 @@ void Wave::pause()
 void Wave::resume()
 {
     if (timerRemainingTimeOnPause) {
-        timerRemainingTimeOnPause = 0;
         timerBetweenEnemies.start(timerRemainingTimeOnPause);
+        timerRemainingTimeOnPause = 0;
+    } else {
+        timerBetweenEnemies.start();
     }
 
     for (auto enemy : groupOfEnemies) {

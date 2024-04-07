@@ -167,9 +167,11 @@ void Tower::pause()
 
 void Tower::resume()
 {
-    if (timerRemainingTimeOnPause) {
-        timerRemainingTimeOnPause = 0;
+    if (timerRemainingTimeOnPause > 0) {
         attackTimer.start(timerRemainingTimeOnPause);
+        timerRemainingTimeOnPause = 0;
+    } else {
+        attackTimer.start();
     }
 
     for (auto bullet : bullets) {

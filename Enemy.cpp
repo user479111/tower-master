@@ -289,7 +289,9 @@ void Enemy::pause()
 void Enemy::resume()
 {
     if (timerRemainingTimeOnPause) {
-        timerRemainingTimeOnPause = 0;
         moveTimer.start(timerRemainingTimeOnPause);
+        timerRemainingTimeOnPause = 0;
+    } else {
+        moveTimer.start();
     }
 }

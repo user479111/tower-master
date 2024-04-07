@@ -6,9 +6,9 @@
   <attstr name="text" language="Русский" val="Битва в пригородном лесу"/>
  </section>
  <attstr name="location" val="SuburbanForest"/>
- <section name="message">
-  <attstr name="text" language="English" val=""/>
-  <attstr name="text" language="Українська" val=""/>
-  <attstr name="text" language="Русский" val=""/>
+ <section name="start-message">
+  <attstr name="text" language="English" val="We retreated to more advantageous defensive positions. Just in time. According to intelligence data, there are now more serious enemy formations on the border. As before, our task is to exhaust the attacking monster troops and gain time to prepare the defense of the capital."/>
+  <attstr name="text" language="Українська" val="Ми встигли вчасно відійти на більш вигідні для оборони позиції. Згідно з даними розвідки, зараз на кордоні знаходяться більш серйозні формування противника. Як і раніше, наша задача - виснажити наступаючі загони монстрів і виграти час для підготовки оборони столиці."/>
+  <attstr name="text" language="Русский" val="Мы успели вовремя отойти на более выгодные для обороны позиции. Согласно данным разведки, сейчас на границе находятся более серьезные формирования противника. По-прежнему, наша задача – истощить наступающие отряды монстров и выиграть время для подготовки обороны столицы."/>
  </section>
 </params>

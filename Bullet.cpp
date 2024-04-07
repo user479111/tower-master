@@ -84,9 +84,11 @@ void Bullet::pause()
 
 void Bullet::resume()
 {
-    if (timerRemainingTimeOnPause) {
-        timerRemainingTimeOnPause = 0;
+    if (timerRemainingTimeOnPause > 0) {
         moveTimer.start(timerRemainingTimeOnPause);
+        timerRemainingTimeOnPause = 0;
+    }  else {
+        moveTimer.start();
     }
 }
 

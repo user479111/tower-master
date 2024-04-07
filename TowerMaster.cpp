@@ -24,7 +24,7 @@ TowerMaster::TowerMaster() :
 
     menuProcessor = new MenuProcessor(preferences, scene);
 
-    connect(menuProcessor, &MenuProcessor::keyChoiseMade, this, &TowerMaster::handleMenuProcessor);
+    connect(menuProcessor, &MenuProcessor::keyChoiceMade, this, &TowerMaster::handleMenuProcessor);
 }
 
 TowerMaster::~TowerMaster()
@@ -123,7 +123,7 @@ void TowerMaster::handleGameProcessor()
         gameProcessor = nullptr;
     }
 
-    connect(menuProcessor, &MenuProcessor::keyChoiseMade, this, &TowerMaster::handleMenuProcessor);
+    connect(menuProcessor, &MenuProcessor::keyChoiceMade, this, &TowerMaster::handleMenuProcessor);
     // Back to main menu => => process = Process::Menu && delete gameProcessor;
     // Quit delete gameProcessor; => quit
 }
@@ -135,7 +135,7 @@ void TowerMaster::handleMenuProcessor()
         case MenuProcessor::StartGame:
         {
             // StartGame => Read Params => process = Process::Game && delete menuProcessor;
-            gameProcessor = new GameProcessor(preferences, scene, menuProcessor->getLocationChoice(), cursor);
+            gameProcessor = new GameProcessor(preferences, scene, menuProcessor->getLevelChoiceId(), cursor);
 
             if (menuProcessor) {
                 delete menuProcessor;
