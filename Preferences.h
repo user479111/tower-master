@@ -13,6 +13,12 @@ struct Resolution {
 class Preferences
 {
 public:
+    enum GameMode {
+        Company
+      , Battle
+    //, Network - for example
+    };
+
     Preferences();
 
     const QString &getLanguage() const;
@@ -34,6 +40,10 @@ public:
     const QString findOptionByNameAndIndex(const QString &optionName,
                                            const int &optionIndex) const;
 
+    GameMode getGameMode() const;
+
+    void setGameMode(GameMode newGameMode);
+
 private:
     void loadXmlParameters();
 
@@ -46,6 +56,8 @@ private:
     Resolution  resolution;
     QString     resolutionString;
     QString     language;
+
+    GameMode    gameMode;
 
 };
 

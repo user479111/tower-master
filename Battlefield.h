@@ -6,6 +6,7 @@
 #include <QTimer>
 #include <QList>
 
+#include "Level.h"
 #include "Location.h"
 #include "Cursor.h"
 #include "Tower.h"
@@ -19,7 +20,7 @@ class Battlefield : public QObject
 public:
     Battlefield(QGraphicsScene * scene,
                 Cursor * cursor,
-                Location * location);
+                Level * level);
     ~Battlefield();
 
     bool eventFilter(QObject *obj, QEvent *event);
@@ -45,6 +46,8 @@ public:
 
     void updateGameObjectsHighlighting();
 
+    Level *getLevel() const;
+
 signals:
     void battlefieldScaled();
     void enemiesHaveBeenRun();
@@ -67,7 +70,7 @@ private slots:
 private:
     QGraphicsScene * scene;
     Cursor * cursor;
-    Location * location;
+    Level * level;
 
     QList<Tower*> towers;
 

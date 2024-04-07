@@ -6,9 +6,16 @@
   <attstr name="text" language="Русский" val="Битва за столицу"/>
  </section>
  <attstr name="location" val="CapitalEntrance"/>
- <section name="message">
-  <attstr name="text" language="English" val=""/>
-  <attstr name="text" language="Українська" val=""/>
-  <attstr name="text" language="Русский" val=""/>
+ <section name="start-message">
+  <attstr name="text" language="English" val="We've dealt a good blow to the enemy and bought enough time. The positions for defending the city were well-prepared. We need to equip them to repel the enemy assault and prepare for a counterattack. Monster squads are already in the vicinity. The capital must stand strong!"/>
+  <attstr name="text" language="Українська" val="Ми добре пошматували противника і виграли достатньо часу. Позиції для оборони міста були добре підготовлені. Ми маємо обладнати їх для відбиття ворожого штурму і підготовки до контр наступу. Загони монстрів вже на околицях. Столиця повинна встояти!"/>
+  <attstr name="text" language="Русский" val="Мы хорошо потрепали противника и выиграли достаточно времени. Позиции для обороны города были хорошо подготовлены. Мы должны оборудовать их для отражения вражеского штурма и подготовки к контрнаступлению. Отряды монстров уже в окрестностях. Столица должна устоять!"/>
+ </section>
+ <section name="victory-message">
+  <attstr name="text" language="English" val="We did it! The enemy's advance has been repelled. We've received a message from our allies. They're already attacking enemy units from the flanks. It's time to begin the counterattack!"/>
+  <attstr name="text" language="Українська" val="Нам вдалося! Наступ противника відбитий. Нам надійшло повідомлення від союзників. Вони вже атакують підрозділи ворога з флангів. Настав час починати контратаку!"/>
+  <attstr name="text" language="Русский" val="Нам удалось! Наступление противника отражено. Нам поступило сообщение от союзников. Они уже атакуют подразделения противника с флангов. Пришло время начинать контратаку!"/>
  </section>
 </params>
+
+

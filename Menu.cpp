@@ -177,21 +177,39 @@ void Menu::readMenuItemXml(MenuItem * newItem, const QDomNodeList &menuItemAttri
 
                 if (QString(currentElement.attributes().namedItem("val").nodeValue()) == "top-left") {
                     newItem->setAlign(MenuItem::Align::TopLeft);
+
+                    newItem->setPos(QPointF(
+                                        board->x() + QString(
+                                            currentElement.
+                                            attributes().
+                                            namedItem("x").
+                                            nodeValue()).
+                                            toFloat(),
+                                        board->y() + QString(
+                                            currentElement.
+                                            attributes().
+                                            namedItem("y").
+                                            nodeValue()).
+                                                    toFloat()));
+
+                } else {
+
+                    newItem->setPos(QPointF(
+                                        QString(
+                                            currentElement.
+                                            attributes().
+                                            namedItem("x").
+                                            nodeValue()).
+                                            toFloat(),
+                                        QString(
+                                            currentElement.
+                                            attributes().
+                                            namedItem("y").
+                                            nodeValue()).
+                                                    toFloat()));
+
                 }
 
-                newItem->setPos(QPointF(
-                                    QString(
-                                        currentElement.
-                                        attributes().
-                                        namedItem("x").
-                                        nodeValue()).
-                                        toFloat(),
-                                    QString(
-                                        currentElement.
-                                        attributes().
-                                        namedItem("y").
-                                        nodeValue()).
-                                                toFloat()));
             }
 
             if (!QString(currentElement.attributes().namedItem("z").nodeValue()).isEmpty()) {
@@ -434,6 +452,8 @@ void Menu::setBoardPos(const qreal &x, const qreal &y)
 
 void Menu::setBoardPos(const QPointF &pos)
 {
+    QPointF prevPos = board->pos();
+
     board->setPos(pos);
 
     QPointF boardCenter = QPointF(board->pos().x() + board->boundingRect().width() / 2,
@@ -453,7 +473,7 @@ void Menu::setBoardPos(const QPointF &pos)
                 break;
             }
             case MenuItem::Align::TopLeft: {
-                item->setPos(QPointF(board->x() + item->x(), board->y() + item->y()));
+                item->setPos(QPointF(board->x() + item->x() - prevPos.x(), board->y() + item->y() - prevPos.y()));
                 break;
             }
             case MenuItem::Align::Global: {

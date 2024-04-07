@@ -121,7 +121,7 @@ void ScrollOption::setTitle(const QString &newTitle)
     title = newTitle;
 }
 
-QString ScrollOption::getOptionChoise() const
+QString ScrollOption::getOptionChoice() const
 {
     return currentOption->toPlainText();
 }

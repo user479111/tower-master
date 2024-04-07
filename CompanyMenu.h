@@ -2,8 +2,9 @@
 #define COMPANYMENU_H
 
 #include "Menu.h"
+#include "LevelInfo.h"
 #include "Preferences.h"
-#include "LocationItem.h"
+#include "MenuTextItem.h"
 
 #include <QGraphicsPixmapItem>
 #include <QGraphicsScene>
@@ -18,7 +19,6 @@ public:
     virtual ~CompanyMenu();
 
     void prepare();
-    void prepareLevel(const QString & id, bool active);
 
     void show(QGraphicsScene * scene);
     void hide(QGraphicsScene * scene);
@@ -33,33 +33,28 @@ public:
 
     void setMapPreviewScale(float newMapPreviewScale);
 
-    void setLevelInfoPos(QPointF newLevelInfoPos);
+    void setInfoPos(QPointF newInfoPos);
 
-    void setLevelInfoFontSize(float newLevelInfoFontSize);
+    void setInfoFontSize(float newInfoFontSize);
 
     void setLevelListPos(QPointF newLevelListPos);
 
     void setLevelListWidth(int newLevelListWidth);
 
-    const QString &getLevelChoice() const;
-
-    void setLevelInfoWidth(int newLevelInfoWidth);
+    const int getLevelChoiceId() const;
 
 protected:
     void loadXmlParameters();
 
 public slots:
-    void processLevelClick(LocationItem * choise);
+    void processLevelClick(MenuTextItem * Choice);
 
 private:
     static const QString XML_FILE_NAME;
     static const QString SAVE_COMPANY_FILE;
-    static const QString LOCATIONS_DIRECTORY;
-    static const QString LEVEL_DIR_PREFIX;
-    static const QString LEVEL_FILE_NAME;
     const Preferences * preferences;
 
-    QList<LocationItem*> levels;
+    QMap<LevelInfo *, MenuTextItem *> levels;
     QPointF levelListPos;
     int levelListFontSize;
     int levelListInterval;
@@ -70,12 +65,12 @@ private:
     QPointF mapPreviewPos;
     float mapPreviewScale;
 
-    QGraphicsTextItem* levelInfo;
-    QPointF levelInfoPos;
-    float levelInfoFontSize;
-    int levelInfoWidth;
+    QGraphicsTextItem* info;
+    QPointF infoPos;
+    float infoFontSize;
 
-    QString levelChoice;
+    int levelChoiceId;
+
 };
 
 #endif // COMPANYMENU_H

@@ -6,7 +6,7 @@
 const QString MessageMenu::XML_FILE_NAME  = "MessageMenu.xml";
 
 const QString MessageMenu::FONT_STYLE = "Helvetica [Cronyx]";
-const int     MessageMenu::FONT_SIZE  = 20;
+const int     MessageMenu::FONT_SIZE  = 15;
 const float   MessageMenu::SPACE_FACTOR = 0.8;
 
 MessageMenu::MessageMenu(const Preferences * preferences)

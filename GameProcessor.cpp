@@ -5,16 +5,16 @@
 
 GameProcessor::GameProcessor(Preferences * preferences,
                              QGraphicsScene * scene,
-                             QString locationName,
+                             int levelId,
                              Cursor * cursor,
                              QObject * parent)
     : QObject(parent),
       scene(scene),
       cursor(cursor),
       preferences(preferences),
-      locationName(locationName),
-      location(new Location(scene, locationName)),
-      battlefield(new Battlefield(scene, cursor, location)),
+      levelId(levelId),
+      level(new Level(preferences, scene, levelId)),
+      battlefield(new Battlefield(scene, cursor, level)),
       gameInterface(new GameInterface(preferences, scene, cursor, battlefield))
 {
     scene->setBackgroundBrush(QBrush(Qt::black));
@@ -27,8 +27,8 @@ GameProcessor::GameProcessor(Preferences * preferences,
 
 GameProcessor::~GameProcessor()
 {
-    if (location) {
-        delete location;
+    if (level) {
+        delete level;
     }
 
     if (battlefield) {
@@ -51,15 +51,15 @@ void GameProcessor::processRestartClick()
 
     cursor->setPos(scene->views().first()->mapFromGlobal(QCursor::pos()));
 
-    if (location) {
-        delete location;
+    if (level) {
+        delete level;
     }
-    location = new Location(scene, locationName);
+    level = new Level(preferences, scene, levelId);
 
     if (battlefield) {
         delete battlefield;
     }
-    battlefield = new Battlefield(scene, cursor, location);
+    battlefield = new Battlefield(scene, cursor, level);
 
     if (gameInterface) {
         delete gameInterface;

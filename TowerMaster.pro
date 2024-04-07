@@ -21,11 +21,13 @@ SOURCES += \
     GameObject.cpp \
     GameOverMenu.cpp \
     GameProcessor.cpp \
+    Level.cpp \
+    LevelInfo.cpp \
     Location.cpp \
-    LocationItem.cpp \
     Menu.cpp \
     MenuItem.cpp \
     MenuProcessor.cpp \
+    MenuTextItem.cpp \
     MessageMenu.cpp \
     Minimap.cpp \
     PauseMenu.cpp \
@@ -50,11 +52,13 @@ HEADERS += \
     GameObject.h \
     GameOverMenu.h \
     GameProcessor.h \
+    Level.h \
+    LevelInfo.h \
     Location.h \
-    LocationItem.h \
     Menu.h \
     MenuItem.h \
     MenuProcessor.h \
+    MenuTextItem.h \
     MessageMenu.h \
     Minimap.h \
     PauseMenu.h \
