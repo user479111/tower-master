@@ -36,7 +36,8 @@ SOURCES += \
     SettingsMenu.cpp \
     Tower.cpp \
     TowerMaster.cpp \
-    VictoryMenu.cpp \
+    VictoryMenuContinue.cpp \
+    VictoryMenuEnd.cpp \
     Wave.cpp \
     main.cpp
 
@@ -67,7 +68,8 @@ HEADERS += \
     SettingsMenu.h \
     Tower.h \
     TowerMaster.h \
-    VictoryMenu.h \
+    VictoryMenuContinue.h \
+    VictoryMenuEnd.h \
     Wave.h
 
 FORMS +=

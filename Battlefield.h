@@ -48,6 +48,9 @@ public:
 
     Level *getLevel() const;
 
+    bool getLevelCompleted() const;
+    void setLevelCompleted(bool newLevelCompleted);
+
 signals:
     void battlefieldScaled();
     void enemiesHaveBeenRun();
@@ -82,6 +85,7 @@ private:
     float minScale;
 
     bool paused;
+    bool levelCompleted;
 
     int enemyReachedNumber; // Number of enemies that have reached the end of the route
 };

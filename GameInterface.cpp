@@ -51,7 +51,8 @@ GameInterface::GameInterface(Preferences * preferences,
     infoBoardDisplayed(false),
     pauseMenu(new PauseMenu(preferences)),
     gameOverMenu(new GameOverMenu(preferences)),
-    victoryMenu(new VictoryMenu(preferences)),
+    victoryMenuEnd(new VictoryMenuEnd(preferences)),
+    victoryMenuContinue(new VictoryMenuContinue(preferences)),
     messageMenu(new MessageMenu(preferences)),
     hide(false)
 {
@@ -290,8 +291,11 @@ GameInterface::GameInterface(Preferences * preferences,
     connect(gameOverMenu, &GameOverMenu::mainMenuClicked, this, &GameInterface::processMainMenuClick);
 
     // Prepare for Victory Menu signals
-    connect(victoryMenu, &VictoryMenu::restartClicked, this, &GameInterface::processRestartClick);
-    connect(victoryMenu, &VictoryMenu::mainMenuClicked, this, &GameInterface::processMainMenuClick);
+    connect(victoryMenuEnd, &VictoryMenuEnd::restartClicked, this, &GameInterface::processRestartClick);
+    connect(victoryMenuEnd, &VictoryMenuEnd::mainMenuClicked, this, &GameInterface::processMainMenuClick);
+    connect(victoryMenuContinue, &VictoryMenuContinue::restartClicked, this, &GameInterface::processRestartClick);
+    connect(victoryMenuContinue, &VictoryMenuContinue::mainMenuClicked, this, &GameInterface::processMainMenuClick);
+    connect(victoryMenuContinue, &VictoryMenuContinue::continueClicked, this, &GameInterface::processContinueClick);
 
     // Prepare for Message Menu signals
     connect(messageMenu, &MessageMenu::closeClicked, this, &GameInterface::processCloseClick);
@@ -323,7 +327,8 @@ GameInterface::~GameInterface()
 
     delete pauseMenu;
     delete gameOverMenu;
-    delete victoryMenu;
+    delete victoryMenuEnd;
+    delete victoryMenuContinue;
 
     delete totalBaseHealthBar;
     delete currentBaseHealthBar;
@@ -555,6 +560,17 @@ void GameInterface::warnThePlayer()
 
     // Show the Pause menu
     messageMenu->show(scene);
+}
+
+void GameInterface::showVictoryMenu()
+{
+    // Show the Victory menu
+    if (preferences->getGameMode() == Preferences::GameMode::Company &&
+            battlefield->getLevel()->nextLevelExists()) {
+        victoryMenuContinue->show(scene);
+    } else {
+        victoryMenuEnd->show(scene);
+    }
 }
 
 // Move all the interface items with the scene
@@ -846,16 +862,26 @@ void GameInterface::processMainMenuClick()
     emit mainMenuSignal();
 }
 
+void GameInterface::processContinueClick()
+{
+    emit nextLevel();
+}
+
 void GameInterface::processCloseClick()
 {
     // Hide the Pause menu
     messageMenu->hide(scene);
 
-    // Allow map scrolling
-    cursor->setScrollAreaRect(battlefield->getLocation()->mapRectToScene(battlefield->getLocation()->boundingRect()));
+    if (battlefield->getLevelCompleted()) {
+        showVictoryMenu();
+    } else {
+        // Allow map scrolling
+        cursor->setScrollAreaRect(battlefield->getLocation()->mapRectToScene(
+                                      battlefield->getLocation()->boundingRect()));
 
-    // Resume battlefield events
-    battlefield->resume();
+        // Resume battlefield events
+        battlefield->resume();
+    }
 }
 
 void GameInterface::processGameObjectClicked(const GameObject *object)
@@ -891,14 +917,32 @@ void GameInterface::processGameOver()
 
 void GameInterface::processVictory()
 {
+    if (preferences->getGameMode() == Preferences::GameMode::Company) {
+
+        // Activate next level
+        if (battlefield->getLevel()->nextLevelExists()) {
+            preferences->activateNextCompanyLevel(battlefield->getLevel()->getId() + 1);
+        }
+
+    }
+
     // Pause battlefield events
     battlefield->pause();
 
     // Pause map scroll
     cursor->setScrollAreaRect(scene->sceneRect());
 
-    // Show the Victory menu
-    victoryMenu->show(scene);
+    if (preferences->getGameMode() == Preferences::GameMode::Company &&
+            !battlefield->getLevel()->getVictoryMessage().isEmpty()) {
+
+        messageMenu->setMessageText(battlefield->getLevel()->getVictoryMessage());
+
+        // Show the Victory message
+        messageMenu->show(scene);
+    } else {
+        showVictoryMenu();
+    }
+
 }
 
 void GameInterface::processEnemyAttack()

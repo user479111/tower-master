@@ -16,7 +16,6 @@ public:
     enum GameMode {
         Company
       , Battle
-    //, Network - for example
     };
 
     Preferences();
@@ -44,12 +43,17 @@ public:
 
     void setGameMode(GameMode newGameMode);
 
+    // Update SaveCompany.xml
+    void activateNextCompanyLevel(int id) const;
+
 private:
     void loadXmlParameters();
 
 private:
     static const QString PREFERENCES_FILE;
     static const QString SETTINGS_FILE;
+
+    static const QString SAVE_COMPANY_FILE;
 
     bool        fullscreen;
     QString     fullscreenString;

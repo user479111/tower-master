@@ -22,6 +22,7 @@ GameProcessor::GameProcessor(Preferences * preferences,
     scene->installEventFilter(this);
 
     connect(gameInterface, &GameInterface::restart, this, &GameProcessor::processRestartClick);
+    connect(gameInterface, &GameInterface::nextLevel, this, &GameProcessor::processNextLevelSignal);
     connect(gameInterface, &GameInterface::mainMenuSignal, this, &GameProcessor::processMainMenuClick);
 }
 
@@ -67,10 +68,18 @@ void GameProcessor::processRestartClick()
     gameInterface = new GameInterface(preferences, scene, cursor, battlefield);
 
     connect(gameInterface, &GameInterface::restart, this, &GameProcessor::processRestartClick);
+    connect(gameInterface, &GameInterface::nextLevel, this, &GameProcessor::processNextLevelSignal);
     connect(gameInterface, &GameInterface::mainMenuSignal, this, &GameProcessor::processMainMenuClick);
 }
 
 void GameProcessor::processMainMenuClick()
 {
     emit mainMenuSignal();
+}
+
+void GameProcessor::processNextLevelSignal()
+{
+    levelId++;
+
+    processRestartClick();
 }

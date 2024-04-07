@@ -27,6 +27,9 @@ public:
     const QString &getVictoryMessage() const;
     void setVictoryMessage(const QString &newVictoryMessage);
 
+    // Check next level existence
+    bool nextLevelExists() const;
+
 private:
     void loadXmlParameters();
 

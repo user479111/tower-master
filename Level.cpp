@@ -2,6 +2,7 @@
 
 #include <QFile>
 #include <QDebug>
+#include <QFileInfo>
 #include <QtXml/QDomDocument>
 
 const QString Level::LEVEL_DIR_PREFIX = ":/Data/Data/Company/Levels/level_";
@@ -113,6 +114,18 @@ const QString &Level::getVictoryMessage() const
 void Level::setVictoryMessage(const QString &newVictoryMessage)
 {
     victoryMessage = newVictoryMessage;
+}
+
+// Check next level existence
+bool Level::nextLevelExists() const
+{
+    QFileInfo fileInfo(LEVEL_DIR_PREFIX + QString::number(id+1) + "/" + LEVEL_FILE_NAME);
+
+    if (fileInfo.exists() && fileInfo.isFile()) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
 const QString &Level::getStartMessage() const

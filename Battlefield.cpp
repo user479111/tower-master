@@ -17,6 +17,7 @@ Battlefield::Battlefield(QGraphicsScene * scene,
     currentWaveIndex(0),
     minScale(0.0),
     paused(false),
+    levelCompleted(false),
     enemyReachedNumber(0)
 {
     // display location
@@ -304,6 +305,7 @@ void Battlefield::startNextWave()
     timerBetweenWaves.setInterval(level->getLocation()->getWaves().at(currentWaveIndex)->getInterval() * 1000);
 
     if (currentWaveIndex + 1 == level->getLocation()->getWaves().size()) {
+        levelCompleted = true;
         emit victory();
         return;
     } else {
@@ -343,6 +345,16 @@ void Battlefield::processHighlightedEnemyOut()
 void Battlefield::processHighlightedEnemyUpdate(const Enemy *enemy)
 {
     emit highlightedEnemyUpdate(enemy);
+}
+
+bool Battlefield::getLevelCompleted() const
+{
+    return levelCompleted;
+}
+
+void Battlefield::setLevelCompleted(bool newLevelCompleted)
+{
+    levelCompleted = newLevelCompleted;
 }
 
 Level *Battlefield::getLevel() const

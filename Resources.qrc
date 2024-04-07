@@ -40,7 +40,7 @@
         <file>Data/Preferences/Preferences.xml</file>
         <file>Data/Menu/PauseMenu.xml</file>
         <file>Data/Menu/GameOverMenu.xml</file>
-        <file>Data/Menu/VictoryMenu.xml</file>
+        <file>Data/Menu/VictoryMenuEnd.xml</file>
         <file>Data/Game/InfoDesk.png</file>
         <file>Data/Towers/Tower_001/Tower.xml</file>
         <file>Data/Enemies/FireAtronarch/Enemy.xml</file>
@@ -57,5 +57,6 @@
         <file>Data/Company/Levels/level_0/Level.xml</file>
         <file>Data/Company/Levels/level_1/Level.xml</file>
         <file>Data/Company/Levels/level_2/Level.xml</file>
+        <file>Data/Menu/VictoryMenuContinue.xml</file>
     </qresource>
 </RCC>

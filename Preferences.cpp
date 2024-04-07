@@ -7,6 +7,8 @@
 const QString Preferences::PREFERENCES_FILE = "./Data/Preferences/Preferences.xml";
 const QString Preferences::SETTINGS_FILE = ":/Data/Data/Menu/SettingsMenu.xml";
 
+const QString Preferences::SAVE_COMPANY_FILE = "./Data/Company/SaveCompany.xml";
+
 Preferences::Preferences()
     : fullscreen(false),
       fullscreenString("Off"),
@@ -66,6 +68,47 @@ void Preferences::loadXmlParameters()
 void Preferences::setGameMode(GameMode newGameMode)
 {
     gameMode = newGameMode;
+}
+
+void Preferences::activateNextCompanyLevel(int id) const
+{
+    QDomDocument doc;
+    QFile file(SAVE_COMPANY_FILE);
+
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qDebug() << "Failed to open XML file for reading: " << SAVE_COMPANY_FILE;
+        return;
+    }
+
+    if (!doc.setContent(&file)) {
+        qDebug() << "Failed to parse XML content: " << SAVE_COMPANY_FILE;
+        file.close();
+        return;
+    }
+
+    QDomElement root = doc.documentElement();
+    QDomNodeList attstrList = root.elementsByTagName("attnum");
+
+    for (int i = 0; i < attstrList.size(); ++i) {
+        QDomElement attstr = attstrList.at(i).toElement();
+        QString name = attstr.attribute("name");
+        int levelId = attstr.attribute("id").toInt();
+
+        if (name == "level" && levelId == id) {
+            attstr.setAttribute("active", QString::number(1));
+        }
+    }
+
+    file.close();
+
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
+        qDebug() << "Failed to open XML file for writing: " << SAVE_COMPANY_FILE;
+        return;
+    }
+
+    QTextStream stream(&file);
+    stream << doc.toString();
+    file.close();
 }
 
 Preferences::GameMode Preferences::getGameMode() const
