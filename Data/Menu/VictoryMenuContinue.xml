@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<params name="victory-menu">
+
+    <section name="menu">
+        <attstr name="menu-image" val="MenuBoard.png"/>
+        <attpos x="0" y="0" z='1' val="center"/>
+    </section>
+
+    <section name="menu-content">
+        <section name="restart" type="menu-item">
+            <attpos x="0" y="0" z="1" val="center"/>
+            <attnum name="fixed-size" val="false"/>
+            <attstr name="image" val="Scroll.png"/>
+            <attstr name="text" language="English" val="Restart"/>
+            <attstr name="text" language="Українська" val="Спочатку"/>
+            <attstr name="text" language="Русский" val="Сначала"/>
+        </section>
+        <section name="main-menu" type="menu-item">
+            <attpos x="0" y="0" z="1" val="center"/>
+            <attnum name="fixed-size" val="false"/>
+            <attstr name="image" val="Scroll.png"/>
+            <attstr name="text" language="English" val="Main menu"/>
+            <attstr name="text" language="Українська" val="Головне меню"/>
+            <attstr name="text" language="Русский" val="Главное меню"/>
+        </section>
+        <section name="continue" type="menu-item">
+            <attpos x="0" y="0" z="1" val="center"/>
+            <attnum name="fixed-size" val="false"/>
+            <attstr name="image" val="Scroll.png"/>
+            <attstr name="text" language="English" val="Continue"/>
+            <attstr name="text" language="Українська" val="Продовжити"/>
+            <attstr name="text" language="Русский" val="Продолжить"/>
+        </section>
+    </section>
+
+</params>

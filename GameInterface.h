@@ -18,7 +18,8 @@
 #include "PauseMenu.h"
 #include "Battlefield.h"
 #include "Preferences.h"
-#include "VictoryMenu.h"
+#include "VictoryMenuEnd.h"
+#include "VictoryMenuContinue.h"
 #include "GameOverMenu.h"
 #include "MessageMenu.h"
 
@@ -42,6 +43,7 @@ public:
 
     void showStartMessage();
     void warnThePlayer();
+    void showVictoryMenu();
 
 private slots:
     void processScroll();
@@ -67,6 +69,7 @@ private slots:
     void processResumeClick();
     void processRestartClick();
     void processMainMenuClick();
+    void processContinueClick();
     void processCloseClick();
 
     void processGameObjectClicked(const GameObject * object);
@@ -76,6 +79,7 @@ private slots:
 signals:
     void mainMenuSignal();
     void restart();
+    void nextLevel();
 
 private:
     static const float BUILD_ITEM_SCALE;
@@ -135,7 +139,8 @@ private:
     // (InGameMenu -> pause, game over, victory, message)
     PauseMenu * pauseMenu;
     GameOverMenu * gameOverMenu;
-    VictoryMenu * victoryMenu;
+    VictoryMenuEnd * victoryMenuEnd;
+    VictoryMenuContinue * victoryMenuContinue;
     MessageMenu * messageMenu;
     bool hide;
 };

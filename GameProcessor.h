@@ -27,6 +27,7 @@ public:
 private slots:
     void processRestartClick();
     void processMainMenuClick();
+    void processNextLevelSignal();
 
 signals:
     void mainMenuSignal();
