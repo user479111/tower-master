@@ -58,5 +58,6 @@
         <file>Data/Company/Levels/level_1/Level.xml</file>
         <file>Data/Company/Levels/level_2/Level.xml</file>
         <file>Data/Menu/VictoryMenuContinue.xml</file>
+        <file>Data/Menu/CreditsMenu.xml</file>
     </qresource>
 </RCC>

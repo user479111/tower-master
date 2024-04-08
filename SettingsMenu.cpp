@@ -18,7 +18,7 @@ void SettingsMenu::show(QGraphicsScene *scene)
 {
     // Load image
     QPixmap backgroundImage(MENU_DIRECTORY + getBackgroundImage());
-     // Scale it to the screen size
+    // Scale it to the screen size
     backgroundImage = backgroundImage.scaled(scene->width(),
                                              scene->height(),
                                              Qt::IgnoreAspectRatio,
