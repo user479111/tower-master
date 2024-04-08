@@ -10,6 +10,7 @@ MenuProcessor::MenuProcessor(Preferences * preferences,
     companyMenu(new CompanyMenu(preferences)),
     battleMenu(new BattleMenu(preferences)),
     settingsMenu(new SettingsMenu(preferences)),
+    creditsMenu(new CreditsMenu(preferences)),
     choice(StayInMenu),
     levelChoiceId(0)
 {
@@ -23,6 +24,7 @@ MenuProcessor::MenuProcessor(Preferences * preferences,
     connect(companyMenu, &Menu::itemClicked, this, &MenuProcessor::processItemClick);
     connect(battleMenu, &Menu::itemClicked, this, &MenuProcessor::processItemClick);
     connect(settingsMenu, &Menu::itemClicked, this, &MenuProcessor::processItemClick);
+    connect(creditsMenu, &Menu::itemClicked, this, &MenuProcessor::processItemClick);
 }
 
 MenuProcessor::~MenuProcessor()
@@ -49,7 +51,7 @@ void MenuProcessor::processItemClick()
         } else if (currentMenu->transition() == "settings") {
             currentMenu = settingsMenu;
         } else if (currentMenu->transition() == "credits") {
-            // Process CreditsMenu class.
+            currentMenu = creditsMenu;
         } else if (currentMenu->transition() == "quit") {
 
             choice = Quit;
@@ -93,12 +95,18 @@ void MenuProcessor::processItemClick()
             baseMenu->resetItemsLanguage();
             battleMenu->resetItemsLanguage();
             settingsMenu->resetItemsLanguage();
-            //creditsMenu->resetItemsLanguage();
+            creditsMenu->resetItemsLanguage();
 
             choice = ApplySettings;
             emit  keyChoiceMade();
 
             choice = StayInMenu;
+        }
+
+    } else if (dynamic_cast<CreditsMenu*>(currentMenu)) {
+
+        if (currentMenu->transition() == "back") {
+            currentMenu = baseMenu;
         }
 
     } else {

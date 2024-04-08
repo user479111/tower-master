@@ -55,7 +55,6 @@ void MessageMenu::show(QGraphicsScene *scene)
     }
 
     // Show the Message
-
     messageTextItem->setDefaultTextColor(Qt::black);
     messageTextItem->setFont(QFont(FONT_STYLE, FONT_SIZE, QFont::Bold));
     messageTextItem->setPos(getBoard()->x() + getBoard()->boundingRect().width() / 2 - messageTextItem->boundingRect().width() / 2,

@@ -14,6 +14,7 @@
 #include "BattleMenu.h"
 #include "Preferences.h"
 #include "SettingsMenu.h"
+#include "CreditsMenu.h"
 
 class MenuProcessor : public QObject
 {
@@ -43,7 +44,7 @@ private:
     CompanyMenu * companyMenu;
     BattleMenu * battleMenu;
     SettingsMenu * settingsMenu;
-    //CreditsMenu * subMenuCreadits;
+    CreditsMenu * creditsMenu;
 
     Choice choice;
     int levelChoiceId;

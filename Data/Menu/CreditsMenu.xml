@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<params name="game-over-menu">
+
+    <section name="background">
+        <attstr name="background-image" val="MainMenuTower.png"/>
+    </section>
+
+    <section name="menu">
+        <attstr name="menu-image" val="SettingsBoard.png"/>
+        <attpos x="50" y="0" z='1'/>
+    </section>
+
+    <section name="menu-content">
+        <section name="back" type="menu-item">
+            <attpos x="495" y="395" z="1" val="top-left"/>
+            <attnum name="fixed-size" val="false"/>
+            <attstr name="image" val="Scroll.png"/>
+            <attstr name="text" language="English" val="Back"/>
+            <attstr name="text" language="Українська" val="Назад"/>
+            <attstr name="text" language="Русский" val="Назад"/>
+        </section>
+    </section>
+
+    <section name="credits-content">
+        <section name="row" id="0">
+            <attstr name="text" language="English" val="TowerMaster is a free game project designed for educational purposes."/>
+            <attstr name="text" language="Українська" val="TowerMaster — безкоштовний ігровий проект, розроблений для освітніх цілей."/>
+            <attstr name="text" language="Русский" val="TowerMaster — бесплатный игровой проект, созданный для образовательных целей."/>
+        </section>
+        <section name="row" id="1">
+            <attstr name="text" language="English" val="Stepan Tsukanov - author, developer, artist"/>
+            <attstr name="text" language="Українська" val="Степан Цуканов - автор, розробник, художник"/>
+            <attstr name="text" language="Русский" val="Степан Цуканов - автор, разработчик, художник"/>
+        </section>
+    </section>
+
+</params>
